@@ -1,8 +1,10 @@
 import * as express from 'express'
-import { Application, Request, Response } from 'express'
+import { Application } from 'express'
+import 'dotenv/config'
+import routes from './routes'
 
 const app: Application = express()
 
-app.get('/', (req: Request, res: Response) => res.send('HE1HE1HE1'))
+app.use(routes)
 
-app.listen(3000)
+app.listen(process.env.PORT)
