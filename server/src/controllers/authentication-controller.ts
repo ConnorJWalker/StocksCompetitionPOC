@@ -10,14 +10,25 @@ const SignUp = async (req: Request, res: Response) => {
         return res.send({ errors: signupValidator.validationErrors })
     }
 
-    const token = await AuthenticationService.CreateUser(signupForm)
+    const token = await AuthenticationService.SignUp(signupForm)
 
     res.statusCode = 201
     return res.send({ token })
 }
 
-const LogIn = (req: Request, res: Response) => {
-    return res.send('Log In')
+const LogIn = async (req: Request, res: Response) => {
+    if (!req.body || !req.body.discordUsername || !req.body.password) {
+        res.statusCode = 400
+        return res.send({ error: 'discord username and password are required' })
+    }
+
+    const token = await AuthenticationService.LogIn(req.body)
+    if (token === null) {
+        res.statusCode = 401
+        return res.send({ error: 'discord username or password is incorrect' })
+    }
+
+    return res.send({ token })
 }
 
 const Refresh = (req: Request, res: Response) => {

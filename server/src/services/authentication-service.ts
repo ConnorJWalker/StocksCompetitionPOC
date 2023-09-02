@@ -1,30 +1,33 @@
 import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
 import ISignupForm from '../models/dto/isignup-form'
-import { User } from '../config/database'
+import DatabaseService from './database-service'
+import IUser, {IUserWithSecrets} from '../models/iuser'
+import ILoginForm from '../models/dto/ilogin-form'
 
-const CreateUser = async (signupForm: ISignupForm): Promise<string> => {
-    const user = await User.create({
-        displayName: signupForm.displayName,
-        discordUsername: signupForm.discordUsername,
-        profilePicture: signupForm.profilePicture,
-        displayColour: signupForm.displayColour,
-        password: await bcrypt.hash(signupForm.password, 10),
-        apiKey: signupForm.apiKey
-    })
+const SignUp = async (signupForm: ISignupForm): Promise<string> => {
+    const hashedPassword = await bcrypt.hash(signupForm.password, 10)
+    const user = await DatabaseService.CreateUser(signupForm, hashedPassword)
 
     return createToken(user)
 }
 
-function createToken(user: any) {
-    return jwt.sign({
-        displayName: user.displayName,
-        discordUsername: user.discordUsername,
-        profilePicture: user.profilePicture,
-        displayColour: user.displayColour
-    }, process.env.JWT_SECRET as jwt.Secret)
+const LogIn = async (loginForm: ILoginForm): Promise<string | null> => {
+    const user = await DatabaseService.FindUserByUsernameWithSecrets(loginForm.discordUsername)
+    if (user === null) return null
+
+    if (await bcrypt.compare(loginForm.password, user.password)) {
+        return createToken({ ...user, password: undefined, apiKey: undefined })
+    }
+
+    return null
+}
+
+function createToken(user: IUser | IUserWithSecrets) {
+    return jwt.sign({ ...user }, process.env.JWT_SECRET as jwt.Secret)
 }
 
 export default {
-    CreateUser
+    SignUp,
+    LogIn
 }
