@@ -1,10 +1,24 @@
 import { Request, Response } from 'express'
 import AuthenticationService from '../services/authentication-service'
 import SignUpValidator from '../utils/sign-up-validator'
+import ISignupForm from '../models/dto/isignup-form'
+import {RateLimitError} from '../models/errors'
 
 const SignUp = async (req: Request, res: Response) => {
     const signupValidator = new SignUpValidator()
-    const signupForm = await signupValidator.formFromRequestBody(req.body)
+
+    let signupForm: ISignupForm | null
+    try {
+        signupForm = await signupValidator.formFromRequestBody(req.body)
+    }
+    catch (error) {
+        if (error instanceof RateLimitError) {
+            return res.status(429).json({ error: error.message })
+        }
+
+        throw error
+    }
+
     if (signupForm === null) {
         res.statusCode = 400
         return res.send({ errors: signupValidator.validationErrors })

@@ -1,8 +1,15 @@
 import ISignupForm from '../models/dto/isignup-form'
 import DatabaseService from '../services/database-service'
+import Trading212Service from '../services/trading212-service'
+import { FailureReason } from '../models/ihttp-result'
+import { RateLimitError } from '../models/errors'
 
 export default class SignUpValidator {
     public validationErrors: { [key: string]: string[] } = {}
+    private apiKeyErrors = {
+        [FailureReason.Unauthorised]: 'api key is not accepted by the trading212 api',
+        [FailureReason.MissingScope]: 'all permissions (except "orders - execute") must be given',
+    }
 
     public async formFromRequestBody(body: any): Promise<ISignupForm | null> {
         this.validationErrors = {}
@@ -19,10 +26,10 @@ export default class SignUpValidator {
         }
 
         await this.validateUserIsUnique(body.discordUsername)
+        await this.validateApiKey(body.apiKey)
         this.validateDisplayColour(body.displayColour)
 
         // TODO: check discord username is valid
-        // TODO: check api key is valid
 
         return Object.keys(this.validationErrors).length === 0
             ? body as ISignupForm
@@ -49,6 +56,26 @@ export default class SignUpValidator {
         if (user !== null) {
             this.addError('discordUsername', `account already exists for ${discordUsername}`)
         }
+    }
+
+    private async validateApiKey(apiKey: string) {
+        if (apiKey === undefined) return
+
+        const [success, reason] = await Trading212Service.ValidateApiKey(apiKey)
+        if (success) return
+
+        if (this.apiKeyErrors.hasOwnProperty(reason!)) {
+            // @ts-ignore
+            this.addError('apiKey', this.apiKeyErrors[reason!])
+            return
+        }
+
+        if (reason === FailureReason.RateLimitExceeded) {
+            throw new RateLimitError('trading212 rate limit reached during api key validation')
+        }
+
+        console.log(reason!.toString())
+        throw new Error('an unknown error occurred while accessing the trading212 api')
     }
 
     private validateDisplayColour(displayColour: string) {
