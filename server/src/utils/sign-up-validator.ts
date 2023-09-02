@@ -1,9 +1,10 @@
 import ISignupForm from '../models/dto/isignup-form'
+import DatabaseService from '../services/database-service'
 
 export default class SignUpValidator {
     public validationErrors: { [key: string]: string[] } = {}
 
-    public formFromRequestBody(body: any): ISignupForm | null {
+    public async formFromRequestBody(body: any): Promise<ISignupForm | null> {
         this.validationErrors = {}
 
         if (!(body instanceof Object)) {
@@ -17,8 +18,9 @@ export default class SignUpValidator {
             this.addError('passwordConfirm', 'passwords must match')
         }
 
-        // TODO: check colour hex is valid
-        // TODO: check user doesnt already exist
+        await this.validateUserIsUnique(body.discordUsername)
+        this.validateDisplayColour(body.displayColour)
+
         // TODO: check discord username is valid
         // TODO: check api key is valid
 
@@ -38,6 +40,24 @@ export default class SignUpValidator {
                 this.addError(field, `${field} is required`)
             }
         })
+    }
+
+    private async validateUserIsUnique(discordUsername: string) {
+        if (discordUsername === undefined) return
+
+        const user = await DatabaseService.FindUserByUsername(discordUsername)
+        if (user !== null) {
+            this.addError('discordUsername', `account already exists for ${discordUsername}`)
+        }
+    }
+
+    private validateDisplayColour(displayColour: string) {
+        if (displayColour === undefined) return
+
+        const regex = new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$")
+        if (regex.exec(displayColour) === null) {
+            this.addError('displayColour', 'display colour must be a valid rgb hex code')
+        }
     }
 
     private addError(field: string, error: string) {

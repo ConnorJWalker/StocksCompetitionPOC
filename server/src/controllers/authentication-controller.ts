@@ -4,7 +4,7 @@ import SignUpValidator from '../utils/sign-up-validator'
 
 const SignUp = async (req: Request, res: Response) => {
     const signupValidator = new SignUpValidator()
-    const signupForm = signupValidator.formFromRequestBody(req.body)
+    const signupForm = await signupValidator.formFromRequestBody(req.body)
     if (signupForm === null) {
         res.statusCode = 400
         return res.send({ errors: signupValidator.validationErrors })
