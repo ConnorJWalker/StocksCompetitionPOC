@@ -15,6 +15,11 @@ const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Prom
     return UserFromDbResult(user)
 }
 
+const FindUserById = async (id: number) => {
+    const user = await User.findByPk(id)
+    return user === null ? null : UserFromDbResult(user)
+}
+
 const FindUserByUsername = async (username: string): Promise<IUser | null> => {
     const user = await User.findOne({ where: {
         discordUsername: username
@@ -33,6 +38,7 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
 
 export default {
     CreateUser,
+    FindUserById,
     FindUserByUsername,
     FindUserByUsernameWithSecrets
 }
