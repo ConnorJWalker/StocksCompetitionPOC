@@ -35,14 +35,40 @@ const SignupForm = () => {
 
                 <footer>
                     <button className='link'>Log In</button>
-                    <button className='btn-pink'>Next</button>
+                    <button className='btn-pink' onClick={nextButtonClick}>Next</button>
                 </footer>
             </>
         )
     }
 
     function renderApiKeyForm() {
-        return <></>
+        return (
+            <>
+                <h1>Trading 212 Api Key</h1>
+                <ul>
+                    <li>Open Trading 212 into invest account (not ISA or CFD)</li>
+                    <li>Click Settings -&gt; Api (Beta) -&gt; Generate API Key</li>
+                    <li>Set all permission toggle (except Orders - Execute) to on</li>
+                    <li>Click Generate key and copy to the text area below</li>
+                </ul>
+
+                <textarea />
+
+                <footer>
+                    <button className='link'>Log In</button>
+
+                    <div>
+                        <button onClick={() => setShowMainForm(true)}>Back</button>
+                        <button className='btn-pink'>Sign Up</button>
+                    </div>
+                </footer>
+            </>
+        )
+    }
+
+    function nextButtonClick() {
+        // TODO: form validation
+        setShowMainForm(false)
     }
 }
 

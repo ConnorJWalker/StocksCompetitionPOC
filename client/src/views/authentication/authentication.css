@@ -59,6 +59,24 @@ footer {
     align-items: center;
 }
 
+footer > div > button:first-of-type {
+    margin-right: 10px;
+}
+
+ul {
+    margin-bottom: 25px;
+    list-style-position: inside;
+    line-height: 1.6;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+    resize: none;
+    overflow-y: auto;
+    margin-bottom: 30px;
+}
+
 @media screen and (min-width: 500px) {
     .form-container {
         max-width: 750px;
