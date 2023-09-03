@@ -47,3 +47,7 @@ button.link {
     border: none;
     font-size: 1em;
 }
+
+ul {
+    list-style-position: inside;
+}
