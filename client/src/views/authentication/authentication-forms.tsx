@@ -9,10 +9,18 @@ const AuthenticationForms = () => {
     return (
         <div className='authentication-container'>
             <div className='form-container'>
-                { showSignup ? <SignupForm/> : <LoginForm/> }
+                {
+                    showSignup
+                        ? <SignupForm ChangePage={changePage} />
+                        : <LoginForm ChangePage={changePage} />
+                }
             </div>
         </div>
     )
+
+    function changePage() {
+        setShowSignup(!showSignup)
+    }
 }
 
 export default AuthenticationForms

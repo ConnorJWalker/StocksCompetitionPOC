@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const SignupForm = () => {
+const SignupForm = ({ ChangePage }: any) => {
     const [showMainForm, setShowMainForm] = useState(true)
 
     return showMainForm ? renderMainForm() : renderApiKeyForm()
@@ -34,7 +34,7 @@ const SignupForm = () => {
                 </div>
 
                 <footer>
-                    <button className='link'>Log In</button>
+                    <button className='link' onClick={ChangePage}>Log In</button>
                     <button className='btn-pink' onClick={nextButtonClick}>Next</button>
                 </footer>
             </>
