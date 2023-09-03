@@ -1,6 +1,8 @@
-import { User } from '../config/database'
+import { Instrument, User } from '../config/database'
 import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} from '../models/iuser'
 import ISignupForm from '../models/dto/isignup-form'
+import IT212Instrument from '../models/trading212/instrument'
+import { Optional } from 'sequelize'
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -36,9 +38,39 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
     return user === null ? null : UserWithSecretsFromDbResult(user)
 }
 
+const UpdateStocksList = async (stocks: IT212Instrument[]): Promise<number> => {
+    const t212Tickers = stocks.map<string>(stock => stock.ticker)
+    const savedT212Tickers = await Instrument.findAll({
+        attributes: ['t212Ticker'],
+        where: {
+            t212Ticker: t212Tickers
+        }
+    })
+
+    const savedTickersSet = new Set<string>()
+    savedT212Tickers.forEach(ticker => savedTickersSet.add(ticker.dataValues.t212Ticker))
+
+    const toSave: Optional<any, string>[] = []
+    stocks.forEach(stock => {
+        if (!savedTickersSet.has(stock.ticker)) {
+            toSave.push({
+                type: stock.type,
+                currencyCode: stock.currencyCode,
+                name: stock.name,
+                ticker: stock.shortName,
+                t212Ticker: stock.ticker
+            })
+        }
+    })
+
+    await Instrument.bulkCreate(toSave)
+    return toSave.length
+}
+
 export default {
     CreateUser,
     FindUserById,
     FindUserByUsername,
-    FindUserByUsernameWithSecrets
+    FindUserByUsernameWithSecrets,
+    UpdateStocksList
 }

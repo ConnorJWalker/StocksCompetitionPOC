@@ -3,6 +3,7 @@ import IT212OpenPosition from '../models/trading212/open-position'
 import IOpenPositions, { OpenPositionsFromApi } from '../models/dto/responses/iopen-positions'
 import IAccountValue, {AccountValueFromApi} from '../models/dto/responses/iaccount-value'
 import IT212AccountCash from '../models/trading212/account-cash'
+import IT212Instrument from '../models/trading212/instrument'
 
 const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]> => {
     const results = await Promise.all([
@@ -56,6 +57,15 @@ const GetCash = async (apiKey: string): Promise<IAccountValue> => {
     throw new Error(`Could not fetch cash: ${result.statusCode}`)
 }
 
+const GetAllStocks = async (apiKey: string): Promise<IT212Instrument[]> => {
+    const result = await send<IT212Instrument[]>('equity/metadata/instruments', apiKey)
+    if (result.ok) {
+        return result.content!
+    }
+
+    throw new Error(`Could not fetch all stocks: ${result.statusCode}`)
+}
+
 const send = async <T>(endpoint: string, apiKey: string, method: string = 'get'): Promise<IHttpResult<T | null>> => {
     const response = await fetch(`${process.env.T212_URL}${endpoint}`, {
         method,
@@ -74,5 +84,6 @@ const send = async <T>(endpoint: string, apiKey: string, method: string = 'get')
 export default {
     ValidateApiKey,
     GetOpenPositions,
-    GetCash
+    GetCash,
+    GetAllStocks
 }

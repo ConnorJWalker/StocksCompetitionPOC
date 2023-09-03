@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize'
 import UserSchema from './schemas/user'
+import InstrumentSchema from './schemas/instrument'
 
 const env = process.env
 
@@ -9,10 +10,12 @@ const sequalize = new Sequelize(env.DATABASE_NAME, env.DATABASE_USERNAME, env.DA
     dialect: env.DATABASE_DIALECT
 })
 
-const user = sequalize.define('User', UserSchema);
+const user = sequalize.define('User', UserSchema)
+const instrument = sequalize.define('Instrument', InstrumentSchema);
 
 (async () => {
     await sequalize.sync()
 })()
 
 export const User = user
+export const Instrument = instrument
