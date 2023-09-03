@@ -1,6 +1,8 @@
 import IHttpResult, { FailureReason } from '../models/ihttp-result'
-import IT212OpenPosition from '../models/trading212/openPosition'
+import IT212OpenPosition from '../models/trading212/open-position'
 import IOpenPositions, { OpenPositionsFromApi } from '../models/dto/responses/iopen-positions'
+import IAccountValue, {AccountValueFromApi} from '../models/dto/responses/iaccount-value'
+import IT212AccountCash from '../models/trading212/account-cash'
 
 const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]> => {
     const results = await Promise.all([
@@ -45,6 +47,15 @@ const GetOpenPositions = async (apiKey: string): Promise<IOpenPositions[]> => {
     throw new Error(`Could not fetch open positions: ${result.statusCode}`)
 }
 
+const GetCash = async (apiKey: string): Promise<IAccountValue> => {
+    const result = await send<IT212AccountCash>('equity/account/cash', apiKey)
+    if (result.ok) {
+        return AccountValueFromApi(result.content!)
+    }
+
+    throw new Error(`Could not fetch cash: ${result.statusCode}`)
+}
+
 const send = async <T>(endpoint: string, apiKey: string, method: string = 'get'): Promise<IHttpResult<T | null>> => {
     const response = await fetch(`${process.env.T212_URL}${endpoint}`, {
         method,
@@ -62,5 +73,6 @@ const send = async <T>(endpoint: string, apiKey: string, method: string = 'get')
 
 export default {
     ValidateApiKey,
-    GetOpenPositions
+    GetOpenPositions,
+    GetCash
 }

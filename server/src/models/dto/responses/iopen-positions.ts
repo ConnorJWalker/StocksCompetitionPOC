@@ -1,4 +1,4 @@
-import IT212OpenPosition from '../../trading212/openPosition'
+import IT212OpenPosition from '../../trading212/open-position'
 
 export default interface IOpenPositions {
     ticker: string
