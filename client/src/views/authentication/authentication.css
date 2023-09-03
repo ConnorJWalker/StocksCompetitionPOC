@@ -1,0 +1,106 @@
+.authentication-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.form-container {
+    width: 90%;
+    background-color: #fff;
+    padding: 35px;
+}
+
+.profile-picture {
+    border-radius: 100%;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+}
+
+div.profile-picture {
+    border: 1px solid #E60050;
+    color: #E60050;
+    font-weight: 300;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+input[type=text], input[type=password] {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.colour-picker {
+    width: 100%;
+    height: 50px;
+    display: block;
+}
+
+.colour-picker span {
+    color: #fff;
+    background-color: #5514B4;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    width: fit-content;
+}
+
+footer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media screen and (min-width: 500px) {
+    .form-container {
+        max-width: 750px;
+    }
+
+    .profile-picture {
+        margin: unset;
+    }
+
+    div.profile-picture {
+        margin-right: 30px;
+    }
+
+    input[type=text], input[type=password] {
+        margin-bottom: unset;
+        width: unset;
+    }
+
+    .form-group {
+        display: flex;
+        margin-bottom: 30px;
+    }
+
+    .text-input-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        justify-content: space-around;
+    }
+
+    .colour-picker {
+        width: 100px;
+        height: 100px;
+        display: inline;
+        margin-left: 30px;
+    }
+
+    .colour-picker span {
+        width: 100%;
+        height: unset;
+        display: block;
+        text-align: center;
+        padding: unset;
+    }
+}

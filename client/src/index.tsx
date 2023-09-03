@@ -1,7 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import AuthenticationForms from './views/authentication/authentication-forms'
 import './index.css'
-import App from './App'
+
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <AuthenticationForms />
+    }
+])
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -9,6 +17,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <React.StrictMode>
-        <App />
+        <RouterProvider router={router} />
     </React.StrictMode>
 )
