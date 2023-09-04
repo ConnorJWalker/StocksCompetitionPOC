@@ -12,7 +12,8 @@ export const GetEmptySignupForm = () => {
     return {
         displayName: '',
         discordUsername: '',
-        displayColour: '',
+        profilePicture: 'profile.png',
+        displayColour: '#fff',
         password: '',
         passwordConfirm: '',
         apiKey: ''

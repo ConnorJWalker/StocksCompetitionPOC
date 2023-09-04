@@ -16,8 +16,9 @@ const LogIn = async (loginForm: ILoginForm) => {
     storeUserDetails(token)
 }
 
-const SignUp = (signupForm: ISignupForm) => {
-
+const SignUp = async (signupForm: ISignupForm) => {
+    const token = await ApiService.SignUp(signupForm)
+    storeUserDetails(token)
 }
 
 const LogOut = () => {

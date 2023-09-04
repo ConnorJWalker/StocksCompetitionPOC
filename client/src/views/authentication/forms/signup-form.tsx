@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import SignUpValidator from '../../../utils/sign-up-validator'
 import ValidationErrors from './validation-errors'
 import { GetEmptySignupForm } from '../../../models/dto/isignup-form'
+import { HttpError } from '../../../services/api-service'
+import AuthenticationService from '../../../services/authentication-service'
 
 const SignupForm = ({ ChangePage }: any) => {
     const validator = new SignUpValidator()
     const [showMainForm, setShowMainForm] = useState(true)
     const [validationErrors, setValidationErrors] = useState(validator.validationErrors)
     const [signupForm, setSignupForm] = useState(GetEmptySignupForm())
+
+    const navigate = useNavigate()
 
     return showMainForm ? renderMainForm() : renderApiKeyForm()
 
@@ -92,14 +97,16 @@ const SignupForm = ({ ChangePage }: any) => {
                     <li>Click Generate key and copy to the text area below</li>
                 </ul>
 
-                <textarea />
+                <textarea
+                    value={signupForm.apiKey}
+                    onChange={e => setSignupForm({ ...signupForm, apiKey: e.target.value })} />
 
                 <footer>
                     <button className='link'>Log In</button>
 
                     <div>
                         <button onClick={() => setShowMainForm(true)}>Back</button>
-                        <button className='btn-pink'>Sign Up</button>
+                        <button className='btn-pink' onClick={signupButtonClick}>Sign Up</button>
                     </div>
                 </footer>
             </>
@@ -113,6 +120,24 @@ const SignupForm = ({ ChangePage }: any) => {
         }
 
         setValidationErrors({ ...validator.validationErrors })
+    }
+
+    async function signupButtonClick() {
+        if (!signupForm.apiKey) return
+
+        try {
+            await AuthenticationService.SignUp(signupForm)
+            navigate(0)
+        }
+        catch (error) {
+            if (error instanceof HttpError) {
+                // TODO: display errors to user
+                console.log(error)
+                return
+            }
+
+            throw error
+        }
     }
 }
 

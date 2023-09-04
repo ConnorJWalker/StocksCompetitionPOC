@@ -31,7 +31,17 @@ const Login = async (loginForm: ILoginForm): Promise<string> => {
 }
 
 const SignUp = async (signupForm: ISignupForm): Promise<string> => {
-    return ''
+    const response = await sendWithoutAuth<AuthResponse>(
+        'authentication/signup',
+        'post',
+        signupForm
+    )
+
+    if (response.ok) {
+        return response.content!.token
+    }
+
+    throw new HttpError(response)
 }
 
 const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body: object | null = null): Promise<IHttpResult<T | null>> => {
