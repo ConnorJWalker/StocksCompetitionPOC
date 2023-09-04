@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { GetEmptyLoginForm } from '../../../models/dto/ilogin-form'
 import AuthenticationService from '../../../services/authentication-service'
 import { HttpError } from '../../../services/api-service'
 
 const LoginForm = ({ ChangePage }: any) => {
     const [loginForm, setLoginForm] = useState(GetEmptyLoginForm())
+    const navigate = useNavigate()
 
     return (
         <>
@@ -39,6 +41,7 @@ const LoginForm = ({ ChangePage }: any) => {
 
         try {
             await AuthenticationService.LogIn(loginForm)
+            navigate(0)
         }
         catch (error) {
             if (error instanceof HttpError) {
