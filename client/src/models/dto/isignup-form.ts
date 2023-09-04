@@ -13,7 +13,16 @@ export const GetEmptySignupForm = () => {
         displayName: '',
         discordUsername: '',
         profilePicture: 'profile.png',
-        displayColour: '#fff',
+        displayColour: ((): string => {
+            const availableCharacters = "0123456789abcdef"
+
+            let colour = '#'
+            for (let i = 0; i < 6; i++) {
+                colour += availableCharacters[Math.floor(Math.random() * availableCharacters.length)]
+            }
+
+            return colour
+        })(),
         password: '',
         passwordConfirm: '',
         apiKey: ''

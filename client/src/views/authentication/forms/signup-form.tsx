@@ -72,9 +72,13 @@ const SignupForm = ({ ChangePage }: any) => {
                                 confirmPassword: validator.validateConfirmPassword(signupForm.password, signupForm.passwordConfirm) })} />
                     </div>
 
-                    <label className='colour-picker' style={{ backgroundColor: 'red' }}>
+                    <label className='colour-picker' style={{ backgroundColor: signupForm.displayColour }}>
                         <span><small>Colour</small></span>
-                        <input type='color' hidden />
+                        <input
+                            type='color'
+                            value={signupForm.displayColour}
+                            onChange={e => setSignupForm({ ...signupForm, displayColour: e.target.value })}
+                            hidden />
                     </label>
                 </div>
 
