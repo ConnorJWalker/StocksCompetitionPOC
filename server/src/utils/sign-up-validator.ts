@@ -26,7 +26,12 @@ export default class SignUpValidator {
         }
 
         await this.validateUserIsUnique(body.discordUsername)
-        await this.validateApiKey(body.apiKey)
+
+        // prevent trading 212 api being contacted if there is no api key
+        if (this.validationErrors['apiKey'] === undefined) {
+            await this.validateApiKey(body.apiKey)
+        }
+
         this.validateDisplayColour(body.displayColour)
 
         // TODO: check discord username is valid
