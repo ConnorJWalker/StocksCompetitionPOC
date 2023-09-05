@@ -128,7 +128,10 @@ const SignupForm = ({ ChangePage }: any) => {
     }
 
     async function signupButtonClick() {
-        if (!signupForm.apiKey) return
+        if (!signupForm.apiKey) {
+            setValidationErrors({ ...validationErrors, apiKey: ['Api key is required'] })
+            return
+        }
 
         try {
             await AuthenticationService.SignUp(signupForm)
