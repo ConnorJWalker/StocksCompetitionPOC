@@ -9,6 +9,7 @@ const LoginForm = ({ ChangePage }: any) => {
     const [loginForm, setLoginForm] = useState(GetEmptyLoginForm())
     const [discordUsernameErrors, setDiscordUsernameErrors] = useState<string[]>([])
     const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+    const [serverErrors, setServerErrors] = useState<string[]>([])
 
     const navigate = useNavigate()
 
@@ -36,6 +37,8 @@ const LoginForm = ({ ChangePage }: any) => {
                 </div>
             </div>
 
+            <ValidationErrors errors={serverErrors} />
+
             <footer>
                 <button className='link' onClick={ChangePage}>Sign Up</button>
                 <button className='btn-pink' onClick={loginButtonClick}>Log In</button>
@@ -44,7 +47,6 @@ const LoginForm = ({ ChangePage }: any) => {
     )
 
     async function loginButtonClick() {
-        // TODO: display validation errors
         if (validatePassword().length > 0 || validatePassword().length > 0) {
             return
         }
@@ -55,8 +57,7 @@ const LoginForm = ({ ChangePage }: any) => {
         }
         catch (error) {
             if (error instanceof HttpError) {
-                // TODO: display error
-                console.log(error.statusCode, error.response)
+                setServerErrors([error.response.error!])
                 return
             }
 

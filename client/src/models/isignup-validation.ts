@@ -2,7 +2,8 @@ export default interface ISignupValidation {
     displayName: string[]
     discordUsername: string[]
     password: string[]
-    confirmPassword: string[]
+    confirmPassword: string[],
+    apiKey: string[]
 }
 
 export const GetEmptySignupValidation = (): ISignupValidation => {
@@ -10,6 +11,7 @@ export const GetEmptySignupValidation = (): ISignupValidation => {
         displayName: [],
         discordUsername: [],
         password: [],
-        confirmPassword: []
+        confirmPassword: [],
+        apiKey: []
     }
 }

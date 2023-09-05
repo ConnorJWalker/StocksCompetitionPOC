@@ -81,6 +81,10 @@ textarea {
     color: red;
 }
 
+.validation-errors li:first-letter {
+    text-transform: uppercase;
+}
+
 @media screen and (min-width: 500px) {
     .form-container {
         max-width: 750px;

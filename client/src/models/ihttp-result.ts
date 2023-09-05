@@ -3,3 +3,8 @@ export default interface IHttpResult<T> {
     statusCode: number
     content: T
 }
+
+export interface IHttpErrorResult {
+    error?: string
+    errors?: object
+}

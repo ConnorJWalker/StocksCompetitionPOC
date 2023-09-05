@@ -1,14 +1,14 @@
 import ILoginForm from '../models/dto/ilogin-form'
 import ISignupForm from '../models/dto/isignup-form'
-import IHttpResult from '../models/ihttp-result'
+import IHttpResult, { IHttpErrorResult } from '../models/ihttp-result'
 
 interface AuthResponse { token: string }
 
-export class HttpError<T> extends Error {
+export class HttpError extends Error {
     public statusCode: number
-    public response: T
+    public response: IHttpErrorResult
 
-    constructor(httpResult: IHttpResult<T>) {
+    constructor(httpResult: IHttpResult<IHttpErrorResult>) {
         super()
 
         this.statusCode = httpResult.statusCode
@@ -24,10 +24,10 @@ const Login = async (loginForm: ILoginForm): Promise<string> => {
     )
 
     if (response.ok) {
-        return response.content!.token
+        return (response.content as AuthResponse).token
     }
 
-    throw new HttpError(response)
+    throw new HttpError(response as IHttpResult<IHttpErrorResult>)
 }
 
 const SignUp = async (signupForm: ISignupForm): Promise<string> => {
@@ -38,13 +38,13 @@ const SignUp = async (signupForm: ISignupForm): Promise<string> => {
     )
 
     if (response.ok) {
-        return response.content!.token
+        return (response.content as AuthResponse).token
     }
 
-    throw new HttpError(response)
+    throw new HttpError(response as IHttpResult<IHttpErrorResult>)
 }
 
-const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body: object | null = null): Promise<IHttpResult<T | null>> => {
+const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body: object | null = null): Promise<IHttpResult<T | IHttpErrorResult>> => {
     const response = await fetch(`${process.env.REACT_APP_SERVER_URL}${endpoint}`, {
         method,
         body: JSON.stringify(body),
@@ -56,7 +56,7 @@ const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body
     return {
         ok: response.ok,
         statusCode: response.status,
-        content: response.ok ? await response.json() as T : null
+        content: await response.json()
     }
 }
 

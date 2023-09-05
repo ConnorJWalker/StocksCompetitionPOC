@@ -101,6 +101,7 @@ const SignupForm = ({ ChangePage }: any) => {
                     <li>Click Generate key and copy to the text area below</li>
                 </ul>
 
+                <ValidationErrors errors={validationErrors.apiKey} />
                 <textarea
                     value={signupForm.apiKey}
                     onChange={e => setSignupForm({ ...signupForm, apiKey: e.target.value })} />
@@ -135,8 +136,16 @@ const SignupForm = ({ ChangePage }: any) => {
         }
         catch (error) {
             if (error instanceof HttpError) {
-                // TODO: display errors to user
-                console.log(error)
+                const errors = error.response!.errors!
+                setValidationErrors({ ...validationErrors, ...errors })
+
+                // if there are errors for the main page, move back to main page
+                // to prevent errors from being hidden from the user
+                const errorKeys = Object.keys(errors)
+                if (errorKeys.length > 1 || errorKeys[0] !== 'apiKey') {
+                    setShowMainForm(true)
+                }
+
                 return
             }
 
