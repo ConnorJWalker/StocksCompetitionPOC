@@ -3,6 +3,7 @@ import AuthenticationService from '../services/authentication-service'
 import SignUpValidator from '../utils/sign-up-validator'
 import ISignupForm from '../models/dto/isignup-form'
 import {RateLimitError} from '../models/errors'
+import DiscordService from '../services/discord-service'
 
 const SignUp = async (req: Request, res: Response) => {
     const signupValidator = new SignUpValidator()
@@ -25,21 +26,22 @@ const SignUp = async (req: Request, res: Response) => {
     }
 
     const token = await AuthenticationService.SignUp(signupForm)
+    try {
+        await DiscordService.SendWelcomeMessage(signupForm.discordUsername, true)
+    }
+    catch { /* Ignore */ }
 
-    res.statusCode = 201
-    return res.send({ token })
+    return res.status(201).json({ token })
 }
 
 const LogIn = async (req: Request, res: Response) => {
     if (!req.body || !req.body.discordUsername || !req.body.password) {
-        res.statusCode = 400
-        return res.send({ error: 'discord username and password are required' })
+        return res.status(400).json({ error: 'discord username and password are required' })
     }
 
     const token = await AuthenticationService.LogIn(req.body)
     if (token === null) {
-        res.statusCode = 401
-        return res.send({ error: 'discord username or password is incorrect' })
+        return res.status(401).json({ error: 'discord username or password is incorrect' })
     }
 
     return res.send({ token })
