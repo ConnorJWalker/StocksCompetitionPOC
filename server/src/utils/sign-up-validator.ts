@@ -1,6 +1,7 @@
 import ISignupForm from '../models/dto/isignup-form'
 import DatabaseService from '../services/database-service'
 import Trading212Service from '../services/trading212-service'
+import DiscordService, { DiscordError } from '../services/discord-service'
 import { FailureReason } from '../models/ihttp-result'
 import { RateLimitError } from '../models/errors'
 
@@ -25,7 +26,7 @@ export default class SignUpValidator {
             this.addError('passwordConfirm', 'passwords must match')
         }
 
-        await this.validateUserIsUnique(body.discordUsername)
+        await this.validateDiscordUsername(body.discordUsername)
 
         // prevent trading 212 api being contacted if there is no api key
         if (this.validationErrors['apiKey'] === undefined) {
@@ -33,8 +34,6 @@ export default class SignUpValidator {
         }
 
         this.validateDisplayColour(body.displayColour)
-
-        // TODO: check discord username is valid
 
         return Object.keys(this.validationErrors).length === 0
             ? body as ISignupForm
@@ -54,12 +53,26 @@ export default class SignUpValidator {
         })
     }
 
-    private async validateUserIsUnique(discordUsername: string) {
+    private async validateDiscordUsername(discordUsername: string) {
         if (discordUsername === undefined) return
 
         const user = await DatabaseService.FindUserByUsername(discordUsername)
         if (user !== null) {
             this.addError('discordUsername', `account already exists for ${discordUsername}`)
+        }
+
+        try {
+            if (!await DiscordService.UserIsInDiscord(discordUsername)) {
+                this.addError('discordUsername', `account ${discordUsername} is not currently in the discord server`)
+            }
+        }
+        catch (error) {
+            if (error instanceof DiscordError) {
+                this.addError('discordUsername', error.message)
+                return
+            }
+
+            throw error
         }
     }
 
@@ -79,7 +92,6 @@ export default class SignUpValidator {
             throw new RateLimitError('trading212 rate limit reached during api key validation')
         }
 
-        console.log(reason!.toString())
         throw new Error('an unknown error occurred while accessing the trading212 api')
     }
 

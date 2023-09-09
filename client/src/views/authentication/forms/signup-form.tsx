@@ -40,7 +40,7 @@ const SignupForm = ({ ChangePage }: any) => {
                         <ValidationErrors errors={validationErrors.discordUsername} />
                         <input
                             type='text'
-                            placeholder='Discrod Username'
+                            placeholder='Discord Username'
                             value={signupForm.discordUsername}
                             onChange={e => setSignupForm({ ...signupForm, discordUsername: e.target.value })}
                             onBlur={() => setValidationErrors({
