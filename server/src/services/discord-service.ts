@@ -39,7 +39,7 @@ const UserIsInDiscord = async (discordUsername: string): Promise<boolean> => {
     return getUserIndex(discordUsername, response.content!) !== -1
 }
 
-const GetProfilePicture = async (discordUsername: string): Promise<string | null> => {
+const GetProfilePicture = async (discordUsername: string): Promise<string> => {
     const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members?limit=${process.env.DISCORD_PAGINATION_LIMIT}`)
 
     if (!response.ok) {
@@ -54,8 +54,8 @@ const GetProfilePicture = async (discordUsername: string): Promise<string | null
     const baseUrl = 'https://cdn.discordapp.com/'
 
     const user = response.content![index].user
-    return response.content === null
-        ? `${baseUrl}embed/${user.discriminator === 0 ? user.id >> 22 : user.discriminator % 5}.png`
+    return user.avatar === null
+        ? `${baseUrl}embed/avatars/${user.discriminator === 0 ? user.id >> 22 : user.discriminator % 5}.png`
         : `${baseUrl}avatars/${user.id}/${user.avatar}.png`
 }
 

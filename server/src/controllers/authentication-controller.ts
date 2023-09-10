@@ -11,6 +11,12 @@ const SignUp = async (req: Request, res: Response) => {
     let signupForm: ISignupForm | null
     try {
         signupForm = await signupValidator.formFromRequestBody(req.body)
+
+        if (signupForm === null) {
+            return res.status(400).json({ errors: signupValidator.validationErrors })
+        }
+
+        signupForm.profilePicture = await DiscordService.GetProfilePicture(signupForm.discordUsername!)
     }
     catch (error) {
         if (error instanceof RateLimitError) {
@@ -18,11 +24,6 @@ const SignUp = async (req: Request, res: Response) => {
         }
 
         throw error
-    }
-
-    if (signupForm === null) {
-        res.statusCode = 400
-        return res.send({ errors: signupValidator.validationErrors })
     }
 
     const token = await AuthenticationService.SignUp(signupForm)

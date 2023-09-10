@@ -42,7 +42,7 @@ export default class SignUpValidator {
 
     private validateRequiredFields(body: any) {
         const requiredFields: string[] = [
-            'displayName', 'discordUsername', 'profilePicture', 'displayColour',
+            'displayName', 'discordUsername', 'displayColour',
             'password', 'passwordConfirm', 'apiKey'
         ]
 
