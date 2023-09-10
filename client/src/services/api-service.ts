@@ -1,6 +1,7 @@
 import ILoginForm from '../models/dto/ilogin-form'
 import ISignupForm from '../models/dto/isignup-form'
 import IHttpResult, { IHttpErrorResult } from '../models/ihttp-result'
+import IProfilePicture from '../models/dto/iprofile-picture'
 
 interface AuthResponse { token: string }
 
@@ -58,6 +59,14 @@ const GetDiscordUsernameErrors = async (discordUsername: string): Promise<string
     return ['an error occurred validating discord username']
 }
 
+const GetDiscordProfilePicture = async (discordUsername: string): Promise<string | undefined> => {
+    const response = await sendWithoutAuth<IProfilePicture>(`authentication/profile-picture/${discordUsername}`)
+
+    if (!response.ok) return
+
+    return (response.content as IProfilePicture).profilePicture
+}
+
 const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body: object | null = null): Promise<IHttpResult<T | IHttpErrorResult>> => {
     const response = await fetch(`${process.env.REACT_APP_SERVER_URL}${endpoint}`, {
         method,
@@ -77,5 +86,6 @@ const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body
 export default {
     Login,
     SignUp,
-    GetDiscordUsernameErrors
+    GetDiscordUsernameErrors,
+    GetDiscordProfilePicture
 }

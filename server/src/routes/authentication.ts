@@ -11,4 +11,6 @@ router.post('/refresh', AuthenticationController.Refresh)
 
 router.get('/validate-username/:discordUsername', AuthenticationController.ValidateDiscordUsername)
 
+router.get('/profile-picture/:discordUsername', AuthenticationController.GetProfilePicture)
+
 export default router

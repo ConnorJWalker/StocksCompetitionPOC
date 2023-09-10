@@ -63,9 +63,22 @@ const ValidateDiscordUsername = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: signupValidator.validationErrors })
 }
 
+const GetProfilePicture = async (req: Request, res: Response) => {
+    const signupValidator = new SignUpValidator()
+    await signupValidator.validateDiscordUsername(req.params.discordUsername)
+
+    if (signupValidator.validationErrors['discordUsername'] !== undefined) {
+        return res.status(400).json({ errors: signupValidator.validationErrors })
+    }
+
+    const profilePicture = await DiscordService.GetProfilePicture(req.params.discordUsername)
+    return res.status(200).json({ profilePicture })
+}
+
 export default {
     SignUp,
     LogIn,
     Refresh,
-    ValidateDiscordUsername
+    ValidateDiscordUsername,
+    GetProfilePicture
 }

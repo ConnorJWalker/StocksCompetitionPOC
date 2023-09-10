@@ -20,13 +20,13 @@ h1 {
     width: 100px;
     height: 100px;
     margin: 0 auto 15px;
+    display: flex;
 }
 
 div.profile-picture {
     border: 1px solid #E60050;
     color: #E60050;
     font-weight: 300;
-    display: flex;
     justify-content: space-around;
     align-items: center;
 }
@@ -94,7 +94,7 @@ textarea {
         margin: unset;
     }
 
-    div.profile-picture {
+    .profile-picture {
         margin-right: 30px;
     }
 

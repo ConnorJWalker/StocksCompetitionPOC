@@ -12,7 +12,6 @@ export const GetEmptySignupForm = () => {
     return {
         displayName: '',
         discordUsername: '',
-        profilePicture: '',
         displayColour: ((): string => {
             const availableCharacters = "0123456789abcdef"
 

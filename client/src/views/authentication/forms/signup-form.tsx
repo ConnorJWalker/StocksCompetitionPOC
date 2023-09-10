@@ -2,15 +2,15 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SignUpValidator from '../../../utils/sign-up-validator'
 import ValidationErrors from './validation-errors'
-import { GetEmptySignupForm } from '../../../models/dto/isignup-form'
-import { HttpError } from '../../../services/api-service'
+import ISignupForm, { GetEmptySignupForm } from '../../../models/dto/isignup-form'
+import ApiService, { HttpError } from '../../../services/api-service'
 import AuthenticationService from '../../../services/authentication-service'
 
 const SignupForm = ({ ChangePage }: any) => {
     const validator = new SignUpValidator()
     const [showMainForm, setShowMainForm] = useState(true)
     const [validationErrors, setValidationErrors] = useState(validator.validationErrors)
-    const [signupForm, setSignupForm] = useState(GetEmptySignupForm())
+    const [signupForm, setSignupForm] = useState<ISignupForm>(GetEmptySignupForm())
 
     const navigate = useNavigate()
 
@@ -21,10 +21,7 @@ const SignupForm = ({ ChangePage }: any) => {
             <>
                 <h1>Sign Up</h1>
                 <div className='form-group'>
-                    {/* TODO: add image for profile picture  */}
-                    <div className='profile-picture'>
-                        <p>Picture</p>
-                    </div>
+                    { renderProfilePicture() }
 
                     <div className='text-input-group'>
                         <ValidationErrors errors={validationErrors.displayName} />
@@ -116,12 +113,25 @@ const SignupForm = ({ ChangePage }: any) => {
         )
     }
 
+    function renderProfilePicture() {
+        if (signupForm.profilePicture === undefined) {
+            return (
+                <div className='profile-picture'>
+                    <p>Picture</p>
+                </div>
+            )
+        }
+
+        return <img className='profile-picture' src={signupForm.profilePicture} alt='discord profile picture' />
+    }
+
     async function discordUsernameOnBlur() {
         const discordValidationErrors = await validator.validateDiscordUsername(signupForm.discordUsername)
         setValidationErrors({ ...validationErrors, discordUsername: discordValidationErrors })
 
-        if (discordValidationErrors.length !== 0) {
-            return
+        if (discordValidationErrors.length === 0) {
+            const profilePicture = await ApiService.GetDiscordProfilePicture(signupForm.discordUsername)
+            setSignupForm({ ...signupForm, profilePicture })
         }
     }
 
