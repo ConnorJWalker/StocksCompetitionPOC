@@ -10,19 +10,53 @@ export class DiscordError extends Error {
     }
 }
 
+const getUserIndex = (discordUsername: string, guildMembers: IGuildMember[]): number => {
+    let userIndex = -1
+    guildMembers.some((user, index) => {
+        const isUser = user.user.username === discordUsername || user.user.global_name === discordUsername
+        if (isUser) {
+            userIndex = index
+            return true
+        }
+
+        return false
+    })
+
+    return userIndex
+}
+
 const UserIsInDiscord = async (discordUsername: string): Promise<boolean> => {
-    const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members`)
+    if (discordUsername === process.env.DISCORD_BOT_NAME) {
+        throw new DiscordError('you are not the discord bot', 400)
+    }
+
+    const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members?limit=${process.env.DISCORD_PAGINATION_LIMIT}`)
 
     if (!response.ok) {
         throw new DiscordError('an error occurred getting guild members', response.statusCode)
     }
 
-    let userExists = false
-    response.content!.forEach(member => {
-        if (member.user.username === discordUsername) userExists = true
-    })
+    return getUserIndex(discordUsername, response.content!) !== -1
+}
 
-    return userExists
+const GetProfilePicture = async (discordUsername: string): Promise<string | null> => {
+    const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members?limit=${process.env.DISCORD_PAGINATION_LIMIT}`)
+
+    if (!response.ok) {
+        throw new DiscordError('an error occurred getting guild members', response.statusCode)
+    }
+
+    const index = getUserIndex(discordUsername, response.content!)
+    if (index === -1) {
+        throw new DiscordError('user was not found', 404)
+    }
+
+    const baseUrl = 'https://cdn.discordapp.com/'
+
+    const user = response.content![index].user
+    return response.content === null
+        ? `${baseUrl}embed/${user.discriminator === 0 ? user.id >> 22 : user.discriminator % 5}.png`
+        : `${baseUrl}avatars/${user.id}/${user.avatar}.png`
 }
 
 const SendWelcomeMessage = async (discordUsername: string, isCompetitor: boolean) => {
@@ -52,5 +86,6 @@ const send = async <T>(endpoint: string, method: string = 'get', body: object | 
 
 export default {
     UserIsInDiscord,
+    GetProfilePicture,
     SendWelcomeMessage
 }
