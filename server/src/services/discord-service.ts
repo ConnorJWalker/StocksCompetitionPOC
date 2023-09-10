@@ -31,8 +31,10 @@ const fetchUser = async (discordUsername: string): Promise<IDiscordUser | null> 
             user = guildMember.user
         }
 
+        const redisKey = `discord:${guildMember.user.global_name}`
         if (guildMember.user.global_name) {
-            await Redis.hSet(`discord:${guildMember.user.global_name}`, DiscordUserToCache(guildMember.user))
+            await Redis.hSet(redisKey, DiscordUserToCache(guildMember.user))
+            await Redis.expire(redisKey, 600)
         }
     }
 
