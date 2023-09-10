@@ -1,5 +1,7 @@
 import IHttpResult from '../models/ihttp-result'
 import IGuildMember from '../models/discord/guild-member'
+import Redis from '../config/redis'
+import IDiscordUser, { DiscordUserFromCache, DiscordUserToCache } from '../models/discord/user'
 
 export class DiscordError extends Error {
     responseCode: number
@@ -10,19 +12,31 @@ export class DiscordError extends Error {
     }
 }
 
-const getUserIndex = (discordUsername: string, guildMembers: IGuildMember[]): number => {
-    let userIndex = -1
-    guildMembers.some((user, index) => {
-        const isUser = user.user.username === discordUsername || user.user.global_name === discordUsername
-        if (isUser) {
-            userIndex = index
-            return true
+const fetchUser = async (discordUsername: string): Promise<IDiscordUser | null> => {
+    const cachedUser = await Redis.hGetAll(`discord:${discordUsername}`)
+
+    if (cachedUser['id'] !== undefined) {
+        return DiscordUserFromCache(cachedUser)
+    }
+
+    const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members?limit=${process.env.DISCORD_PAGINATION_LIMIT}`)
+
+    if (!response.ok) {
+        throw new DiscordError('an error occurred getting guild members', response.statusCode)
+    }
+
+    let user: IDiscordUser | null = null
+    for (const guildMember of response.content || []) {
+        if (guildMember.user.global_name === discordUsername) {
+            user = guildMember.user
         }
 
-        return false
-    })
+        if (guildMember.user.global_name) {
+            await Redis.hSet(`discord:${guildMember.user.global_name}`, DiscordUserToCache(guildMember.user))
+        }
+    }
 
-    return userIndex
+    return user
 }
 
 const UserIsInDiscord = async (discordUsername: string): Promise<boolean> => {
@@ -30,32 +44,18 @@ const UserIsInDiscord = async (discordUsername: string): Promise<boolean> => {
         throw new DiscordError('you are not the discord bot', 400)
     }
 
-    const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members?limit=${process.env.DISCORD_PAGINATION_LIMIT}`)
-
-    if (!response.ok) {
-        throw new DiscordError('an error occurred getting guild members', response.statusCode)
-    }
-
-    return getUserIndex(discordUsername, response.content!) !== -1
+    return await fetchUser(discordUsername) !== null
 }
 
 const GetProfilePicture = async (discordUsername: string): Promise<string> => {
-    const response = await send<IGuildMember[]>(`guilds/${process.env.DISCORD_SERVER_ID}/members?limit=${process.env.DISCORD_PAGINATION_LIMIT}`)
-
-    if (!response.ok) {
-        throw new DiscordError('an error occurred getting guild members', response.statusCode)
-    }
-
-    const index = getUserIndex(discordUsername, response.content!)
-    if (index === -1) {
+    const user = await fetchUser(discordUsername)
+    if (user === null) {
         throw new DiscordError('user was not found', 404)
     }
 
     const baseUrl = 'https://cdn.discordapp.com/'
-
-    const user = response.content![index].user
-    return user.avatar === null
-        ? `${baseUrl}embed/avatars/${user.discriminator === 0 ? user.id >> 22 : user.discriminator % 5}.png`
+    return !user.avatar
+        ? `${baseUrl}embed/avatars/${user.discriminator === 0 ? (Number(user.id) >> 22) % 6 : user.discriminator % 5}.png`
         : `${baseUrl}avatars/${user.id}/${user.avatar}.png`
 }
 
