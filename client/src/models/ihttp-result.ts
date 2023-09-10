@@ -6,5 +6,5 @@ export default interface IHttpResult<T> {
 
 export interface IHttpErrorResult {
     error?: string
-    errors?: object
+    errors?: { [key: string]: string[] }
 }

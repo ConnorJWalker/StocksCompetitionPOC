@@ -1,5 +1,6 @@
 import ISignupValidation, { GetEmptySignupValidation } from '../models/isignup-validation'
 import ISignupForm from '../models/dto/isignup-form'
+import ApiService from '../services/api-service'
 
 export default class SignUpValidator {
     public validationErrors: ISignupValidation = GetEmptySignupValidation()
@@ -19,7 +20,7 @@ export default class SignUpValidator {
         return this.validationErrors.displayName
     }
 
-    public validateDiscordUsername(discordUsername: string): string[] {
+    public async validateDiscordUsername(discordUsername: string): Promise<string[]> {
         this.validationErrors.discordUsername = []
 
         if (!discordUsername) {
@@ -32,7 +33,10 @@ export default class SignUpValidator {
             return this.validationErrors.discordUsername
         }
 
-        // TODO: add discord username exists check and isn't already signed up
+        const apiErrors = await ApiService.GetDiscordUsernameErrors(discordUsername)
+        if (apiErrors.length !== 0) {
+            this.validationErrors.discordUsername = this.validationErrors.discordUsername.concat(apiErrors)
+        }
 
         return this.validationErrors.discordUsername
     }
@@ -67,9 +71,9 @@ export default class SignUpValidator {
         return this.validationErrors.confirmPassword
     }
 
-    public mainFormIsValid(signupForm: ISignupForm): boolean {
+    public async mainFormIsValid(signupForm: ISignupForm): Promise<boolean> {
         this.validateDisplayName(signupForm.displayName)
-        this.validateDiscordUsername(signupForm.discordUsername)
+        await this.validateDiscordUsername(signupForm.discordUsername)
         this.validatePassword(signupForm.password)
         this.validateConfirmPassword(signupForm.password, signupForm.passwordConfirm)
 

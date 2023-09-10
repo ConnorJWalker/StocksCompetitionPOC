@@ -52,8 +52,20 @@ const Refresh = (req: Request, res: Response) => {
     return res.send('Refresh')
 }
 
+const ValidateDiscordUsername = async (req: Request, res: Response) => {
+    const signupValidator = new SignUpValidator()
+    await signupValidator.validateDiscordUsername(req.params.discordUsername)
+
+    if (signupValidator.validationErrors['discordUsername'] === undefined) {
+        return res.status(200).json({ })
+    }
+
+    return res.status(400).json({ errors: signupValidator.validationErrors })
+}
+
 export default {
     SignUp,
     LogIn,
-    Refresh
+    Refresh,
+    ValidateDiscordUsername
 }

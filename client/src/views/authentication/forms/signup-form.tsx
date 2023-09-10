@@ -43,9 +43,7 @@ const SignupForm = ({ ChangePage }: any) => {
                             placeholder='Discord Username'
                             value={signupForm.discordUsername}
                             onChange={e => setSignupForm({ ...signupForm, discordUsername: e.target.value })}
-                            onBlur={() => setValidationErrors({
-                                ...validationErrors,
-                                discordUsername: validator.validateDiscordUsername(signupForm.discordUsername) })} />
+                            onBlur={discordUsernameOnBlur} />
                     </div>
                 </div>
 
@@ -118,8 +116,17 @@ const SignupForm = ({ ChangePage }: any) => {
         )
     }
 
-    function nextButtonClick() {
-        if (validator.mainFormIsValid(signupForm)) {
+    async function discordUsernameOnBlur() {
+        const discordValidationErrors = await validator.validateDiscordUsername(signupForm.discordUsername)
+        setValidationErrors({ ...validationErrors, discordUsername: discordValidationErrors })
+
+        if (discordValidationErrors.length !== 0) {
+            return
+        }
+    }
+
+    async function nextButtonClick() {
+        if (await validator.mainFormIsValid(signupForm)) {
             setShowMainForm(false)
             return
         }

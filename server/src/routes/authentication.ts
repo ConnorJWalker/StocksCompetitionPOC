@@ -9,4 +9,6 @@ router.post('/login', AuthenticationController.LogIn)
 
 router.post('/refresh', AuthenticationController.Refresh)
 
+router.get('/validate-username/:discordUsername', AuthenticationController.ValidateDiscordUsername)
+
 export default router

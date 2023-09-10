@@ -53,7 +53,7 @@ export default class SignUpValidator {
         })
     }
 
-    private async validateDiscordUsername(discordUsername: string) {
+    public async validateDiscordUsername(discordUsername: string) {
         if (discordUsername === undefined) return
 
         const user = await DatabaseService.FindUserByUsername(discordUsername)
