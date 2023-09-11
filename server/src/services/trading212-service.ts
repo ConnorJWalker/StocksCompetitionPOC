@@ -1,11 +1,29 @@
 import IHttpResult, { FailureReason } from '../models/ihttp-result'
 import IT212OpenPosition from '../models/trading212/open-position'
 import IOpenPositions, { OpenPositionsFromApi } from '../models/dto/responses/iopen-positions'
-import IAccountValue, {AccountValueFromApi} from '../models/dto/responses/iaccount-value'
+import IAccountValue, { AccountValueFromApi } from '../models/dto/responses/iaccount-value'
 import IT212AccountCash from '../models/trading212/account-cash'
 import IT212Instrument from '../models/trading212/instrument'
+import Redis from '../config/redis'
+
+const failureCodes: { [key: number]: FailureReason } = {
+    401: FailureReason.Unauthorised,
+    403: FailureReason.MissingScope,
+    429: FailureReason.RateLimitExceeded
+}
+
+const getFailureCode = (code: number): FailureReason =>  failureCodes[code] === undefined ? FailureReason.Other : failureCodes[code]
 
 const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]> => {
+    const cacheKey = `t212-keys:${apiKey}`
+    const cachedValue = await Redis.get(cacheKey)
+
+    if (cachedValue !== null) {
+        if (cachedValue === 'valid') return [true, undefined]
+
+        return [false, getFailureCode(parseInt(cachedValue))]
+    }
+
     const results = await Promise.all([
         send('equity/account/cash', apiKey),
         send('history/dividends', apiKey),
@@ -18,24 +36,14 @@ const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]
 
     for (let i = 0; i < results.length; i++) {
         if (!results[i].ok) {
-            let reason: FailureReason
-            switch (results[i].statusCode) {
-                case 401:
-                    reason = FailureReason.Unauthorised
-                    break
-                case 403:
-                    reason = FailureReason.MissingScope
-                    break
-                case 429:
-                    reason = FailureReason.RateLimitExceeded
-                    break
-                default: reason = FailureReason.Other
-            }
+            const reason = getFailureCode(results[i].statusCode)
+            await Redis.setEx(cacheKey, 600, results[i].statusCode.toString())
 
             return [false, reason]
         }
     }
 
+    await Redis.setEx(cacheKey, 600, 'valid')
     return [true, undefined]
 }
 
