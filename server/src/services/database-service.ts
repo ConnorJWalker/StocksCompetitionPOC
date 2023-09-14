@@ -1,8 +1,9 @@
-import { Instrument, User } from '../config/database'
+import { AccountValue, Instrument, User } from '../config/database'
 import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} from '../models/iuser'
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
+import IAccountValue from '../models/dto/responses/iaccount-value'
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -38,6 +39,11 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
     return user === null ? null : UserWithSecretsFromDbResult(user)
 }
 
+const GetAllUsersWithSecrets = async (): Promise<IUserWithSecrets[]> => {
+    const users = await User.findAll()
+    return users.map(user => UserWithSecretsFromDbResult(user))
+}
+
 const UpdateStocksList = async (stocks: IT212Instrument[]): Promise<number> => {
     const t212Tickers = stocks.map<string>(stock => stock.ticker)
     const savedT212Tickers = await Instrument.findAll({
@@ -67,10 +73,19 @@ const UpdateStocksList = async (stocks: IT212Instrument[]): Promise<number> => {
     return toSave.length
 }
 
+const AddAccountValues = async (users: IUser[], accountValues: IAccountValue[]): Promise<void> => {
+    await AccountValue.bulkCreate(accountValues.map((accountValue, index) => ({
+        ...accountValue,
+        userId: users[index].id
+    })))
+}
+
 export default {
     CreateUser,
     FindUserById,
     FindUserByUsername,
     FindUserByUsernameWithSecrets,
-    UpdateStocksList
+    GetAllUsersWithSecrets,
+    UpdateStocksList,
+    AddAccountValues
 }

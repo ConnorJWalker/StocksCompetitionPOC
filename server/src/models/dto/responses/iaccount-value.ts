@@ -1,6 +1,7 @@
 import IT212AccountCash from '../../trading212/account-cash'
 
 export default interface IAccountValue {
+    discordUsername?: string
     cash: number
     invested: number
     total: number
