@@ -22,5 +22,9 @@ export default {
     invested: {
         allowNull: false,
         type: DataTypes.DECIMAL(10, 2)
+    },
+    gainLoss: {
+        allowNull: false,
+        type: DataTypes.DECIMAL(10, 2)
     }
 }
