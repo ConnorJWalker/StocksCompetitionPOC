@@ -7,15 +7,11 @@ export default {
         primaryKey: true,
         type: DataTypes.INTEGER
     },
-    cash: {
+    quantity: {
         allowNull: false,
-        type: DataTypes.DECIMAL(10, 2)
+        type: DataTypes.DECIMAL(15, 5)
     },
-    invested: {
-        allowNull: false,
-        type: DataTypes.DECIMAL(10, 2)
-    },
-    gainLoss: {
+    averagePrice: {
         allowNull: false,
         type: DataTypes.DECIMAL(10, 2)
     }

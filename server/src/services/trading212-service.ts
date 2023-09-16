@@ -50,7 +50,8 @@ const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]
 const GetOpenPositions = async (apiKey: string): Promise<IOpenPositions[]> => {
     const result = await send<IT212OpenPosition[]>('equity/portfolio', apiKey)
     if (result.ok) {
-        return result.content!.map(position => OpenPositionsFromApi(position))
+        return []
+        // return result.content!.map(position => OpenPositionsFromApi(position))
     }
 
     throw new Error(`Could not fetch open positions: ${result.statusCode}`)

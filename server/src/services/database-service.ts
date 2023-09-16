@@ -1,9 +1,10 @@
-import { AccountValue, Instrument, User } from '../config/database'
+import { AccountValue, Instrument, OpenPositions, User } from '../config/database'
 import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} from '../models/iuser'
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
 import IAccountValue from '../models/dto/responses/iaccount-value'
+import IOpenPositions, { OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -80,6 +81,21 @@ const AddAccountValues = async (users: IUser[], accountValues: IAccountValue[]):
     })))
 }
 
+const GetOpenPositions = async (): Promise<IOpenPositions[]> => {
+    const openPositions = await User.findAll({
+        attributes: {
+            exclude: ['apiKey', 'password']
+        },
+        include: [{
+            model: OpenPositions,
+            required: true,
+            include: [Instrument]
+        }]
+    })
+
+    return openPositions.map(position => OpenPositionsFromDbResult(position))
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -87,5 +103,6 @@ export default {
     FindUserByUsernameWithSecrets,
     GetAllUsersWithSecrets,
     UpdateStocksList,
-    AddAccountValues
+    AddAccountValues,
+    GetOpenPositions
 }
