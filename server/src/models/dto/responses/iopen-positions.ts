@@ -1,6 +1,6 @@
 import IT212OpenPosition from '../../trading212/open-position'
 import { Model } from 'sequelize'
-import IUser from '../../iuser'
+import IUser, { IUserWithSecrets } from '../../iuser'
 
 export default interface IOpenPositions {
     user: IUser,
@@ -13,9 +13,15 @@ export default interface IOpenPositions {
     }[]
 }
 
-export const OpenPositionsFromApi = (user: IUser, openPositions: IT212OpenPosition[]): IOpenPositions => {
+export const OpenPositionsFromApi = (user: IUserWithSecrets, openPositions: IT212OpenPosition[]): IOpenPositions => {
     return {
-        user,
+        user: {
+            id: user.id,
+            displayName: user.displayName,
+            discordUsername: user.discordUsername,
+            profilePicture: user.profilePicture,
+            displayColour: user.displayColour
+        },
         positions: openPositions.map(position => ({
             ticker: position.ticker,
             quantity: position.quantity,

@@ -5,6 +5,7 @@ import IAccountValue, { AccountValueFromApi } from '../models/dto/responses/iacc
 import IT212AccountCash from '../models/trading212/account-cash'
 import IT212Instrument from '../models/trading212/instrument'
 import Redis from '../config/redis'
+import { IUserWithSecrets } from '../models/iuser'
 
 const failureCodes: { [key: number]: FailureReason } = {
     401: FailureReason.Unauthorised,
@@ -47,11 +48,10 @@ const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]
     return [true, undefined]
 }
 
-const GetOpenPositions = async (apiKey: string): Promise<IOpenPositions[]> => {
-    const result = await send<IT212OpenPosition[]>('equity/portfolio', apiKey)
+const GetOpenPositions = async (user: IUserWithSecrets): Promise<IOpenPositions> => {
+    const result = await send<IT212OpenPosition[]>('equity/portfolio', user.apiKey)
     if (result.ok) {
-        return []
-        // return result.content!.map(position => OpenPositionsFromApi(position))
+        return OpenPositionsFromApi(user, result.content!)
     }
 
     throw new Error(`Could not fetch open positions: ${result.statusCode}`)
