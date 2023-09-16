@@ -1,10 +1,10 @@
-import { AccountValue, Instrument, OpenPositions, User } from '../config/database'
+import { AccountValue, Instrument, OpenPositions, Sequalize, User } from '../config/database'
 import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} from '../models/iuser'
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
 import IAccountValue from '../models/dto/responses/iaccount-value'
-import IOpenPositions, { OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
+import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -19,7 +19,7 @@ const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Prom
     return UserFromDbResult(user)
 }
 
-const FindUserById = async (id: number) => {
+const FindUserById = async (id: number): Promise<IUser | null> => {
     const user = await User.findByPk(id)
     return user === null ? null : UserFromDbResult(user)
 }
@@ -96,6 +96,36 @@ const GetOpenPositions = async (): Promise<IOpenPositions[]> => {
     return openPositions.map(position => OpenPositionsFromDbResult(position))
 }
 
+const UpdateOpenPositions = async (user: IUser, newPositions: IPosition[], updatedPositions: IPosition[], removedPositions: IPosition[]): Promise<void> => {
+    const created = OpenPositions.bulkCreate(newPositions.map(position => ({
+        UserId: user.id,
+        quantity: position.quantity,
+        averagePrice: position.averagePrice,
+        InstrumentId: Sequalize.literal(
+            `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(position.trading212Ticker)})`,
+        )
+    })))
+
+    if (updatedPositions.length > 0) {
+        let updateSql: string = ''
+        updatedPositions.forEach(position => {
+            updateSql += `UPDATE OpenPositions SET quantity = ${Sequalize.escape(position.quantity)}, updatedAt = NOW() `
+                + `WHERE UserId = ${Sequalize.escape(user.id)} AND InstrumentId = ${Sequalize.escape(position.instrumentId!)};`
+        })
+
+        await Sequalize.query(updateSql)
+    }
+
+    const deleted = OpenPositions.destroy({
+        where: {
+            UserId: user.id,
+            InstrumentId: removedPositions.map(removed => removed.instrumentId!)
+        }
+    })
+
+    await Promise.all([created, deleted])
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -104,5 +134,6 @@ export default {
     GetAllUsersWithSecrets,
     UpdateStocksList,
     AddAccountValues,
-    GetOpenPositions
+    GetOpenPositions,
+    UpdateOpenPositions
 }

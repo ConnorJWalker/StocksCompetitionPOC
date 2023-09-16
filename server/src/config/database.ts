@@ -9,7 +9,10 @@ const env = process.env
 // @ts-ignore
 const sequalize = new Sequelize(env.DATABASE_NAME, env.DATABASE_USERNAME, env.DATABASE_PASSWORD, {
     host: env.DATABASE_HOST,
-    dialect: env.DATABASE_DIALECT
+    dialect: env.DATABASE_DIALECT,
+    dialectOptions: {
+        multipleStatements: true
+    }
 })
 
 const user = sequalize.define('User', UserSchema)
@@ -24,6 +27,7 @@ openPositions.belongsTo(instrument)
 
 ;(async () => await sequalize.sync())()
 
+export const Sequalize = sequalize
 export const User = user
 export const Instrument = instrument
 export const AccountValue = accountValue
