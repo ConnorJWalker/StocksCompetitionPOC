@@ -150,7 +150,7 @@ const GetAccountValue = async (userId: number): Promise<IAccountValue | null> =>
         where: {
             UserId: userId
         },
-        order: ['AccountValues.id', 'DESC']
+        order: [['id', 'DESC']]
     })
 
     return accountValue === null ? null : AccountValueFromDb(accountValue)
