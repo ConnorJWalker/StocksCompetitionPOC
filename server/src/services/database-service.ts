@@ -3,7 +3,7 @@ import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} 
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
-import IAccountValue from '../models/dto/responses/iaccount-value'
+import IAccountValue, { AccountValueFromDb } from '../models/dto/responses/iaccount-value'
 import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
 import { IDbOrderHistory } from '../models/dto/responses/iorder-history'
 
@@ -83,14 +83,17 @@ const UpdateStocksList = async (stocks: IT212Instrument[]): Promise<number> => {
 const AddAccountValues = async (users: IUser[], accountValues: IAccountValue[]): Promise<void> => {
     await AccountValue.bulkCreate(accountValues.map((accountValue, index) => ({
         ...accountValue,
-        userId: users[index].id
+        UserId: users[index].id
     })))
 }
 
-const GetOpenPositions = async (): Promise<IOpenPositions[]> => {
+const GetOpenPositions = async (userId: number | undefined = undefined): Promise<IOpenPositions[]> => {
     const openPositions = await User.findAll({
         attributes: {
             exclude: ['apiKey', 'password']
+        },
+        where: userId === undefined ? undefined : {
+            id: userId
         },
         include: [{
             model: OpenPositions,
@@ -142,6 +145,17 @@ const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
     })))
 }
 
+const GetAccountValue = async (userId: number): Promise<IAccountValue | null> => {
+    const accountValue = await AccountValue.findOne({
+        where: {
+            UserId: userId
+        },
+        order: ['AccountValues.id', 'DESC']
+    })
+
+    return accountValue === null ? null : AccountValueFromDb(accountValue)
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -152,5 +166,6 @@ export default {
     AddAccountValues,
     GetOpenPositions,
     UpdateOpenPositions,
-    AddOrders
+    AddOrders,
+    GetAccountValue
 }

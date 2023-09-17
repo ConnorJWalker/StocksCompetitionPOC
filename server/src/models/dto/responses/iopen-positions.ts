@@ -35,7 +35,7 @@ export const OpenPositionsFromApi = (user: IUser, openPositions: IT212OpenPositi
             quantity: position.quantity,
             averagePrice: position.averagePrice,
             currentPrice: position.currentPrice,
-            icon: process.env.T212_ICON_URL + position.ticker
+            icon: process.env.T212_ICON_URL + position.ticker + '.png'
         }))
     }
 }
@@ -63,7 +63,7 @@ export const OpenPositionsFromDbResult = (openPosition: Model): IOpenPositions =
             trading212Ticker: position.dataValues.Instrument.t212Ticker,
             quantity: parseFloat(position.dataValues.quantity),
             averagePrice: parseFloat(position.dataValues.averagePrice),
-            icons: process.env.T212_ICON_URL + position.dataValues.Instrument.t212Ticker
+            icons: process.env.T212_ICON_URL + position.dataValues.Instrument.t212Ticker + '.png'
         }))
     }
 }

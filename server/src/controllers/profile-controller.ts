@@ -1,15 +1,27 @@
 import { Response } from 'express'
-import Trading212Service from '../services/trading212-service'
 import { RequestWithTargetUser } from '../middleware/get-profile-user'
+import DatabaseService from '../services/database-service'
+import Redis from '../config/redis'
+import IAccountValue from '../models/dto/responses/iaccount-value'
 
 const GetProfileStocks = async (req: RequestWithTargetUser, res: Response) => {
-    const openPositions = await Trading212Service.GetOpenPositions(req.targetUser!.apiKey)
-    return res.json(openPositions)
+    const openPositions = await DatabaseService.GetOpenPositions(req.targetUser!.id)
+    return openPositions.length === 1 ? res.json(openPositions[0]) : res.status(404).send()
 }
 
 const GetProfileCash = async (req: RequestWithTargetUser, res: Response) => {
-    const cash = await Trading212Service.GetCash(req.targetUser!.apiKey)
-    return res.json(cash)
+    const cached = await Redis.get('t212-account-values')
+    let userValue: IAccountValue | null
+
+    if (cached === null) {
+        userValue = await DatabaseService.GetAccountValue(req.targetUser!.id)
+    }
+    else {
+        userValue = (JSON.parse(cached!) as IAccountValue[])
+            .find(value => value.discordUsername === req.targetUser!.discordUsername) || null
+    }
+
+    return userValue === null ? res.status(404).send() : res.json(userValue)
 }
 
 export default {
