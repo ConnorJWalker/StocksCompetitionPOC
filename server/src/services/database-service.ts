@@ -1,10 +1,16 @@
-import { AccountValue, Instrument, OpenPositions, Sequalize, User } from '../config/database'
+import { AccountValue, Instrument, OpenPositions, OrderHistory, Sequalize, User } from '../config/database'
 import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} from '../models/iuser'
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
 import IAccountValue from '../models/dto/responses/iaccount-value'
 import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
+import { IDbOrderHistory } from '../models/dto/responses/iorder-history'
+
+const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
+    `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,
+)
+
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -101,9 +107,7 @@ const UpdateOpenPositions = async (user: IUser, newPositions: IPosition[], updat
         UserId: user.id,
         quantity: position.quantity,
         averagePrice: position.averagePrice,
-        InstrumentId: Sequalize.literal(
-            `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(position.trading212Ticker)})`,
-        )
+        InstrumentId: instrumentIdFromTicker(position.trading212Ticker)
     })))
 
     if (updatedPositions.length > 0) {
@@ -126,6 +130,18 @@ const UpdateOpenPositions = async (user: IUser, newPositions: IPosition[], updat
     await Promise.all([created, deleted])
 }
 
+const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
+    if (orders.length === 0) return
+
+    await OrderHistory.bulkCreate(orders.map(order => ({
+        type: order.type,
+        averagePrice: order.averagePrice,
+        quantity: order.quantity,
+        UserId: order.userId,
+        InstrumentId: instrumentIdFromTicker(order.trading212Ticker)
+    })))
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -135,5 +151,6 @@ export default {
     UpdateStocksList,
     AddAccountValues,
     GetOpenPositions,
-    UpdateOpenPositions
+    UpdateOpenPositions,
+    AddOrders
 }

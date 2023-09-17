@@ -3,11 +3,12 @@ import { Model } from 'sequelize'
 import IUser from '../../iuser'
 
 export interface IPosition {
-    instrumentId?: number,
+    instrumentId?: number
     ticker: string
     trading212Ticker: string
     quantity: number
     averagePrice: number
+    currentPrice?: number
     icon: string
 }
 
@@ -33,6 +34,7 @@ export const OpenPositionsFromApi = (user: IUser, openPositions: IT212OpenPositi
             trading212Ticker: position.ticker,
             quantity: position.quantity,
             averagePrice: position.averagePrice,
+            currentPrice: position.currentPrice,
             icon: process.env.T212_ICON_URL + position.ticker
         }))
     }
