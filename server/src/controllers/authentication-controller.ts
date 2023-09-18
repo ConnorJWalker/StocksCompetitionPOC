@@ -71,7 +71,7 @@ const ValidateDiscordUsername = async (req: Request, res: Response) => {
     await signupValidator.validateDiscordUsername(req.params.discordUsername)
 
     if (signupValidator.validationErrors['discordUsername'] === undefined) {
-        return res.status(200).send()
+        return res.status(200).json({ /* Empty */ })
     }
 
     return res.status(400).json({ errors: signupValidator.validationErrors })

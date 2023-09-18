@@ -3,26 +3,30 @@ import ISignupForm from '../models/dto/isignup-form'
 import ILoginForm from '../models/dto/ilogin-form'
 import ApiService from './api-service'
 import IUser from '../models/iuser'
+import IAuthenticationResponse from '../models/dto/iauthentication-response'
 
-const storeUserDetails = (token: string) => {
-    const decodedToken = jwtDecode<IUser>(token)
+const storeUserDetails = (authenticationResponse: IAuthenticationResponse) => {
+    const decodedToken = jwtDecode<IUser>(authenticationResponse.accessToken)
 
-    localStorage.setItem('authenticationToken', token)
+    localStorage.setItem('accessToken', authenticationResponse.accessToken)
+    localStorage.setItem('refreshToken', authenticationResponse.refreshToken)
     localStorage.setItem('user', JSON.stringify(decodedToken))
 }
 
 const LogIn = async (loginForm: ILoginForm) => {
-    const token = await ApiService.Login(loginForm)
-    storeUserDetails(token)
+    const authenticationResponse = await ApiService.Login(loginForm)
+    storeUserDetails(authenticationResponse)
 }
 
 const SignUp = async (signupForm: ISignupForm) => {
-    const token = await ApiService.SignUp(signupForm)
-    storeUserDetails(token)
+    const authenticationResponse = await ApiService.SignUp(signupForm)
+    storeUserDetails(authenticationResponse)
 }
 
 const LogOut = () => {
-    localStorage.removeItem('authenticationToken')
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('user')
 }
 
 export default {

@@ -2,8 +2,7 @@ import ILoginForm from '../models/dto/ilogin-form'
 import ISignupForm from '../models/dto/isignup-form'
 import IHttpResult, { IHttpErrorResult } from '../models/ihttp-result'
 import IProfilePicture from '../models/dto/iprofile-picture'
-
-interface AuthResponse { token: string }
+import IAuthenticationResponse from '../models/dto/iauthentication-response'
 
 export class HttpError extends Error {
     public statusCode: number
@@ -17,29 +16,29 @@ export class HttpError extends Error {
     }
 }
 
-const Login = async (loginForm: ILoginForm): Promise<string> => {
-    const response = await sendWithoutAuth<AuthResponse>(
+const Login = async (loginForm: ILoginForm): Promise<IAuthenticationResponse> => {
+    const response = await sendWithoutAuth<IAuthenticationResponse>(
         'authentication/login',
         'post',
         loginForm
     )
 
     if (response.ok) {
-        return (response.content as AuthResponse).token
+        return (response.content as IAuthenticationResponse)
     }
 
     throw new HttpError(response as IHttpResult<IHttpErrorResult>)
 }
 
-const SignUp = async (signupForm: ISignupForm): Promise<string> => {
-    const response = await sendWithoutAuth<AuthResponse>(
+const SignUp = async (signupForm: ISignupForm): Promise<IAuthenticationResponse> => {
+    const response = await sendWithoutAuth<IAuthenticationResponse>(
         'authentication/signup',
         'post',
         signupForm
     )
 
     if (response.ok) {
-        return (response.content as AuthResponse).token
+        return (response.content as IAuthenticationResponse)
     }
 
     throw new HttpError(response as IHttpResult<IHttpErrorResult>)

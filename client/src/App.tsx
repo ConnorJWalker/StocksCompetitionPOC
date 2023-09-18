@@ -16,7 +16,7 @@ const App = () => {
     return <RouterProvider router={router} />
 
     function authenticateView(element: ReactNode) {
-        if (!localStorage.getItem('authenticationToken')) {
+        if (!localStorage.getItem('accessToken')) {
             return <AuthenticationForms />
         }
 
