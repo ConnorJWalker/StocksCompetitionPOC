@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize'
 import UserSchema from './schemas/user'
+import RefreshTokensSchema from './schemas/refresh-tokens'
 import InstrumentSchema from './schemas/instrument'
 import AccountValueSchema from './schemas/account-value'
 import OpenPositionsSchema from './schemas/open-positions'
@@ -20,6 +21,7 @@ const sequalize = new Sequelize(env.DATABASE_NAME, env.DATABASE_USERNAME, env.DA
 })
 
 const user = sequalize.define('User', UserSchema)
+const refreshToken = sequalize.define('RefreshToken', RefreshTokensSchema)
 const instrument = sequalize.define('Instrument', InstrumentSchema)
 const accountValue = sequalize.define('AccountValue', AccountValueSchema)
 const openPositions = sequalize.define('OpenPositions', OpenPositionsSchema)
@@ -37,6 +39,7 @@ orderHistory.belongsTo(instrument)
 
 export const Sequalize = sequalize
 export const User = user
+export const RefreshToken = refreshToken
 export const Instrument = instrument
 export const AccountValue = accountValue
 export const OpenPositions = openPositions

@@ -1,16 +1,24 @@
-import { AccountValue, Instrument, OpenPositions, OrderHistory, Sequalize, User } from '../config/database'
-import IUser, {IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult} from '../models/iuser'
+import {
+    AccountValue,
+    Instrument,
+    OpenPositions,
+    OrderHistory,
+    RefreshToken,
+    Sequalize,
+    User
+} from '../config/database'
+import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from '../models/iuser'
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
 import IAccountValue, { AccountValueFromDb } from '../models/dto/responses/iaccount-value'
 import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
 import { IDbOrderHistory } from '../models/dto/responses/iorder-history'
+import IRefreshToken, { RefreshTokenFromDbResult } from '../models/irefresh-token'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,
 )
-
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -49,6 +57,23 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
 const GetAllUsersWithSecrets = async (): Promise<IUserWithSecrets[]> => {
     const users = await User.findAll()
     return users.map(user => UserWithSecretsFromDbResult(user))
+}
+
+const GetRefreshToken = async (token: string): Promise<IRefreshToken | null> => {
+    const dbToken = await RefreshToken.findOne({ where: { token } })
+    return dbToken === null ? null : RefreshTokenFromDbResult(dbToken)
+}
+
+const InvalidateRefreshTokenFamily = async (family: string): Promise<void> => {
+    await RefreshToken.update({ invalid: true }, { where: { family } })
+}
+
+const MarkRefreshTokenAsUsed = async (id: number): Promise<void> => {
+    await RefreshToken.update({ used: true }, { where: { id } })
+}
+
+const CreateRefreshToken = async (family: string, token: string): Promise<void> => {
+    await RefreshToken.create({ family, token })
 }
 
 const UpdateStocksList = async (stocks: IT212Instrument[]): Promise<number> => {
@@ -162,6 +187,10 @@ export default {
     FindUserByUsername,
     FindUserByUsernameWithSecrets,
     GetAllUsersWithSecrets,
+    GetRefreshToken,
+    InvalidateRefreshTokenFamily,
+    MarkRefreshTokenAsUsed,
+    CreateRefreshToken,
     UpdateStocksList,
     AddAccountValues,
     GetOpenPositions,
