@@ -1,10 +1,10 @@
 import 'dotenv/config'
-import Redis from '../config/redis'
-import DatabaseService from '../services/database-service'
-import Trading212Service from '../services/trading212-service'
-import { IUserWithSecrets } from '../models/iuser'
-import { IPosition } from '../models/dto/responses/iopen-positions'
-import { IDbOrderHistory } from '../models/dto/responses/iorder-history'
+import Redis from './config/redis'
+import DatabaseService from './services/database-service'
+import Trading212Service from './services/trading212-service'
+import { IUserWithSecrets } from './models/iuser'
+import { IPosition } from './models/dto/responses/iopen-positions'
+import { IDbOrderHistory } from './models/dto/responses/iorder-history'
 
 // start at max so first api response is stored in database
 let accountValueResponseCount = 50
@@ -81,7 +81,23 @@ const updateOpenPositions = async (users: IUserWithSecrets[]): Promise<void> => 
             handled.add(position.trading212Ticker)
         })
 
-        const newPositions = t212OpenPosition.positions.filter(position => !handled.has(position.trading212Ticker))
+        const newPositions = t212OpenPosition.positions.filter(position => {
+            const isNew = !handled.has(position.trading212Ticker)
+
+            if (isNew) {
+                newOrderHistory.push({
+                    userId: dbOpenPosition.user.id,
+                    type: 'buy',
+                    averagePrice: position.currentPrice!,
+                    quantity: position.quantity,
+                    trading212Ticker: position.trading212Ticker
+                })
+
+                return true
+            }
+
+            return false
+        })
 
         await DatabaseService.UpdateOpenPositions(dbOpenPosition.user, newPositions, updatedPositions, removedPositions)
     }

@@ -122,7 +122,7 @@ const GetOpenPositions = async (userId: number | undefined = undefined): Promise
         },
         include: [{
             model: OpenPositions,
-            required: true,
+            required: false,
             include: [Instrument]
         }]
     })

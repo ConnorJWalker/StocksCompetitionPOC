@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon src/server.ts",
     "fetch-stocks": "npx ts-node scripts/get-all-stocks.ts",
-    "stock-fetcher-process": "npx ts-node src/data-fetcher/index.ts",
+    "stock-fetcher-process": "npx ts-node src/data-fetcher.ts",
     "test": "echo no"
   },
   "author": "Connor Walker",
