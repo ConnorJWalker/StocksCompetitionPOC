@@ -4,7 +4,7 @@ import DatabaseService from './services/database-service'
 import Trading212Service from './services/trading212-service'
 import { IUserWithSecrets } from './models/iuser'
 import { IPosition } from './models/dto/responses/iopen-positions'
-import { IDbOrderHistory } from './models/dto/responses/iorder-history'
+import { IDbOrderHistory } from './models/iorder-history'
 
 // start at max so first api response is stored in database
 let accountValueResponseCount = 50

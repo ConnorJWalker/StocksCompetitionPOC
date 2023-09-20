@@ -1,7 +1,7 @@
 import IHttpResult, { FailureReason } from '../models/ihttp-result'
 import IT212OpenPosition from '../models/trading212/open-position'
 import IOpenPositions, { OpenPositionsFromApi } from '../models/dto/responses/iopen-positions'
-import IAccountValue, { AccountValueFromApi } from '../models/dto/responses/iaccount-value'
+import IAccountValue, { AccountValueFromApi } from '../models/iaccount-value'
 import IT212AccountCash from '../models/trading212/account-cash'
 import IT212Instrument from '../models/trading212/instrument'
 import Redis from '../config/redis'

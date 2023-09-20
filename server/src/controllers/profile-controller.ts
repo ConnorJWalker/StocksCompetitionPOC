@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { RequestWithTargetUser } from '../middleware/get-profile-user'
 import DatabaseService from '../services/database-service'
 import Redis from '../config/redis'
-import IAccountValue from '../models/dto/responses/iaccount-value'
+import IAccountValue from '../models/iaccount-value'
 
 const GetProfileStocks = async (req: RequestWithTargetUser, res: Response) => {
     const openPositions = await DatabaseService.GetOpenPositions(req.targetUser!.id)

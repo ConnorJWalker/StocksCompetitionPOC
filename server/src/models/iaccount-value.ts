@@ -1,4 +1,4 @@
-import IT212AccountCash from '../../trading212/account-cash'
+import IT212AccountCash from './trading212/account-cash'
 import { Model } from 'sequelize'
 
 export default interface IAccountValue {
@@ -18,13 +18,20 @@ export const AccountValueFromApi = (accountValue: IT212AccountCash): IAccountVal
     }
 }
 
+const ParseFloat = (input: string, decimalPlaces: number): number => {
+    return Number(parseFloat(input).toFixed(decimalPlaces))
+}
+
 export const AccountValueFromDb = (accountValue: Model): IAccountValue => {
     const dataValues = accountValue.dataValues
+    const cash = ParseFloat(dataValues.cash, 2)
+    const invested = ParseFloat(dataValues.invested, 2)
+    const gainLoss = ParseFloat(dataValues.gainLoss, 2)
 
     return {
-        cash: dataValues.cash,
-        invested: dataValues.invested,
-        total: dataValues.invested + dataValues.cash + dataValues.gainLoss,
-        gainLoss: dataValues.gainLoss
+        cash,
+        invested,
+        total: ParseFloat(`${cash + invested + gainLoss}`, 2),
+        gainLoss
     }
 }

@@ -11,10 +11,11 @@ import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult 
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
-import IAccountValue, { AccountValueFromDb } from '../models/dto/responses/iaccount-value'
+import IAccountValue, { AccountValueFromDb } from '../models/iaccount-value'
 import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
-import { IDbOrderHistory } from '../models/dto/responses/iorder-history'
+import { IDbOrderHistory } from '../models/iorder-history'
 import IRefreshToken, { RefreshTokenFromDbResult } from '../models/irefresh-token'
+import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/responses/iaccount-value-response'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,
@@ -52,6 +53,16 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
     }})
 
     return user === null ? null : UserWithSecretsFromDbResult(user)
+}
+
+const GetAllUsers = async (): Promise<IUser[]> => {
+    const users = await User.findAll({
+        attributes: {
+            exclude: ['apiKey', 'password']
+        }
+    })
+
+    return users.map(user => UserFromDbResult(user))
 }
 
 const GetAllUsersWithSecrets = async (): Promise<IUserWithSecrets[]> => {
@@ -181,11 +192,28 @@ const GetAccountValue = async (userId: number): Promise<IAccountValue | null> =>
     return accountValue === null ? null : AccountValueFromDb(accountValue)
 }
 
+const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
+    const values = await User.findAll({
+        attributes: {
+            exclude: ['apiKey', 'password']
+        },
+        include: [{
+            model: AccountValue,
+            required: false,
+            order: [['id', 'DESC']],
+            limit: 1
+        }]
+    })
+
+    return AccountValueResponseFromDb(values)
+}
+
 export default {
     CreateUser,
     FindUserById,
     FindUserByUsername,
     FindUserByUsernameWithSecrets,
+    GetAllUsers,
     GetAllUsersWithSecrets,
     GetRefreshToken,
     InvalidateRefreshTokenFamily,
@@ -196,5 +224,6 @@ export default {
     GetOpenPositions,
     UpdateOpenPositions,
     AddOrders,
-    GetAccountValue
+    GetAccountValue,
+    GetAccountValues
 }
