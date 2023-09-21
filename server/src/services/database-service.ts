@@ -16,6 +16,7 @@ import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/
 import { IDbOrderHistory } from '../models/iorder-history'
 import IRefreshToken, { RefreshTokenFromDbResult } from '../models/irefresh-token'
 import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/responses/iaccount-value-response'
+import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/responses/iorder-history-response'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,
@@ -181,6 +182,30 @@ const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
     })))
 }
 
+const GetOrderHistories = async (): Promise<IOrderHistoryResponse[]> => {
+    const values = await OrderHistory.findAll({
+        include: [
+            {
+                model: User,
+                required: true,
+                attributes: {
+                    exclude: ['apiKey', 'password', 'createdAt', 'updatedAt']
+                }
+            },
+            {
+                model: Instrument,
+                required: true,
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt']
+                }
+            }
+        ],
+        order: [['id', 'DESC']]
+    })
+
+    return values.map(value => OrderHistoryResponseFromDb(value))
+}
+
 const GetAccountValue = async (userId: number): Promise<IAccountValue | null> => {
     const accountValue = await AccountValue.findOne({
         where: {
@@ -224,6 +249,7 @@ export default {
     GetOpenPositions,
     UpdateOpenPositions,
     AddOrders,
+    GetOrderHistories,
     GetAccountValue,
     GetAccountValues
 }

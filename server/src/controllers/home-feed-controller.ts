@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import Redis from '../config/redis'
 import DatabaseService from '../services/database-service'
-import IAccountValue from '../models/iaccount-value'
 import { AccountValueResponseFromRedis } from '../models/dto/responses/iaccount-value-response'
 
 const GetAccountValues = async (req: Request, res: Response) => {
@@ -20,7 +19,7 @@ const GetAccountValueGraph = async (req: Request, res: Response) => {
 }
 
 const GetFeed = async (req: Request, res: Response) => {
-    return res.send('Get Main Feed')
+    return res.json(await DatabaseService.GetOrderHistories())
 }
 
 export default {
