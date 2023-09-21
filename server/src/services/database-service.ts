@@ -214,10 +214,10 @@ const GetAccountValue = async (userId: number): Promise<IAccountValue | null> =>
         order: [['id', 'DESC']]
     })
 
-    return accountValue === null ? null : AccountValueFromDb(accountValue)
+    return accountValue === null ? null : AccountValueFromDb([accountValue])[0]
 }
 
-const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
+const GetAccountValues = async (getAll: boolean = false): Promise<IAccountValueResponse[]> => {
     const values = await User.findAll({
         attributes: {
             exclude: ['apiKey', 'password']
@@ -226,11 +226,11 @@ const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
             model: AccountValue,
             required: false,
             order: [['id', 'DESC']],
-            limit: 1
+            limit: getAll ? undefined : 1
         }]
     })
 
-    return AccountValueResponseFromDb(values)
+    return AccountValueResponseFromDb(values, getAll)
 }
 
 export default {

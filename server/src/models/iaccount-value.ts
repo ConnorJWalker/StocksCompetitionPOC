@@ -22,16 +22,19 @@ const ParseFloat = (input: string, decimalPlaces: number): number => {
     return Number(parseFloat(input).toFixed(decimalPlaces))
 }
 
-export const AccountValueFromDb = (accountValue: Model): IAccountValue => {
-    const dataValues = accountValue.dataValues
-    const cash = ParseFloat(dataValues.cash, 2)
-    const invested = ParseFloat(dataValues.invested, 2)
-    const gainLoss = ParseFloat(dataValues.gainLoss, 2)
+export const AccountValueFromDb = (accountValues: Model[]): IAccountValue[] => {
+    return accountValues.map(value => {
+        const dataValues = value.dataValues
+        const cash = ParseFloat(dataValues.cash, 2)
+        const invested = ParseFloat(dataValues.invested, 2)
+        const gainLoss = ParseFloat(dataValues.gainLoss, 2)
 
-    return {
-        cash,
-        invested,
-        total: ParseFloat(`${cash + invested + gainLoss}`, 2),
-        gainLoss
-    }
+        return {
+            cash,
+            invested,
+            total: ParseFloat(`${cash + invested + gainLoss}`, 2),
+            gainLoss
+        }
+    })
+
 }

@@ -29,11 +29,15 @@ export const AccountValueResponseFromRedis = (cached: string, users: IUser[]): I
     })
 }
 
-export const AccountValueResponseFromDb = (values: Model[]): IAccountValueResponse[] => {
-    return values.map(value => ({
-        user: UserFromDbResult(value),
-        values: value.dataValues.AccountValues.length === 0
-            ? defaultValue
-            : AccountValueFromDb(value.dataValues.AccountValues[0])
-    }))
+export const AccountValueResponseFromDb = (values: Model[], isArray: boolean): IAccountValueResponse[] => {
+    return values.map(value => {
+        const accountValues = AccountValueFromDb(value.dataValues.AccountValues)
+
+        return {
+            user: UserFromDbResult(value),
+            values: value.dataValues.AccountValues.length === 0
+                ? defaultValue
+                : isArray ? accountValues : accountValues[0]
+        }
+    })
 }
