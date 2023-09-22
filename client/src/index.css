@@ -57,10 +57,12 @@ ul {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    color: white;
 }
 
 .container > main {
     flex: 1;
+    padding: 1em;
 }
 
 .container > nav {
