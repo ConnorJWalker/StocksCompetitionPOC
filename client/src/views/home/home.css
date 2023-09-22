@@ -1,3 +1,12 @@
+.chart {
+    background-color: red;
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .leaderboards-container {
     margin-top: 10px;
 }
@@ -21,4 +30,21 @@
 
 .leaderboard-item p:first-of-type {
     flex: 1;
+}
+
+@media screen and (min-width: 750px) {
+    .chart-leaderboards-container {
+        display: flex;
+        height: 80%;
+    }
+
+    .chart {
+        width: unset;
+    }
+
+    .leaderboards-container {
+        flex: 1;
+        margin-top: unset;
+        margin-left: 10px;
+    }
 }

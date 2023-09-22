@@ -8,13 +8,14 @@ const Home = () => {
 
     return (
         <>
-            <h1>Stocks Competition</h1>
-            {/* TODO: replace with actual graph */}
-            <div style={{ backgroundColor: 'red', width: '100%', aspectRatio: '16/9', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <p>Chart</p>
-            </div>
+            <div className='chart-leaderboards-container'>
+                {/* TODO: replace with actual graph */}
+                <div className='chart'>
+                    <p>Chart</p>
+                </div>
 
-            <Leaderboards />
+                <Leaderboards />
+            </div>
         </>
     )
 }
