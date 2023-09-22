@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import UserContext from './context'
 import IUser from './models/iuser'
 import Container from './views/container'
-import Home from './views/home/Home'
+import Home from './views/home/home'
 import AuthenticationForms from './views/authentication/authentication-forms'
 import AuthenticationService from './services/authentication-service'
 

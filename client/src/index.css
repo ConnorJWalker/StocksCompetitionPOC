@@ -88,3 +88,29 @@ ul {
     background-color: white;
     content: "";
 }
+
+@media screen and (min-width: 500px) {
+    .container {
+        flex-direction: row-reverse;
+    }
+
+    .container > nav {
+        flex-direction: column;
+        padding: 0 10px;
+        align-items: center;
+    }
+
+    .container > nav .selected::after {
+        display: none;
+    }
+
+    .container > nav .selected::before {
+        width: 5px;
+        height: 80%;
+        margin-right: 5px;
+        border-radius: 5px;
+        display: inline-block;
+        background-color: white;
+        content: "";
+    }
+}
