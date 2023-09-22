@@ -52,6 +52,10 @@ ul {
     list-style-position: inside;
 }
 
+path {
+    stroke-width: 24px;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -83,7 +87,7 @@ ul {
 
 .container > nav .selected::after {
     width: 80%;
-    height: 5px;
+    height: 2px;
     margin: 0 auto;
     border-radius: 5px;
     display: block;
@@ -107,7 +111,7 @@ ul {
     }
 
     .container > nav .selected::before {
-        width: 5px;
+        width: 2px;
         height: 80%;
         margin-right: 5px;
         border-radius: 5px;
