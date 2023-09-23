@@ -6,14 +6,11 @@ import './home.css'
 
 const Home = () => {
     return (
-        <>
-            <div className='chart-leaderboards-container'>
-                <UserChart />
-                <Leaderboards />
-            </div>
-
+        <div className='home-container'>
+            <UserChart />
+            <Leaderboards />
             <Feed />
-        </>
+        </div>
     )
 }
 

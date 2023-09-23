@@ -1,9 +1,7 @@
 .chart {
     width: 100%;
-    aspect-ratio: 16/9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    aspect-ratio: 16 / 9;
+    max-height: 80vh;
 }
 
 .leaderboards-container {
@@ -67,6 +65,7 @@
     filter: grayscale(100%);
     padding: 5px;
     border: none;
+    font-size: 1.25em;
 }
 
 .post footer button.selected {
@@ -78,19 +77,48 @@
     display: inline-block;
 }
 
-@media screen and (min-width: 750px) {
-    .chart-leaderboards-container {
-        display: flex;
-        height: 80%;
+@media screen and (min-width: 1000px) {
+    .home-container {
+        display: grid;
+        grid-gap: 1em;
+        grid-template-columns: calc(100% - 300px - 1em) 300px;
+        grid-template-rows: 80vh auto;
     }
 
     .chart {
-        width: unset;
+        grid-column: 1/3;
+        height: 80vh;
+    }
+
+    .feed-container {
+        grid-column: 1;
+        margin-top: unset;
     }
 
     .leaderboards-container {
-        flex: 1;
-        margin-top: unset;
-        margin-left: 10px;
+        margin-top: 0;
+        grid-column: 2;
+        grid-row: 2;
+        height: 100%;
+    }
+
+    .leaderboards-container > div {
+        position: sticky;
+        top: 0;
+    }
+
+    .post {
+        margin-right: unset;
+        margin-left: unset;
+    }
+}
+
+@media screen and (min-width: 1500px) {
+    .leaderboards-container {
+        grid-row: 1/3;
+    }
+
+    .chart, .feed-container {
+        grid-column: 1;
     }
 }

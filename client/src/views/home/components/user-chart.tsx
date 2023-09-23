@@ -19,6 +19,7 @@ const UserChart = () => {
     const [data, setData] = useState<ChartData<'line'>>({datasets: []})
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 display: false
@@ -63,7 +64,9 @@ const UserChart = () => {
     }, [])
 
     return (
-        <Line data={data} options={options} />
+        <div className='chart'>
+            <Line data={data} options={options} />
+        </div>
     )
 
     function mapResponse(response: IAccountValuesResponse[]) {
