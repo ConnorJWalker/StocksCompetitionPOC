@@ -5,6 +5,7 @@ import IProfilePicture from '../models/dto/iprofile-picture'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
 import AuthenticationService from './authentication-service'
 import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
+import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
 
 export class HttpError extends Error {
     public statusCode: number
@@ -91,8 +92,13 @@ const GetLeaderboards = async (): Promise<IHttpResult<IAccountValueResponse[]>> 
     return response
 }
 
-const GetUserChars = async (): Promise<IHttpResult<IAccountValuesResponse[]>> => {
+const GetUserCharts = async (): Promise<IHttpResult<IAccountValuesResponse[]>> => {
     return await send<IAccountValuesResponse[]>('feed/accountValues/graph')
+}
+
+const GetFeed = async (): Promise<IOrderHistoryResponse[]> => {
+    const response = await send<IOrderHistoryResponse[]>('feed')
+    return response.content
 }
 
 const sendWithoutAuth = async <T>(endpoint: string, method: string = 'get', body: object | null = null): Promise<IHttpResult<T | IHttpErrorResult>> => {
@@ -148,5 +154,6 @@ export default {
     GetDiscordUsernameErrors,
     GetDiscordProfilePicture,
     GetLeaderboards,
-    GetUserChars
+    GetUserCharts,
+    GetFeed
 }

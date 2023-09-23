@@ -57,7 +57,7 @@ const UserChart = () => {
     }
 
     useEffect(() => {
-        ApiService.GetUserChars()
+        ApiService.GetUserCharts()
             .then(response => mapResponse(response.content))
             .catch(err => console.error(err))
     }, [])

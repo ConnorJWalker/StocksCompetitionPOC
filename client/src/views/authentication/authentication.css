@@ -53,7 +53,7 @@ input[type=text], input[type=password] {
     user-select: none;
 }
 
-footer {
+.authentication-container footer {
     margin-top: 10px;
     display: flex;
     justify-content: space-between;

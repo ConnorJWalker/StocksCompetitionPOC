@@ -31,6 +31,53 @@
     flex: 1;
 }
 
+.feed-container {
+    margin-top: 25px;
+}
+
+.post:first-of-type {
+    margin-top: 10px;
+}
+
+.post {
+    background-color: rgb(27, 34, 42);
+    margin: 0 -1em 10px;
+}
+
+.post header {
+    display: flex;
+    align-items: center;
+}
+
+.post header img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.post > div, .post header, .post footer {
+    padding: 10px;
+}
+
+.post footer {
+    text-align: end;
+}
+
+.post footer button {
+    filter: grayscale(100%);
+    padding: 5px;
+    border: none;
+}
+
+.post footer button.selected {
+    filter: unset;
+}
+
+.like-button {
+    rotate: -90deg;
+    display: inline-block;
+}
+
 @media screen and (min-width: 750px) {
     .chart-leaderboards-container {
         display: flex;
