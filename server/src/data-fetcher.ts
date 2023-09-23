@@ -67,7 +67,8 @@ const updateOpenPositions = async (users: IUserWithSecrets[]): Promise<void> => 
             if (t212Position === undefined) {
                 removedPositions.push(position)
             }
-            else if (t212Position.quantity !== position.quantity) {
+            // If returned quantity is different to stored quantity by more than the database will truncate, add to database
+            else if (t212Position.quantity !== position.quantity && Math.abs(t212Position.quantity - position.quantity) > 0.000009) {
                 updatedPositions.push({ ...position, quantity: t212Position.quantity })
                 newOrderHistory.push({
                     userId: dbOpenPosition.user.id,
