@@ -8,6 +8,8 @@ import AuthenticationForms from './views/authentication/authentication-forms'
 import AuthenticationService from './services/authentication-service'
 
 const App = () => {
+    const [user, setUser] = useState<IUser | null>(null)
+
     const router = createBrowserRouter([
         {
             path: '/',
@@ -34,17 +36,20 @@ const App = () => {
             return <AuthenticationForms />
         }
 
-        const userString = localStorage.getItem('user')
+        if (user === null) {
+            const userString = localStorage.getItem('user')
 
-        // something has gone wrong, log the user out
-        if (userString === null) {
-            AuthenticationService.LogOut()
-            return <AuthenticationForms />
+            // something has gone wrong, log the user out
+            if (userString === null) {
+                AuthenticationService.LogOut()
+                return <AuthenticationForms />
+            }
+
+            setUser(JSON.parse(userString))
         }
 
-        const [user] = useState<IUser>(JSON.parse(userString))
         return (
-            <UserContext.Provider value={user}>
+            <UserContext.Provider value={user!}>
                 <Container tabIndex={tabIndex}>
                     { element }
                 </Container>

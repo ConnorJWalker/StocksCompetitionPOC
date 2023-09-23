@@ -47,7 +47,7 @@ const LogOut = () => {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
 
-    location.reload()
+    window.location.reload()
 }
 
 export default {
