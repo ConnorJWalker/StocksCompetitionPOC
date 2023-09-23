@@ -1,19 +1,13 @@
 import React from 'react'
-import { useUserContext } from '../../context'
 import Leaderboards from './components/leaderboards'
+import UserChart from './components/user-chart'
 import './home.css'
 
 const Home = () => {
-    const user = useUserContext()
-
     return (
         <>
             <div className='chart-leaderboards-container'>
-                {/* TODO: replace with actual graph */}
-                <div className='chart'>
-                    <p>Chart</p>
-                </div>
-
+                <UserChart />
                 <Leaderboards />
             </div>
         </>

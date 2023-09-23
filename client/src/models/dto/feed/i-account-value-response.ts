@@ -1,8 +1,13 @@
 import IUser from '../../iuser'
 
 export default interface IAccountValueResponse {
-    user: IUser,
+    user: IUser
     values: IAccountValues
+}
+
+export interface IAccountValuesResponse {
+    user: IUser
+    values: IAccountValues[]
 }
 
 export interface IAccountValues {
