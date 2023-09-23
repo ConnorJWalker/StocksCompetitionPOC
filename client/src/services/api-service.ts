@@ -51,11 +51,11 @@ const Refresh = async (token: string): Promise<IAuthenticationResponse | null> =
         method: 'post',
         headers: new Headers({
             'content-type': 'application/json',
-            'authorization': 'Bearer' + token
+            'authorization': 'Bearer ' + token
         })
     })
 
-    return response.ok ? await response.json() : null
+    return response.ok ? await response.json() as IAuthenticationResponse : null
 }
 
 const GetDiscordUsernameErrors = async (discordUsername: string): Promise<string[]> => {
@@ -116,7 +116,7 @@ const send = async <T>(endpoint: string, method = 'get', body: object | null = n
             'authorization': 'Bearer ' + localStorage.getItem('accessToken') || '',
         })
     })
-
+    
     if (response.status === 401 && await AuthenticationService.Refresh()) {
         return send(endpoint, method, body)
     }

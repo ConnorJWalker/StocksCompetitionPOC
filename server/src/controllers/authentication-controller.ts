@@ -63,7 +63,7 @@ const Refresh = async (req: Request, res: Response) => {
 
     return newToken === null
         ? res.status(403).send()
-        : res.json({ token: newToken })
+        : res.json(newToken)
 }
 
 const ValidateDiscordUsername = async (req: Request, res: Response) => {
