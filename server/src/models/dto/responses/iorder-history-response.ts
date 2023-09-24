@@ -8,7 +8,7 @@ export default interface IOrderHistoryResponse {
         type: string
         price: number
         quantity: number
-        date: number
+        date: string
         instrument: IInstrument
     }
 }
@@ -20,7 +20,7 @@ export const OrderHistoryResponseFromDb = (value: Model): IOrderHistoryResponse 
             type: value.dataValues.type,
             price: value.dataValues.averagePrice,
             quantity: value.dataValues.quantity,
-            date: value.dataValues.date,
+            date: value.dataValues.createdAt,
             instrument: InstrumentFromDbResult(value.dataValues.Instrument)
         }
     }

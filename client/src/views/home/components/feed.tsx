@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import ApiService from '../../../services/api-service'
 import IOrderHistoryResponse from '../../../models/dto/feed/iorder-history-response'
 
 const Feed = () => {
     const [posts, setPosts] = useState<IOrderHistoryResponse[]>([])
+
+    dayjs.extend(relativeTime)
 
     useEffect(() => {
         ApiService.GetFeed()
@@ -21,7 +25,7 @@ const Feed = () => {
                             <img src={post.user.profilePicture} alt=""/>
                             <span>
                                 <h3>{ post.user.displayName }</h3>
-                                <small>{ Date.now() }</small>
+                                <small>{ dayjs(post.order.date).fromNow() }</small>
                             </span>
                         </header>
                         <div>
