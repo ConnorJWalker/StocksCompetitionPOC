@@ -2,29 +2,46 @@ import { Response } from 'express'
 import { RequestWithTargetUser } from '../middleware/get-profile-user'
 import DatabaseService from '../services/database-service'
 import Redis from '../config/redis'
-import IAccountValue from '../models/iaccount-value'
+import IAccountValueResponse, { AccountValueResponseFromRedis } from '../models/dto/responses/iaccount-value-response'
 
-const GetProfileStocks = async (req: RequestWithTargetUser, res: Response) => {
-    const openPositions = await DatabaseService.GetOpenPositions(req.targetUser!.id)
-    return openPositions.length === 1 ? res.json(openPositions[0]) : res.status(404).send()
+const GetUser = (req: RequestWithTargetUser, res: Response) => {
+    return res.json({ ...req.targetUser, apiKey: undefined, password: undefined })
 }
 
-const GetProfileCash = async (req: RequestWithTargetUser, res: Response) => {
+const GetOpenPositions = async (req: RequestWithTargetUser, res: Response) => {
+    return res.json(await DatabaseService.GetOpenPositionsWithInstrument(req.targetUser!.id))
+}
+
+const GetAccountValue = async (req: RequestWithTargetUser, res: Response) => {
     const cached = await Redis.get('t212-account-values')
-    let userValue: IAccountValue | null
+    let userValue: IAccountValueResponse | undefined
 
-    if (cached === null) {
-        userValue = await DatabaseService.GetAccountValue(req.targetUser!.id)
-    }
-    else {
-        userValue = (JSON.parse(cached!) as IAccountValue[])
-            .find(value => value.discordUsername === req.targetUser!.discordUsername) || null
+    if (cached !== null) {
+        const users = await DatabaseService.GetAllUsers()
+        const parsed = AccountValueResponseFromRedis(cached, users)
+        userValue = parsed.find(value => value.user.discordUsername === req.targetUser?.discordUsername)
     }
 
-    return userValue === null ? res.status(404).send() : res.json(userValue)
+    if (userValue === undefined) {
+        const values = await DatabaseService.GetAccountValues(false, req.targetUser?.discordUsername)
+        userValue = values.find(value => value.user.discordUsername === req.targetUser?.discordUsername)
+    }
+
+    return res.json(userValue || {})
+}
+
+const GetAccountValueGraph = async (req: RequestWithTargetUser, res: Response) => {
+    return res.json(await DatabaseService.GetAccountValues(true, req.targetUser?.discordUsername))
+}
+
+const GetFeed = async (req: RequestWithTargetUser, res: Response) => {
+    return res.json(await DatabaseService.GetOrderHistories(req.targetUser?.id))
 }
 
 export default {
-    GetProfileStocks,
-    GetProfileCash
+    GetUser,
+    GetOpenPositions,
+    GetAccountValue,
+    GetAccountValueGraph,
+    GetFeed
 }

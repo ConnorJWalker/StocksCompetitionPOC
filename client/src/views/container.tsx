@@ -31,7 +31,7 @@ const Container = ({ children, tabIndex }: props) => {
                 </span>
 
                 <span className={tabIndex === 3 ? 'selected' : ''}>
-                    <img src={user.profilePicture} alt='User Profile Picture' onClick={() => navigate('/profile')} />
+                    <img src={user.profilePicture} alt='User Profile Picture' onClick={() => navigate(`/profile/${user.discordUsername}`)} />
                 </span>
             </nav>
         </div>

@@ -3,7 +3,7 @@ import Redis from './config/redis'
 import DatabaseService from './services/database-service'
 import Trading212Service from './services/trading212-service'
 import { IUserWithSecrets } from './models/iuser'
-import { IPosition } from './models/dto/responses/iopen-positions'
+import { IPosition } from './models/iopen-positions'
 import { IDbOrderHistory } from './models/iorder-history'
 
 // start at max so first api response is stored in database

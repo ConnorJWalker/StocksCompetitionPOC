@@ -11,12 +11,13 @@ import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult 
 import ISignupForm from '../models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
-import IAccountValue, { AccountValueFromDb } from '../models/iaccount-value'
-import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/dto/responses/iopen-positions'
+import IAccountValue from '../models/iaccount-value'
+import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/iopen-positions'
 import { IDbOrderHistory } from '../models/iorder-history'
 import IRefreshToken, { RefreshTokenFromDbResult } from '../models/irefresh-token'
 import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/responses/iaccount-value-response'
 import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/responses/iorder-history-response'
+import IOpenPositionsResponse, { OpenPositionsResponseFromDb } from '../models/dto/responses/iopen-positions-response'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,
@@ -124,13 +125,10 @@ const AddAccountValues = async (users: IUser[], accountValues: IAccountValue[]):
     })))
 }
 
-const GetOpenPositions = async (userId: number | undefined = undefined): Promise<IOpenPositions[]> => {
+const GetOpenPositions = async (): Promise<IOpenPositions[]> => {
     const openPositions = await User.findAll({
         attributes: {
             exclude: ['apiKey', 'password']
-        },
-        where: userId === undefined ? undefined : {
-            id: userId
         },
         include: [{
             model: OpenPositions,
@@ -140,6 +138,18 @@ const GetOpenPositions = async (userId: number | undefined = undefined): Promise
     })
 
     return openPositions.map(position => OpenPositionsFromDbResult(position))
+}
+
+const GetOpenPositionsWithInstrument = async (userId: number): Promise<IOpenPositionsResponse[]> => {
+    const openPositions = await OpenPositions.findAll({
+        where: { userId },
+        include: [{
+            model: Instrument,
+            required: true
+        }]
+    })
+
+    return OpenPositionsResponseFromDb(openPositions)
 }
 
 const UpdateOpenPositions = async (user: IUser, newPositions: IPosition[], updatedPositions: IPosition[], removedPositions: IPosition[]): Promise<void> => {
@@ -182,8 +192,11 @@ const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
     })))
 }
 
-const GetOrderHistories = async (): Promise<IOrderHistoryResponse[]> => {
+const GetOrderHistories = async (userId?: number): Promise<IOrderHistoryResponse[]> => {
     const values = await OrderHistory.findAll({
+        where: userId === undefined ? undefined : {
+            userId
+        },
         include: [
             {
                 model: User,
@@ -206,21 +219,13 @@ const GetOrderHistories = async (): Promise<IOrderHistoryResponse[]> => {
     return values.map(value => OrderHistoryResponseFromDb(value))
 }
 
-const GetAccountValue = async (userId: number): Promise<IAccountValue | null> => {
-    const accountValue = await AccountValue.findOne({
-        where: {
-            UserId: userId
-        },
-        order: [['id', 'DESC']]
-    })
-
-    return accountValue === null ? null : AccountValueFromDb([accountValue])[0]
-}
-
-const GetAccountValues = async (getAll: boolean = false): Promise<IAccountValueResponse[]> => {
+const GetAccountValues = async (getAll: boolean = false, discordUsername?: string): Promise<IAccountValueResponse[]> => {
     const values = await User.findAll({
         attributes: {
             exclude: ['apiKey', 'password']
+        },
+        where: discordUsername === undefined ? undefined : {
+            discordUsername
         },
         include: [{
             model: AccountValue,
@@ -247,9 +252,9 @@ export default {
     UpdateStocksList,
     AddAccountValues,
     GetOpenPositions,
+    GetOpenPositionsWithInstrument,
     UpdateOpenPositions,
     AddOrders,
     GetOrderHistories,
-    GetAccountValue,
     GetAccountValues
 }

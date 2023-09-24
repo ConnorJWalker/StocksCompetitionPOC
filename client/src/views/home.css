@@ -77,6 +77,51 @@
     display: inline-block;
 }
 
+.follow-button {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.user-info .profile-picture {
+    width: 100%;
+    height: unset;
+    border-radius: unset;
+}
+
+.user-info .account-value-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.open-position-container header {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.open-position-container object {
+    width: 50px;
+    margin-right: 10px;
+}
+
+.open-position-container object div {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(27, 34, 42);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 0.75em;
+    letter-spacing: 2px;
+}
+
+.about-open-position {
+    line-height: 1.5;
+}
+
 @media screen and (min-width: 1000px) {
     .home-container {
         display: grid;

@@ -6,6 +6,8 @@ import IAuthenticationResponse from '../models/dto/iauthentication-response'
 import AuthenticationService from './authentication-service'
 import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
 import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
+import IUser from '../models/iuser'
+import IOpenPositionsResponse from '../models/dto/profile/iopen-positions-response'
 
 export class HttpError extends Error {
     public statusCode: number
@@ -92,12 +94,30 @@ const GetLeaderboards = async (): Promise<IHttpResult<IAccountValueResponse[]>> 
     return response
 }
 
-const GetUserCharts = async (): Promise<IHttpResult<IAccountValuesResponse[]>> => {
-    return await send<IAccountValuesResponse[]>('feed/accountValues/graph')
+const GetUserCharts = async (discordUsername?: string): Promise<IHttpResult<IAccountValuesResponse[]>> => {
+    const endpoint = discordUsername === undefined
+        ? 'feed/accountValues/graph'
+        : `profile/accountValue/graph/${discordUsername}`
+
+    return await send<IAccountValuesResponse[]>(endpoint)
 }
 
-const GetFeed = async (): Promise<IOrderHistoryResponse[]> => {
-    const response = await send<IOrderHistoryResponse[]>('feed')
+const GetFeed = async (discordUsername?: string): Promise<IOrderHistoryResponse[]> => {
+    const endpoint = discordUsername === undefined
+        ? 'feed'
+        : `profile/feed/${discordUsername}`
+
+    const response = await send<IOrderHistoryResponse[]>(endpoint)
+    return response.content
+}
+
+const GetProfileUser = async (discordUsername: string): Promise<IUser> => {
+    const response = await send<IUser>(`profile/user/${discordUsername}`)
+    return response.content
+}
+
+const GetOpenPositions = async (discordUsername: string): Promise<IOpenPositionsResponse[]> => {
+    const response = await send<IOpenPositionsResponse[]>(`profile/openPositions/${discordUsername}`)
     return response.content
 }
 
@@ -155,5 +175,7 @@ export default {
     GetDiscordProfilePicture,
     GetLeaderboards,
     GetUserCharts,
-    GetFeed
+    GetFeed,
+    GetProfileUser,
+    GetOpenPositions
 }

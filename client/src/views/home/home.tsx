@@ -1,8 +1,8 @@
 import React from 'react'
-import Leaderboards from './components/leaderboards'
-import UserChart from './components/user-chart'
-import Feed from './components/feed'
-import './home.css'
+import Leaderboards from './leaderboards'
+import UserChart from '../../components/user-chart'
+import Feed from '../../components/feed'
+import '../home.css'
 
 const Home = () => {
     return (

@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import ApiService from '../../../services/api-service'
-import IOrderHistoryResponse from '../../../models/dto/feed/iorder-history-response'
+import ApiService from '../services/api-service'
+import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
+import formatPrice from '../utils/format-price'
 
-const Feed = () => {
+interface props {
+    discordUsername?: string
+}
+
+const Feed = ({ discordUsername }: props) => {
     const [posts, setPosts] = useState<IOrderHistoryResponse[]>([])
 
     dayjs.extend(relativeTime)
 
     useEffect(() => {
-        ApiService.GetFeed()
+        ApiService.GetFeed(discordUsername)
             .then(response => setPosts(response))
             .catch(err => console.log(err))
     }, [])
@@ -43,16 +48,6 @@ const Feed = () => {
             }
         </div>
     )
-
-    function formatPrice(price: number, currencyCode: string): string  {
-        switch (currencyCode) {
-            case 'USD': return '$' + price
-            case 'EUR': return '€' + price
-            case 'GBP': return '£' + price
-            case 'GBX': return price + 'p'
-            default: return price + currencyCode
-        }
-    }
 }
 
 export default Feed

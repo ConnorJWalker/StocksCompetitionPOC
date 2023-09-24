@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import ApiService from '../../../services/api-service'
-import IAccountValueResponse from '../../../models/dto/feed/i-account-value-response'
+import ApiService from '../../services/api-service'
+import IAccountValueResponse from '../../models/dto/feed/i-account-value-response'
 
 const Leaderboards = () => {
     const [accountValues, setAccountValues] = useState<IAccountValueResponse[]>([])

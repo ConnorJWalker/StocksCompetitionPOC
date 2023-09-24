@@ -4,6 +4,7 @@ import UserContext from './context'
 import IUser from './models/iuser'
 import Container from './views/container'
 import Home from './views/home/home'
+import Profile from './views/profile/profile'
 import AuthenticationForms from './views/authentication/authentication-forms'
 import AuthenticationService from './services/authentication-service'
 
@@ -24,8 +25,8 @@ const App = () => {
             element: authenticateView(<Home />, 2)
         },
         {
-            path: '/profile',
-            element: authenticateView(<Home />, 3)
+            path: '/profile/:discordUsername',
+            element: authenticateView(<Profile />, 3)
         }
     ])
 

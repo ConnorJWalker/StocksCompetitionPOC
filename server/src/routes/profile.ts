@@ -1,11 +1,18 @@
 import { Router } from 'express'
 import ProfileController from '../controllers/profile-controller'
 import GetProfileUser from '../middleware/get-profile-user'
+import getProfileUser from '../middleware/get-profile-user'
 
 const router = Router()
 
-router.get('/stocks/:discordUsername', GetProfileUser, ProfileController.GetProfileStocks)
+router.get('/user/:discordUsername', GetProfileUser, ProfileController.GetUser)
 
-router.get('/cash/:discordUsername', GetProfileUser, ProfileController.GetProfileCash)
+router.get('/openPositions/:discordUsername', GetProfileUser, ProfileController.GetOpenPositions)
+
+router.get('/accountValue/:discordUsername', GetProfileUser, ProfileController.GetAccountValue)
+
+router.get('/accountValue/graph/:discordUsername', GetProfileUser, ProfileController.GetAccountValueGraph)
+
+router.get('/feed/:discordUsername', getProfileUser, ProfileController.GetFeed)
 
 export default router

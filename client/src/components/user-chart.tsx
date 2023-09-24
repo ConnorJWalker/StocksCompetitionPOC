@@ -10,12 +10,16 @@ import {
     LineElement,
     Tooltip
 } from 'chart.js'
-import { IAccountValuesResponse } from '../../../models/dto/feed/i-account-value-response'
-import ApiService from '../../../services/api-service'
+import { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
+import ApiService from '../services/api-service'
 
 ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
-const UserChart = () => {
+interface props {
+    discordUsername?: string
+}
+
+const UserChart = ({ discordUsername }: props) => {
     const [data, setData] = useState<ChartData<'line'>>({datasets: []})
     const options = {
         responsive: true,
@@ -58,7 +62,7 @@ const UserChart = () => {
     }
 
     useEffect(() => {
-        ApiService.GetUserCharts()
+        ApiService.GetUserCharts(discordUsername)
             .then(response => mapResponse(response.content))
             .catch(err => console.error(err))
     }, [])

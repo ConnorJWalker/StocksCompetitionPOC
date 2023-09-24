@@ -1,6 +1,6 @@
-import IT212OpenPosition from '../../trading212/open-position'
+import IT212OpenPosition from './trading212/open-position'
 import { Model } from 'sequelize'
-import IUser from '../../iuser'
+import IUser from './iuser'
 
 export interface IPosition {
     instrumentId?: number
