@@ -4,6 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import ApiService from '../services/api-service'
 import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
 import formatPrice from '../utils/format-price'
+import { Link } from 'react-router-dom'
 
 interface props {
     discordUsername?: string
@@ -29,7 +30,11 @@ const Feed = ({ discordUsername }: props) => {
                         <header>
                             <img src={post.user.profilePicture} alt=""/>
                             <span>
-                                <h3>{ post.user.displayName }</h3>
+                                <Link to={`/profile/${post.user.discordUsername}`}>
+                                    <h3>
+                                        { post.user.displayName }
+                                    </h3>
+                                </Link>
                                 <small>{ dayjs(post.order.date).fromNow() }</small>
                             </span>
                         </header>
@@ -38,10 +43,13 @@ const Feed = ({ discordUsername }: props) => {
                             &nbsp;({ post.order.instrument.ticker }) for { formatPrice(post.order.price, post.order.instrument.currencyCode) }
                         </div>
                         <footer>
-                            <button>
-                                <span className='like-button'>🚀</span>
-                            </button>
-                            <button>💥</button>
+                            <input type="text" placeholder='Comment' />
+                            <span>
+                                <button>
+                                    <span className='like-button'>🚀</span>
+                                </button>
+                                <button>💥</button>
+                            </span>
                         </footer>
                     </div>
                 ))

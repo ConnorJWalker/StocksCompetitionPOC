@@ -38,7 +38,7 @@
 }
 
 .post {
-    background-color: rgb(27, 34, 42);
+    background-color: var(--background-colour-alt);
     margin: 0 -1em 10px;
 }
 
@@ -58,7 +58,14 @@
 }
 
 .post footer {
-    text-align: end;
+    display: flex;
+}
+
+.post footer input {
+    flex: 1;
+    background-color: transparent;
+    color: white;
+    margin-right: 10px;
 }
 
 .post footer button {
@@ -77,7 +84,7 @@
     display: inline-block;
 }
 
-.follow-button {
+.profile-action-button {
     width: 100%;
     margin: 10px 0;
 }
@@ -110,7 +117,7 @@
 .open-position-container object div {
     width: 50px;
     height: 50px;
-    background-color: rgb(27, 34, 42);
+    background-color: var(--background-colour-alt);
     display: flex;
     justify-content: space-around;
     align-items: center;

@@ -1,3 +1,12 @@
+:root {
+    --background-colour: #161b22;
+    --background-colour-alt: #1c242e;
+    --accent-colour: #e60050;
+    --accent-colour-alt: #c30d4c;
+    --font-colour: #f0f2ff;
+    --danger: #d13232;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -11,10 +20,15 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #161b22;
+    background-color: var(--background-colour);
 }
 
 html, body , #root { height: 100%; }
+
+a {
+    text-decoration: none;
+    color: unset;
+}
 
 input[type=text], input[type=password] {
     padding: 10px 10px;
@@ -30,13 +44,19 @@ button {
 }
 
 button.btn-pink {
-    background-color: #E60050;
-    border: 1px solid #E60050;
-    color: #fff;
+    background-color: var(--accent-colour);
+    border: 1px solid var(--accent-colour);
+    color: var(--font-colour);
 }
 
 button.btn-pink:hover, button.btn-pink:active {
-    background-color: #c30d4c;
+    background-color: var(--accent-colour-alt);
+}
+
+button.btn-danger {
+    background-color: var(--danger);
+    border: 1px solid var(--danger);
+    color: var(--font-colour)
 }
 
 button.link {
@@ -60,7 +80,7 @@ path {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    color: white;
+    color: var(--font-colour);
 }
 
 .container > main {

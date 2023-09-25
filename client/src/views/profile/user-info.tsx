@@ -4,12 +4,15 @@ import ApiService from '../../services/api-service'
 import IAccountValueResponse from '../../models/dto/feed/i-account-value-response'
 import IOpenPositionsResponse from '../../models/dto/profile/iopen-positions-response'
 import formatPrice from '../../utils/format-price'
+import { useUserContext } from '../../context'
+import AuthenticationService from '../../services/authentication-service'
 
 interface props {
     discordUsername?: string
 }
 
 const UserInfo = ({ discordUsername }: props) => {
+    const user = useUserContext()
     const [profileUser, setProfileUser] = useState<IUser | null>(null)
     const [accountValues, setAccountValues] = useState<IAccountValueResponse[]>([])
     const [openPositions, setOpenPositions] = useState<IOpenPositionsResponse[]>([])
@@ -42,7 +45,11 @@ const UserInfo = ({ discordUsername }: props) => {
                     </span>
                 </div>
 
-                <button className='btn-pink follow-button'>Follow</button>
+                {
+                    user.discordUsername === discordUsername
+                        ? <button className='btn-danger profile-action-button' onClick={AuthenticationService.LogOut}>Log Out</button>
+                        : <button className='btn-pink profile-action-button'>Follow</button>
+                }
 
                 { renderAccountValue() }
 
