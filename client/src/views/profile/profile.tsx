@@ -1,18 +1,19 @@
 import React from 'react'
 import UserChart from '../../components/user-chart'
-import { useParams } from 'react-router-dom'
+import { useLoaderData } from 'react-router-dom'
 import UserInfo from './user-info'
 import Feed from '../../components/feed'
+import { IProfileLoaderData } from '../../loaders/profile-loader'
 import '../home.css'
 
 const Profile = () => {
-    const { discordUsername } = useParams()
+    const profileData = useLoaderData() as IProfileLoaderData
 
     return (
         <div className='home-container'>
-            <UserChart discordUsername={discordUsername} />
-            <UserInfo discordUsername={discordUsername} />
-            <Feed discordUsername={discordUsername} />
+            <UserChart data={profileData.userChart} />
+            <UserInfo userInfo={profileData.userInfo} />
+            <Feed posts={profileData.feed} />
         </div>
     )
 }

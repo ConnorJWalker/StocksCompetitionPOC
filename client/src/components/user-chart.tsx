@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Line } from 'react-chartjs-2'
 import {
     Chart as ChartJs,
@@ -11,16 +11,14 @@ import {
     Tooltip
 } from 'chart.js'
 import { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
-import ApiService from '../services/api-service'
 
 ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 interface props {
-    discordUsername?: string
+    data: IAccountValuesResponse[]
 }
 
-const UserChart = ({ discordUsername }: props) => {
-    const [data, setData] = useState<ChartData<'line'>>({datasets: []})
+const UserChart = ({ data }: props) => {
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -61,23 +59,19 @@ const UserChart = ({ discordUsername }: props) => {
         }
     }
 
-    useEffect(() => {
-        ApiService.GetUserCharts(discordUsername)
-            .then(response => mapResponse(response.content))
-            .catch(err => console.error(err))
-    }, [])
+    const mappedData = mapResponse()
 
     return (
         <div className='chart'>
-            <Line data={data} options={options} />
+            <Line data={mappedData} options={options} />
         </div>
     )
 
-    function mapResponse(response: IAccountValuesResponse[]) {
+    function mapResponse(): ChartData<'line'> {
         let highestCount = 0
-        response.forEach(value => highestCount = Math.max(highestCount, value.values.length))
+        data.forEach(value => highestCount = Math.max(highestCount, value.values.length))
 
-        const datasets = response.map(value => ({
+        const datasets = data.map(value => ({
             label: value.user.displayName,
             data: new Array(highestCount - value.values.length).fill(null)
                 .concat(value.values.map(point => point.total)),
@@ -86,10 +80,10 @@ const UserChart = ({ discordUsername }: props) => {
             pointRadius: 0
         }))
 
-        setData({
+        return {
             datasets,
             labels: new Array(highestCount).fill('')
-        })
+        }
     }
 }
 

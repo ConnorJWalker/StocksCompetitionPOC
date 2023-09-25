@@ -1,61 +1,45 @@
-import React, { useEffect, useState } from 'react'
-import IUser from '../../models/iuser'
-import ApiService from '../../services/api-service'
-import IAccountValueResponse from '../../models/dto/feed/i-account-value-response'
-import IOpenPositionsResponse from '../../models/dto/profile/iopen-positions-response'
+import React from 'react'
 import formatPrice from '../../utils/format-price'
 import { useUserContext } from '../../context'
 import AuthenticationService from '../../services/authentication-service'
+import { IProfileData } from '../../loaders/profile-loader'
 
 interface props {
-    discordUsername?: string
+    userInfo: IProfileData
 }
 
-const UserInfo = ({ discordUsername }: props) => {
+const UserInfo = ({ userInfo }: props) => {
     const user = useUserContext()
-    const [profileUser, setProfileUser] = useState<IUser | null>(null)
-    const [accountValues, setAccountValues] = useState<IAccountValueResponse[]>([])
-    const [openPositions, setOpenPositions] = useState<IOpenPositionsResponse[]>([])
-
-    useEffect(() => {
-        ApiService.GetProfileUser(discordUsername!)
-            .then(response => setProfileUser(response))
-            .catch(err => console.log(err))
-
-        ApiService.GetLeaderboards()
-            .then(response => setAccountValues(response.content))
-            .catch(err => console.log(err))
-
-        ApiService.GetOpenPositions(discordUsername!)
-            .then(response => setOpenPositions(response))
-            .catch(err => console.log(err))
-    }, [])
 
     return (
         <div className='leaderboards-container user-info'>
             <div>
                 <div>
                     <img
-                        src={profileUser?.profilePicture}
-                        alt={`${discordUsername}'s profile picture`}
+                        src={userInfo.profileUser.profilePicture}
+                        alt={`${userInfo.profileUser.displayName}'s profile picture`}
                         className='profile-picture' />
                     <span>
-                        <h2>{profileUser?.displayName}</h2>
-                        <p>{profileUser?.discordUsername}</p>
+                        <h2>{userInfo.profileUser.displayName}</h2>
+                        <p>{userInfo.profileUser.discordUsername}</p>
                     </span>
                 </div>
 
                 {
-                    user.discordUsername === discordUsername
+                    user.discordUsername === userInfo.profileUser.discordUsername
                         ? <button className='btn-danger profile-action-button' onClick={AuthenticationService.LogOut}>Log Out</button>
                         : <button className='btn-pink profile-action-button'>Follow</button>
                 }
 
-                { renderAccountValue() }
+                <h2>Leaderboard Position</h2>
+                <div className='account-value-container'>
+                    <p>{ userInfo.accountValue.position } Place:</p>
+                    <p>£{userInfo.accountValue.value?.values.total}</p>
+                </div>
 
                 <h2>Open Positions</h2>
                 {
-                    openPositions.map(position => (
+                    userInfo.openPositions.map(position => (
                         <div className='open-position-container'>
                             <header>
                                 <object data={position.instrument.icon} type='image/png'>
@@ -75,29 +59,6 @@ const UserInfo = ({ discordUsername }: props) => {
             </div>
         </div>
     )
-
-    function renderAccountValue() {
-        const userValue = accountValues.find(value => value.user.discordUsername === discordUsername)
-        const position = accountValues.findIndex(value => value.user.discordUsername === discordUsername)
-        const positionSuffix = (position: number) => {
-            const endCharacter = position.toString().split('').pop()
-
-            if (endCharacter === '1') return 'st'
-            else if (endCharacter === '2') return 'nd'
-            else if (endCharacter === '3') return 'rd'
-            else return 'th'
-        }
-
-        return (
-            <>
-                <h2>Leaderboard Position</h2>
-                <div className='account-value-container'>
-                    <p>{position + 1}{positionSuffix(position + 1)} Place:</p>
-                    <p>£{userValue?.values.total}</p>
-                </div>
-            </>
-        )
-    }
 }
 
 export default UserInfo

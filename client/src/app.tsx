@@ -7,6 +7,8 @@ import Home from './views/home/home'
 import Profile from './views/profile/profile'
 import AuthenticationForms from './views/authentication/authentication-forms'
 import AuthenticationService from './services/authentication-service'
+import ProfileLoader from './loaders/profile-loader'
+import HomeLoader from './loaders/home-loader'
 
 const App = () => {
     const [user, setUser] = useState<IUser | null>(null)
@@ -14,18 +16,22 @@ const App = () => {
     const router = createBrowserRouter([
         {
             path: '/',
+            loader: async () => await HomeLoader(),
             element: authenticateView(<Home />, 0)
         },
         {
             path: '/following',
+            loader: async () => await HomeLoader(),
             element: authenticateView(<Home />, 1)
         },
         {
             path: '/search',
+            loader: async () => await HomeLoader(),
             element: authenticateView(<Home />, 2)
         },
         {
             path: '/profile/:discordUsername',
+            loader: async ({ params }) => await ProfileLoader(params.discordUsername || ''),
             element: authenticateView(<Profile />, 3)
         }
     ])
