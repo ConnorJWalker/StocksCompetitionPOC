@@ -2,7 +2,7 @@ import IUser from '../models/iuser'
 import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
 import IOpenPositionsResponse from '../models/dto/profile/iopen-positions-response'
 import ApiService from '../services/api-service'
-import getPositionSuffix from '../utils/getPositionSuffix'
+import getPositionSuffix from '../utils/get-position-suffix'
 import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
 
 export interface IProfileData {

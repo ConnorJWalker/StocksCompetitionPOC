@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import IUser from './models/iuser'
+import IUser from '../models/iuser'
 
 const UserContext = createContext<IUser | undefined>(undefined)
 

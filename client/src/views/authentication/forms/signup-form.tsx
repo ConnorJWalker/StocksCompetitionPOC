@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import SignUpValidator from '../../../utils/sign-up-validator'
 import ValidationErrors from './validation-errors'
 import ISignupForm, { GetEmptySignupForm } from '../../../models/dto/isignup-form'
 import ApiService, { HttpError } from '../../../services/api-service'
-import AuthenticationService from '../../../services/authentication-service'
+import useSignup from '../../../hooks/use-signup'
 
 const SignupForm = ({ ChangePage }: any) => {
     const validator = new SignUpValidator()
@@ -12,7 +11,7 @@ const SignupForm = ({ ChangePage }: any) => {
     const [validationErrors, setValidationErrors] = useState(validator.validationErrors)
     const [signupForm, setSignupForm] = useState<ISignupForm>(GetEmptySignupForm())
 
-    const navigate = useNavigate()
+    const signup = useSignup()
 
     return showMainForm ? renderMainForm() : renderApiKeyForm()
 
@@ -151,8 +150,7 @@ const SignupForm = ({ ChangePage }: any) => {
         }
 
         try {
-            await AuthenticationService.SignUp(signupForm)
-            navigate(0)
+            await signup(signupForm)
         }
         catch (error) {
             if (error instanceof HttpError) {

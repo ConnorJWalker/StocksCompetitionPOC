@@ -1,8 +1,8 @@
 import React from 'react'
 import formatPrice from '../../utils/format-price'
-import { useUserContext } from '../../context'
-import AuthenticationService from '../../services/authentication-service'
+import { useUserContext } from '../../hooks/user-context'
 import { IProfileData } from '../../loaders/profile-loader'
+import useLogout from '../../hooks/use-logout'
 
 interface props {
     userInfo: IProfileData
@@ -10,6 +10,7 @@ interface props {
 
 const UserInfo = ({ userInfo }: props) => {
     const user = useUserContext()
+    const logout = useLogout()
 
     return (
         <div className='leaderboards-container user-info'>
@@ -27,7 +28,7 @@ const UserInfo = ({ userInfo }: props) => {
 
                 {
                     user.discordUsername === userInfo.profileUser.discordUsername
-                        ? <button className='btn-danger profile-action-button' onClick={AuthenticationService.LogOut}>Log Out</button>
+                        ? <button className='btn-danger profile-action-button' onClick={logout}>Log Out</button>
                         : <button className='btn-pink profile-action-button'>Follow</button>
                 }
 

@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { GetEmptyLoginForm } from '../../../models/dto/ilogin-form'
-import AuthenticationService from '../../../services/authentication-service'
 import { HttpError } from '../../../services/api-service'
 import ValidationErrors from './validation-errors'
+import useLogin from '../../../hooks/use-login'
 
 const LoginForm = ({ ChangePage }: any) => {
     const [loginForm, setLoginForm] = useState(GetEmptyLoginForm())
@@ -11,7 +10,7 @@ const LoginForm = ({ ChangePage }: any) => {
     const [passwordErrors, setPasswordErrors] = useState<string[]>([])
     const [serverErrors, setServerErrors] = useState<string[]>([])
 
-    const navigate = useNavigate()
+    const login = useLogin()
 
     return (
         <>
@@ -52,8 +51,7 @@ const LoginForm = ({ ChangePage }: any) => {
         }
 
         try {
-            await AuthenticationService.LogIn(loginForm)
-            navigate(0)
+            await login(loginForm)
         }
         catch (error) {
             if (error instanceof HttpError) {

@@ -3,7 +3,6 @@ import ISignupForm from '../models/dto/isignup-form'
 import IHttpResult, { IHttpErrorResult } from '../models/ihttp-result'
 import IProfilePicture from '../models/dto/iprofile-picture'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
-import AuthenticationService from './authentication-service'
 import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
 import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
 import IUser from '../models/iuser'
@@ -146,13 +145,6 @@ const send = async <T>(endpoint: string, method = 'get', body: object | null = n
             'authorization': 'Bearer ' + localStorage.getItem('accessToken') || '',
         })
     })
-    
-    if (response.status === 401 && await AuthenticationService.Refresh()) {
-        return send(endpoint, method, body)
-    }
-    else if (response.status === 401) {
-        AuthenticationService.LogOut()
-    }
 
     const result = {
         ok: response.ok,

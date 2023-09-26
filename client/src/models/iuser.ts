@@ -4,5 +4,5 @@ export default interface IUser {
     discordUsername: string
     profilePicture: string
     displayColour: string
-    iat: number
+    exp: number
 }
