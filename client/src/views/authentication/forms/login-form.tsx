@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import { GetEmptyLoginForm } from '../../../models/dto/ilogin-form'
 import HttpError from '../../../models/http-error'
 import ValidationErrors from './validation-errors'
@@ -13,7 +13,7 @@ const LoginForm = ({ ChangePage }: any) => {
     const login = useLogin()
 
     return (
-        <>
+        <form onSubmit={onSubmit}>
             <h1>Log In</h1>
             <div className='form-group'>
                 <div className='text-input-group'>
@@ -39,13 +39,15 @@ const LoginForm = ({ ChangePage }: any) => {
             <ValidationErrors errors={serverErrors} />
 
             <footer>
-                <button className='link' onClick={ChangePage}>Sign Up</button>
-                <button className='btn-pink' onClick={loginButtonClick}>Log In</button>
+                <button className='link' type='button' onClick={ChangePage}>Sign Up</button>
+                <button className='btn-pink'>Log In</button>
             </footer>
-        </>
+        </form>
     )
 
-    async function loginButtonClick() {
+    async function onSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+
         if (validatePassword().length > 0 || validatePassword().length > 0) {
             return
         }

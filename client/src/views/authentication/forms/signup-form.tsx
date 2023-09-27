@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import SignUpValidator from '../../../utils/sign-up-validator'
 import ValidationErrors from './validation-errors'
 import ISignupForm, { GetEmptySignupForm } from '../../../models/dto/isignup-form'
@@ -19,7 +19,7 @@ const SignupForm = ({ ChangePage }: any) => {
 
     function renderMainForm() {
         return (
-            <>
+            <form onSubmit={onMainFormSubmit}>
                 <h1>Sign Up</h1>
                 <div className='form-group'>
                     { renderProfilePicture() }
@@ -79,16 +79,16 @@ const SignupForm = ({ ChangePage }: any) => {
                 </div>
 
                 <footer>
-                    <button className='link' onClick={ChangePage}>Log In</button>
-                    <button className='btn-pink' onClick={nextButtonClick}>Next</button>
+                    <button className='link' type='button' onClick={ChangePage}>Log In</button>
+                    <button className='btn-pink'>Next</button>
                 </footer>
-            </>
+            </form>
         )
     }
 
     function renderApiKeyForm() {
         return (
-            <>
+            <form onSubmit={apiKeyFormSubmit}>
                 <h1>Trading 212 Api Key</h1>
                 <ul className='api-key-instructions'>
                     <li>Open Trading 212 into invest account (not ISA or CFD)</li>
@@ -106,11 +106,11 @@ const SignupForm = ({ ChangePage }: any) => {
                     <button className='link'>Log In</button>
 
                     <div>
-                        <button onClick={() => setShowMainForm(true)}>Back</button>
-                        <button className='btn-pink' onClick={signupButtonClick}>Sign Up</button>
+                        <button type='button' onClick={() => setShowMainForm(true)}>Back</button>
+                        <button className='btn-pink'>Sign Up</button>
                     </div>
                 </footer>
-            </>
+            </form>
         )
     }
 
@@ -136,7 +136,9 @@ const SignupForm = ({ ChangePage }: any) => {
         }
     }
 
-    async function nextButtonClick() {
+    async function onMainFormSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+
         if (await validator.mainFormIsValid(signupForm)) {
             setShowMainForm(false)
             return
@@ -145,7 +147,9 @@ const SignupForm = ({ ChangePage }: any) => {
         setValidationErrors({ ...validator.validationErrors })
     }
 
-    async function signupButtonClick() {
+    async function apiKeyFormSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+
         if (!signupForm.apiKey) {
             setValidationErrors({ ...validationErrors, apiKey: ['Api key is required'] })
             return
