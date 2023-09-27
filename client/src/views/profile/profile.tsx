@@ -8,21 +8,21 @@ import '../home.css'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 
 const Profile = () => {
-    const apiCallsCount = useRef(0)
+    const previousProfile = useRef<string>('')
     const [profileData, setProfileData] = useState<IProfileLoaderData | null>(null)
 
     const { discordUsername } = useParams()
     const { getProfileData } = useAuthenticatedApi()
 
     useEffect(() => {
-        if (apiCallsCount.current === 0) {
-            apiCallsCount.current += 1
-
+        if (discordUsername !== previousProfile.current) {
+            previousProfile.current = discordUsername!
             getProfileData(discordUsername!)
-                .then(data => setProfileData(data))
+                .then(response => setProfileData(response))
                 .catch(err => console.error(err))
         }
-    }, [])
+    }, [discordUsername])
+
 
     return profileData === null ? <></> : (
         <div className='home-container'>
