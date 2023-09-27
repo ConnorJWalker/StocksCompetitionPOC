@@ -31,6 +31,8 @@ const Container = ({ children }: props) => {
                     <SearchIcon />
                 </span>
 
+                <div className='spacer'></div>
+
                 <span className={pathname === `/profile/${user.discordUsername}` ? 'selected' : ''}>
                     <img src={user.profilePicture} alt='User Profile Picture' onClick={() => navigate(`/profile/${user.discordUsername}`)} />
                 </span>

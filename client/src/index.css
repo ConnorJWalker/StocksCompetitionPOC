@@ -112,6 +112,10 @@ path {
     content: "";
 }
 
+.container > nav .spacer {
+    display: none;
+}
+
 @media screen and (min-width: 500px) {
     .container {
         flex-direction: row-reverse;
@@ -121,6 +125,10 @@ path {
         flex-direction: column;
         padding: 0 10px;
         align-items: center;
+    }
+
+    .container > nav span {
+        padding: 25px 0;
     }
 
     .container > nav .selected::after {
@@ -135,5 +143,10 @@ path {
         display: inline-block;
         background-color: white;
         content: "";
+    }
+
+    .container > nav .spacer {
+        display: block;
+        flex: 1;
     }
 }
