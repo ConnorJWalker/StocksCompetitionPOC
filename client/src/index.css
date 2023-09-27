@@ -1,9 +1,11 @@
 :root {
     --background-colour: #161b22;
-    --background-colour-alt: #1c242e;
-    --accent-colour: #e60050;
-    --accent-colour-alt: #c30d4c;
-    --font-colour: #f0f2ff;
+    --background-colour-alt: #1c232e;
+    --background-colour-alt-light: #2c3645;
+    --font-colour: #f0f6ff;
+    --accent-colour: #3e5c85;
+    --action-colour: #1e58a8;
+    --action-colour-alt: #1c529e;
     --danger: #d13232;
 }
 
@@ -15,9 +17,7 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    font-family: 'Ubuntu', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--background-colour);
@@ -43,14 +43,15 @@ button {
     cursor: pointer;
 }
 
-button.btn-pink {
-    background-color: var(--accent-colour);
-    border: 1px solid var(--accent-colour);
+button.btn-action {
+    background-color: var(--action-colour);
+    border: 1px solid var(--action-colour);
     color: var(--font-colour);
 }
 
-button.btn-pink:hover, button.btn-pink:active {
-    background-color: var(--accent-colour-alt);
+button.btn-action:hover, button.btn-pink:active {
+    background-color: var(--action-colour-alt);
+    border: 1px solid var(--action-colour-alt);
 }
 
 button.btn-danger {
@@ -95,6 +96,7 @@ path {
     justify-content: space-around;
     padding: 10px 0;
     color: white;
+    background-color: var(--accent-colour);
 }
 
 .container > nav img, .container > nav svg {

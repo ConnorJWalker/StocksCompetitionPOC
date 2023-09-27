@@ -13,6 +13,7 @@ h1 {
     width: 90%;
     background-color: #fff;
     padding: 35px;
+    color: #18191a;
 }
 
 .profile-picture {
@@ -24,8 +25,8 @@ h1 {
 }
 
 div.profile-picture {
-    border: 1px solid #E60050;
-    color: #E60050;
+    border: 1px solid var(--accent-colour);
+    color: var(--accent-colour);
     font-weight: 300;
     justify-content: space-around;
     align-items: center;
@@ -40,11 +41,12 @@ input[type=text], input[type=password] {
     width: 100%;
     height: 50px;
     display: block;
+    cursor: pointer;
 }
 
 .colour-picker span {
     color: #fff;
-    background-color: #5514B4;
+    background-color: var(--accent-colour);
     height: 100%;
     display: flex;
     align-items: center;
@@ -78,7 +80,7 @@ textarea {
 }
 
 .validation-errors {
-    color: red;
+    color: var(--danger);
 }
 
 .validation-errors li:first-letter {

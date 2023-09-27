@@ -20,7 +20,7 @@ const Container = ({ children }: props) => {
             <main>
                 { children }
             </main>
-            <nav style={{ backgroundColor: user.displayColour }}>
+            <nav>
                 <span className={pathname === '/' ? 'selected' : ''} onClick={() => navigate('/')}>
                     <HomeIcon />
                 </span>

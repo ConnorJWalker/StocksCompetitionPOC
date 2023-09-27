@@ -17,6 +17,11 @@
     display: flex;
     align-items: center;
     margin-top: 5px;
+    cursor: pointer;
+}
+
+.leaderboard-item:hover {
+    background-color: var(--background-colour-alt);
 }
 
 .leaderboard-item img {
@@ -63,8 +68,9 @@
 
 .post footer input {
     flex: 1;
-    background-color: transparent;
-    color: white;
+    background-color: var(--background-colour-alt-light);
+    border: 1px solid var(--background-colour-alt-light);
+    color: var(--font-colour);
     margin-right: 10px;
 }
 
@@ -80,7 +86,6 @@
 }
 
 .like-button {
-    rotate: -90deg;
     display: inline-block;
 }
 
@@ -93,6 +98,7 @@
     width: 100%;
     height: unset;
     border-radius: unset;
+    margin-bottom: 10px;
 }
 
 .user-info .account-value-container {

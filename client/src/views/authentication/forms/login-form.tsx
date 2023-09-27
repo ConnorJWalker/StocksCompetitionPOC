@@ -40,7 +40,7 @@ const LoginForm = ({ ChangePage }: any) => {
 
             <footer>
                 <button className='link' type='button' onClick={ChangePage}>Sign Up</button>
-                <button className='btn-pink'>Log In</button>
+                <button className='btn-action'>Log In</button>
             </footer>
         </form>
     )

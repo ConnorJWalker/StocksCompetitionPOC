@@ -80,7 +80,7 @@ const SignupForm = ({ ChangePage }: any) => {
 
                 <footer>
                     <button className='link' type='button' onClick={ChangePage}>Log In</button>
-                    <button className='btn-pink'>Next</button>
+                    <button className='btn-action'>Next</button>
                 </footer>
             </form>
         )
@@ -107,7 +107,7 @@ const SignupForm = ({ ChangePage }: any) => {
 
                     <div>
                         <button type='button' onClick={() => setShowMainForm(true)}>Back</button>
-                        <button className='btn-pink'>Sign Up</button>
+                        <button className='btn-action'>Sign Up</button>
                     </div>
                 </footer>
             </form>

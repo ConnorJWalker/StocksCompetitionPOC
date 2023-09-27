@@ -29,7 +29,7 @@ const UserInfo = ({ userInfo }: props) => {
                 {
                     user.discordUsername === userInfo.profileUser.discordUsername
                         ? <button className='btn-danger profile-action-button' onClick={logout}>Log Out</button>
-                        : <button className='btn-pink profile-action-button'>Follow</button>
+                        : <button className='btn-action profile-action-button'>Follow</button>
                 }
 
                 <h2>Leaderboard Position</h2>
