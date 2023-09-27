@@ -1,25 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import UserChart from '../../components/user-chart'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import UserInfo from './user-info'
 import Feed from '../../components/feed'
-import ProfileLoader, { IProfileLoaderData } from '../../loaders/profile-loader'
+import IProfileLoaderData from '../../models/pages/iprofile-data'
 import '../home.css'
+import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 
 const Profile = () => {
+    const apiCallsCount = useRef(0)
     const [profileData, setProfileData] = useState<IProfileLoaderData | null>(null)
 
     const { discordUsername } = useParams()
-    const navigate = useNavigate()
-
-    if (discordUsername === undefined) {
-        navigate('/')
-    }
+    const { getProfileData } = useAuthenticatedApi()
 
     useEffect(() => {
-        ProfileLoader(discordUsername!)
-            .then(data => setProfileData(data))
-            .catch(err => console.error(err))
+        if (apiCallsCount.current === 0) {
+            apiCallsCount.current += 1
+
+            getProfileData(discordUsername!)
+                .then(data => setProfileData(data))
+                .catch(err => console.error(err))
+        }
     }, [])
 
     return profileData === null ? <></> : (

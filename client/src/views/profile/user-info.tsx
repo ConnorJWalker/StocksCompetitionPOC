@@ -1,7 +1,7 @@
 import React from 'react'
 import formatPrice from '../../utils/format-price'
 import { useUserContext } from '../../hooks/user-context'
-import { IProfileData } from '../../loaders/profile-loader'
+import { IProfileData } from '../../models/pages/iprofile-data'
 import useLogout from '../../hooks/use-logout'
 
 interface props {
@@ -40,8 +40,8 @@ const UserInfo = ({ userInfo }: props) => {
 
                 <h2>Open Positions</h2>
                 {
-                    userInfo.openPositions.map(position => (
-                        <div className='open-position-container'>
+                    userInfo.openPositions.map((position, index) => (
+                        <div key={index} className='open-position-container'>
                             <header>
                                 <object data={position.instrument.icon} type='image/png'>
                                     <div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { GetEmptyLoginForm } from '../../../models/dto/ilogin-form'
-import { HttpError } from '../../../services/api-service'
+import HttpError from '../../../models/http-error'
 import ValidationErrors from './validation-errors'
 import useLogin from '../../../hooks/use-login'
 

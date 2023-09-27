@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import SignUpValidator from '../../../utils/sign-up-validator'
 import ValidationErrors from './validation-errors'
 import ISignupForm, { GetEmptySignupForm } from '../../../models/dto/isignup-form'
-import ApiService, { HttpError } from '../../../services/api-service'
+import HttpError from '../../../models/http-error'
 import useSignup from '../../../hooks/use-signup'
+import useApi from '../../../hooks/useApi'
 
 const SignupForm = ({ ChangePage }: any) => {
     const validator = new SignUpValidator()
@@ -12,6 +13,7 @@ const SignupForm = ({ ChangePage }: any) => {
     const [signupForm, setSignupForm] = useState<ISignupForm>(GetEmptySignupForm())
 
     const signup = useSignup()
+    const { getDiscordProfilePicture } = useApi()
 
     return showMainForm ? renderMainForm() : renderApiKeyForm()
 
@@ -129,7 +131,7 @@ const SignupForm = ({ ChangePage }: any) => {
         setValidationErrors({ ...validationErrors, discordUsername: discordValidationErrors })
 
         if (discordValidationErrors.length === 0) {
-            const profilePicture = await ApiService.GetDiscordProfilePicture(signupForm.discordUsername)
+            const profilePicture = await getDiscordProfilePicture(signupForm.discordUsername)
             setSignupForm({ ...signupForm, profilePicture })
         }
     }

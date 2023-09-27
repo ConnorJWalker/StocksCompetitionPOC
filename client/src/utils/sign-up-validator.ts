@@ -1,6 +1,6 @@
 import ISignupValidation, { GetEmptySignupValidation } from '../models/isignup-validation'
 import ISignupForm from '../models/dto/isignup-form'
-import ApiService from '../services/api-service'
+import { IHttpErrorResult } from '../models/ihttp-result'
 
 export default class SignUpValidator {
     public validationErrors: ISignupValidation = GetEmptySignupValidation()
@@ -33,9 +33,13 @@ export default class SignUpValidator {
             return this.validationErrors.discordUsername
         }
 
-        const apiErrors = await ApiService.GetDiscordUsernameErrors(discordUsername)
-        if (apiErrors.length !== 0) {
-            this.validationErrors.discordUsername = this.validationErrors.discordUsername.concat(apiErrors)
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}authentication/validate-username/${discordUsername}`)
+
+        if (!response.ok) {
+            const apiErrors = (await response.json() as IHttpErrorResult).errors!['discordUsername'] || ['an error occurred validating discord username']
+            if (apiErrors.length !== 0) {
+                this.validationErrors.discordUsername = this.validationErrors.discordUsername.concat(apiErrors)
+            }
         }
 
         return this.validationErrors.discordUsername

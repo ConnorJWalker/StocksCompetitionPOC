@@ -1,14 +1,15 @@
 import ISignupForm from '../models/dto/isignup-form'
 import useAuthentication from './authentication-context'
 import { useNavigate } from 'react-router-dom'
-import ApiService from '../services/api-service'
+import useApi from './useApi'
 
 const useSignup = () => {
+    const { signup } = useApi()
     const { setTokens } = useAuthentication()
     const navigate = useNavigate()
 
     return async (signupForm: ISignupForm) => {
-        const authenticationResponse = await ApiService.SignUp(signupForm)
+        const authenticationResponse = await signup(signupForm)
         setTokens(authenticationResponse)
         navigate('/', { replace: true })
     }
