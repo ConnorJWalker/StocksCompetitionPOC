@@ -14,19 +14,15 @@ const defaultValue = {
     gainLoss: 0
 }
 
-export const AccountValueResponseFromRedis = (cached: string, users: IUser[]): IAccountValueResponse[] => {
-    const values = JSON.parse(cached) as IAccountValue[]
-
-    return users.map(user=> {
-        const usersValue = values.find(value => value.discordUsername === user.discordUsername)
-
-        return {
-            user,
-            values: usersValue === undefined
-                ? defaultValue
-                : { ...usersValue, discordUsername: undefined  }
-        }
-    })
+export const AccountValueResponseFromT212 = (values: IAccountValue[], users: IUser[]): IAccountValueResponse[] => {
+    return values.map((value, index) => ({
+        user: {
+            ...users[index],
+            password: undefined,
+            apiKey: undefined
+        },
+        values: value
+    }))
 }
 
 export const AccountValueResponseFromDb = (values: Model[], isArray: boolean): IAccountValueResponse[] => {

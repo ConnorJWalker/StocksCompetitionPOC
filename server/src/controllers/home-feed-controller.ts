@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import Redis from '../config/redis'
 import DatabaseService from '../services/database-service'
-import { AccountValueResponseFromRedis } from '../models/dto/responses/iaccount-value-response'
+import IAccountValueResponse from '../models/dto/responses/iaccount-value-response'
 
 const GetAccountValues = async (req: Request, res: Response) => {
     const cachedString = await Redis.get('t212-account-values')
@@ -10,8 +10,7 @@ const GetAccountValues = async (req: Request, res: Response) => {
         return res.json(await DatabaseService.GetAccountValues())
     }
 
-    const users = await DatabaseService.GetAllUsers()
-    return res.json(AccountValueResponseFromRedis(cachedString, users))
+    return res.json(JSON.parse(cachedString) as IAccountValueResponse)
 }
 
 const GetAccountValueGraph = async (req: Request, res: Response) => {

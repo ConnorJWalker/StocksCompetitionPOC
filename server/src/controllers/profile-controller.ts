@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { RequestWithTargetUser } from '../middleware/get-profile-user'
 import DatabaseService from '../services/database-service'
 import Redis from '../config/redis'
-import IAccountValueResponse, { AccountValueResponseFromRedis } from '../models/dto/responses/iaccount-value-response'
+import IAccountValueResponse from '../models/dto/responses/iaccount-value-response'
 
 const GetUser = (req: RequestWithTargetUser, res: Response) => {
     return res.json({ ...req.targetUser, apiKey: undefined, password: undefined })
@@ -17,8 +17,7 @@ const GetAccountValue = async (req: RequestWithTargetUser, res: Response) => {
     let userValue: IAccountValueResponse | undefined
 
     if (cached !== null) {
-        const users = await DatabaseService.GetAllUsers()
-        const parsed = AccountValueResponseFromRedis(cached, users)
+        const parsed = JSON.parse(cached) as IAccountValueResponse[]
         userValue = parsed.find(value => value.user.discordUsername === req.targetUser?.discordUsername)
     }
 

@@ -5,6 +5,7 @@ import Trading212Service from './services/trading212-service'
 import { IUserWithSecrets } from './models/iuser'
 import { IPosition } from './models/iopen-positions'
 import { IDbOrderHistory } from './models/iorder-history'
+import { AccountValueResponseFromT212 } from './models/dto/responses/iaccount-value-response'
 
 // start at max so first api response is stored in database
 let accountValueResponseCount = 50
@@ -19,16 +20,13 @@ const updateAccountValues = async (users: IUserWithSecrets[]) => {
     const accountValuePromises = users.map(user => Trading212Service.GetCash(user.apiKey))
     const accountValues = await Promise.all(accountValuePromises)
 
-    const redisValues = JSON.stringify(accountValues.map((accountValue, index) => ({
-        ...accountValue,
-        discordUsername: users[index].discordUsername
-    })))
-
     if (accountValueResponseCount === 50) {
         await DatabaseService.AddAccountValues(users, accountValues)
     }
 
+    const redisValues = JSON.stringify(AccountValueResponseFromT212(accountValues, users))
     await Redis.set('t212-account-values', redisValues)
+
     accountValueResponseCount = accountValueResponseCount === 50 ? 0 : accountValueResponseCount + 1
 }
 
