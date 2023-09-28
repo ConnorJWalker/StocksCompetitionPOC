@@ -26,6 +26,7 @@ const updateAccountValues = async (users: IUserWithSecrets[]) => {
 
     const redisValues = JSON.stringify(AccountValueResponseFromT212(accountValues, users))
     await Redis.set('t212-account-values', redisValues)
+    await Redis.publish('account-values-update', redisValues)
 
     accountValueResponseCount = accountValueResponseCount === 50 ? 0 : accountValueResponseCount + 1
 }

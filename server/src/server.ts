@@ -8,8 +8,12 @@ import './config/passport'
 import routes from './routes'
 
 const fetcher = spawn('npm', ['run', 'stock-fetcher-process'], { shell: true })
-
 fetcher.stdout.on('data', data => console.log(data.toString()))
+fetcher.stderr.on('data', data => console.error(data.toString()))
+
+const socketServer = spawn('npm', ['run', 'socket-server'], { shell: true })
+socketServer.stdout.on('data', data => console.log(data.toString()))
+socketServer.stderr.on('data', data => console.error(data.toString()))
 
 const app: Application = express()
 

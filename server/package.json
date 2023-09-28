@@ -7,6 +7,7 @@
     "start": "nodemon src/server.ts",
     "fetch-stocks": "npx ts-node scripts/get-all-stocks.ts",
     "stock-fetcher-process": "npx ts-node src/data-fetcher.ts",
+    "socket-server": "npx ts-node src/socket.ts",
     "test": "echo no"
   },
   "author": "Connor Walker",
@@ -31,6 +32,7 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "redis": "^4.6.8",
-    "sequelize": "^6.32.1"
+    "sequelize": "^6.32.1",
+    "socket.io": "^4.7.2"
   }
 }

@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import IUser from '../models/iuser'
 
-const UserContext = createContext<IUser | undefined>(undefined)
+const UserContext = createContext<IUser | null>(null)
 
 export const useUserContext = (): IUser => {
     const user = useContext(UserContext)
@@ -10,7 +10,7 @@ export const useUserContext = (): IUser => {
         throw new Error('useUserContext must be used with a UserContext')
     }
 
-    return user!
+    return user
 }
 
 export default UserContext
