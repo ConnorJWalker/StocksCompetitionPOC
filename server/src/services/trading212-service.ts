@@ -15,6 +15,15 @@ const failureCodes: { [key: number]: FailureReason } = {
 
 const getFailureCode = (code: number): FailureReason =>  failureCodes[code] === undefined ? FailureReason.Other : failureCodes[code]
 
+export class Trading212Error extends Error {
+    public reason: FailureReason
+
+    constructor(message: string, reason: FailureReason) {
+        super(message)
+        this.reason = reason
+    }
+}
+
 const ValidateApiKey = async (apiKey: string): Promise<[boolean, FailureReason?]> => {
     const cacheKey = `t212-keys:${apiKey}`
     const cachedValue = await Redis.get(cacheKey)
@@ -54,7 +63,7 @@ const GetOpenPositions = async (user: IUserWithSecrets): Promise<IOpenPositions>
         return OpenPositionsFromApi(user, result.content!)
     }
 
-    throw new Error(`Could not fetch open positions: ${result.statusCode}`)
+    throw new Trading212Error(`Could not fetch open positions: ${result.statusCode}`, getFailureCode(result.statusCode))
 }
 
 const GetCash = async (apiKey: string): Promise<IAccountValue> => {
@@ -63,7 +72,7 @@ const GetCash = async (apiKey: string): Promise<IAccountValue> => {
         return AccountValueFromApi(result.content!)
     }
 
-    throw new Error(`Could not fetch cash: ${result.statusCode}`)
+    throw new Trading212Error(`Could not fetch cash: ${result.statusCode}`, getFailureCode(result.statusCode))
 }
 
 const GetAllStocks = async (apiKey: string): Promise<IT212Instrument[]> => {
@@ -72,7 +81,7 @@ const GetAllStocks = async (apiKey: string): Promise<IT212Instrument[]> => {
         return result.content!
     }
 
-    throw new Error(`Could not fetch all stocks: ${result.statusCode}`)
+    throw new Trading212Error(`Could not fetch all stocks: ${result.statusCode}`, getFailureCode(result.statusCode))
 }
 
 const send = async <T>(endpoint: string, apiKey: string, method: string = 'get'): Promise<IHttpResult<T | null>> => {

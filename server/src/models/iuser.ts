@@ -27,6 +27,6 @@ export const UserWithSecretsFromDbResult = (user: Model): IUserWithSecrets => {
     return {
         ...UserFromDbResult(user),
         password: user.dataValues.password,
-        apiKey: user.dataValues.apiKey
+        apiKey: user.dataValues.ApiKey.dataValues.apiKey
     }
 }

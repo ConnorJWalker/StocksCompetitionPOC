@@ -1,5 +1,6 @@
 import {
     AccountValue,
+    ApiKey,
     Instrument,
     OpenPositions,
     OrderHistory,
@@ -29,11 +30,14 @@ const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Prom
         discordUsername: signupForm.discordUsername,
         profilePicture: signupForm.profilePicture,
         displayColour: signupForm.displayColour,
-        password: hashedPassword,
-        apiKey: signupForm.apiKey
+        password: hashedPassword
     })
 
-    return UserFromDbResult(user)
+    const formattedUser = UserFromDbResult(user)
+
+    await ApiKey.create({ UserId: formattedUser.id, apiKey: signupForm.apiKey })
+
+    return formattedUser
 }
 
 const FindUserById = async (id: number): Promise<IUser | null> => {
@@ -50,9 +54,15 @@ const FindUserByUsername = async (username: string): Promise<IUser | null> => {
 }
 
 const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWithSecrets | null> => {
-    const user = await User.findOne({ where: {
-        discordUsername: username
-    }})
+    const user = await User.findOne({
+        where: {
+            discordUsername: username
+        },
+        include: {
+            model: ApiKey,
+            required: true
+        }
+    })
 
     return user === null ? null : UserWithSecretsFromDbResult(user)
 }
@@ -60,15 +70,24 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
 const GetAllUsers = async (): Promise<IUser[]> => {
     const users = await User.findAll({
         attributes: {
-            exclude: ['apiKey', 'password']
+            exclude: ['password']
         }
     })
 
     return users.map(user => UserFromDbResult(user))
 }
 
-const GetAllUsersWithSecrets = async (): Promise<IUserWithSecrets[]> => {
-    const users = await User.findAll()
+const GetAllUsersWithValidApiKeys = async (): Promise<IUserWithSecrets[]> => {
+    const users = await User.findAll({
+        include: {
+            model: ApiKey,
+            required: true,
+            where: {
+                isValid: true
+            }
+        }
+    })
+
     return users.map(user => UserWithSecretsFromDbResult(user))
 }
 
@@ -238,13 +257,21 @@ const GetAccountValues = async (getAll: boolean = false, discordUsername?: strin
     return AccountValueResponseFromDb(values, getAll)
 }
 
+const InvalidateApiKeys = async (userIds: number[]): Promise<void> => {
+    await ApiKey.update({ isValid: false }, {
+        where: {
+            UserId: userIds
+        }
+    })
+}
+
 export default {
     CreateUser,
     FindUserById,
     FindUserByUsername,
     FindUserByUsernameWithSecrets,
     GetAllUsers,
-    GetAllUsersWithSecrets,
+    GetAllUsersWithValidApiKeys,
     GetRefreshToken,
     InvalidateRefreshTokenFamily,
     MarkRefreshTokenAsUsed,
@@ -256,5 +283,6 @@ export default {
     UpdateOpenPositions,
     AddOrders,
     GetOrderHistories,
-    GetAccountValues
+    GetAccountValues,
+    InvalidateApiKeys
 }

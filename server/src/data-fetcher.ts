@@ -1,30 +1,72 @@
 import 'dotenv/config'
-import Redis from './config/redis'
+import Redis, { SubscriberClient } from './config/redis'
 import DatabaseService from './services/database-service'
-import Trading212Service from './services/trading212-service'
-import { IUserWithSecrets } from './models/iuser'
-import { IPosition } from './models/iopen-positions'
+import Trading212Service, { Trading212Error } from './services/trading212-service'
+import IUser, { IUserWithSecrets } from './models/iuser'
+import IOpenPositions, { IPosition } from './models/iopen-positions'
 import { IDbOrderHistory } from './models/iorder-history'
 import { AccountValueResponseFromT212 } from './models/dto/responses/iaccount-value-response'
+import { FailureReason } from './models/ihttp-result'
+import IAccountValue from './models/iaccount-value'
 
 // start at max so first api response is stored in database
 let accountValueResponseCount = 50
 
+// store users and update on users update redis event
+let users: IUserWithSecrets[] = []
+let usersRequiresUpdate = false
+SubscriberClient.subscribe('user-update', () => usersRequiresUpdate = true).then(/* Ignore */)
+
+/**
+ * Maps list of settled promises into their resolved state, handling expired api keys and
+ * rate limit errors
+ *
+ * @param {PromiseSettledResult<T>[]} settled List of settled promises from trading 212 service
+ * @returns {T[]} Array of resolved promise results
+ */
+const processTrading212Promises = async <T>(settled: PromiseSettledResult<T>[]): Promise<(T | null)[]> => {
+    let usersWithExpiredKeys: number[] = []
+    const resolved = settled.map((value, index) => {
+        if (value.status === 'fulfilled') return value.value
+
+        const error = value.reason as Trading212Error
+        if (error.reason === FailureReason.Unauthorised) {
+            usersWithExpiredKeys.push(users[index].id)
+        }
+
+        return null
+    })
+
+    if (usersWithExpiredKeys.length !== 0) {
+        await DatabaseService.InvalidateApiKeys(usersWithExpiredKeys)
+        usersRequiresUpdate = true
+    }
+
+    return resolved
+}
+
 /**
  * Fetch the users cash, invested and gain/loss values from trading 212. Every response is saved to redis
  * with an event published, every 50th api response will be saved to the database
- *
- * @param {IUserWithSecrets[]} users List of users to request the account values for
  */
-const updateAccountValues = async (users: IUserWithSecrets[]) => {
+const updateAccountValues = async () => {
     const accountValuePromises = users.map(user => Trading212Service.GetCash(user.apiKey))
-    const accountValues = await Promise.all(accountValuePromises)
+    const accountValuesSettled = await Promise.allSettled(accountValuePromises)
+    const accountValues = await processTrading212Promises(accountValuesSettled)
+
+    const usersToSave: IUser[] = []
+    const accountValuesToSave = accountValues.filter((value, index) => {
+        if (value === null) return false
+
+        usersToSave.push(users[index])
+        return true
+    }) as IAccountValue[]
 
     if (accountValueResponseCount === 50) {
-        await DatabaseService.AddAccountValues(users, accountValues)
+        await DatabaseService.AddAccountValues(usersToSave, accountValuesToSave)
     }
 
-    const redisValues = JSON.stringify(AccountValueResponseFromT212(accountValues, users))
+    const redisValues = JSON.stringify(AccountValueResponseFromT212(accountValuesToSave, usersToSave))
     await Redis.set('t212-account-values', redisValues)
     await Redis.publish('account-values-update', redisValues)
 
@@ -35,16 +77,14 @@ const updateAccountValues = async (users: IUserWithSecrets[]) => {
  * Fetch users open positions lists from trading 212 and compare against open positions store in database.
  * Add, remove or update records in the database to resemble response from trading 212, adding to OrderHistories
  * if quantities don't match. This method is a workaround for the order history endpoint not currently working
- *
- * @param {IUserWithSecrets[]} users List of users to request the open positions for
  */
-const updateOpenPositions = async (users: IUserWithSecrets[]): Promise<void> => {
+const updateOpenPositions = async (): Promise<void> => {
     const t212OpenPositionsPromises = users.map(user => Trading212Service.GetOpenPositions(user))
 
-    const [t212OpenPositions, dbOpenPositions] = await Promise.all([
-        Promise.all(t212OpenPositionsPromises),
-        DatabaseService.GetOpenPositions()
-    ])
+    const dbOpenPositions = await DatabaseService.GetOpenPositions()
+    const t212OpenPositionsSettled = await Promise.allSettled(t212OpenPositionsPromises)
+    const t212OpenPositions = await processTrading212Promises(t212OpenPositionsSettled)
+    const t212OpenPositionsToSave = t212OpenPositions.filter(value => value !== null) as IOpenPositions[]
 
     const newOrderHistory: IDbOrderHistory[] = []
     for (const dbOpenPosition of dbOpenPositions) {
@@ -52,10 +92,12 @@ const updateOpenPositions = async (users: IUserWithSecrets[]): Promise<void> => 
         const removedPositions: IPosition[] = []
         const updatedPositions: IPosition[] = []
 
-        const t212OpenPosition = t212OpenPositions.find(position => position.user.id === dbOpenPosition.user.id)
+        const t212OpenPosition = t212OpenPositionsToSave.find(position => position.user.id === dbOpenPosition.user.id)
 
         if (t212OpenPosition === undefined) {
-            throw new Error(`Could not find user ${dbOpenPosition.user.discordUsername} in t212 result`)
+            // throw new Error(`Could not find user ${dbOpenPosition.user.discordUsername} in t212 result`)
+            // TODO: add a disqualification strike
+            return
         }
 
         dbOpenPosition.positions.forEach(position => {
@@ -117,10 +159,12 @@ const updateOpenPositions = async (users: IUserWithSecrets[]): Promise<void> => 
  * of 1 request every 5 seconds, call every 6 seconds to reduce chance of 429 response
  */
 setInterval(async () => {
-    const users = await DatabaseService.GetAllUsersWithSecrets()
+    if (users.length === 0 || usersRequiresUpdate) {
+        users = await DatabaseService.GetAllUsersWithValidApiKeys()
+    }
 
     await Promise.all([
-        updateAccountValues(users),
-        updateOpenPositions(users)
+        updateAccountValues(),
+        updateOpenPositions()
     ])
 }, 6000)

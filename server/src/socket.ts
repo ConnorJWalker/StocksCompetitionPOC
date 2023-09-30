@@ -1,5 +1,5 @@
 import { Server } from 'socket.io'
-import Redis from './config/redis'
+import { SubscriberClient } from './config/redis'
 import IAccountValueResponse from './models/dto/responses/iaccount-value-response'
 import IAccountValue from './models/iaccount-value'
 
@@ -12,7 +12,7 @@ const io = new Server(parseInt(process.env.SOCKET_PORT!), {
 })
 
 ;(async () => {
-    await Redis.subscribe('account-values-update', (message: string) => {
+    await SubscriberClient.subscribe('account-values-update', (message: string) => {
         const newAccountValues = JSON.parse(message) as IAccountValueResponse[]
 
         let changedValues: IAccountValueResponse[] = []

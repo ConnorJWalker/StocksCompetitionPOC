@@ -27,9 +27,5 @@ export default {
     password: {
         allowNull: false,
         type: DataTypes.STRING
-    },
-    apiKey: {
-        allowNull: false,
-        type: DataTypes.STRING
     }
 }
