@@ -4,7 +4,7 @@ import { Application, Request, Response, NextFunction } from 'express'
 import * as cors from 'cors'
 import 'express-async-errors'
 import 'dotenv/config'
-import './config/passport'
+import '../shared/config/passport'
 import routes from './routes'
 
 const fetcher = spawn('npm', ['run', 'stock-fetcher-process'], { shell: true })

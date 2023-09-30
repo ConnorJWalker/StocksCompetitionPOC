@@ -2,10 +2,10 @@ import * as crypto from 'node:crypto'
 import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
 import ISignupForm from '../models/dto/isignup-form'
-import DatabaseService from './database-service'
-import IUser from '../models/iuser'
+import DatabaseService from '../../shared/services/database-service'
+import IUser from '../../shared/models/iuser'
 import ILoginForm from '../models/dto/ilogin-form'
-import IAuthenticationResponse from '../models/dto/responses/iauthentication-response'
+import IAuthenticationResponse from '../models/dto/iauthentication-response'
 
 /**
  * Creates a new user in the database and creates authentication tokens containing the user's sign up

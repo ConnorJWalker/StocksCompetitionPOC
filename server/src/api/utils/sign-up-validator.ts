@@ -1,8 +1,8 @@
 import ISignupForm from '../models/dto/isignup-form'
-import DatabaseService from '../services/database-service'
-import Trading212Service from '../services/trading212-service'
-import DiscordService, { DiscordError } from '../services/discord-service'
-import { FailureReason } from '../models/ihttp-result'
+import DatabaseService from '../../shared/services/database-service'
+import Trading212Service from '../../shared/services/trading212-service'
+import DiscordService, { DiscordError } from '../../shared/services/discord-service'
+import { FailureReason } from '../../shared/models/ihttp-result'
 import { RateLimitError } from '../models/errors'
 
 export default class SignUpValidator {

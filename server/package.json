@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/server.ts",
+    "start": "nodemon src/api/index.ts",
     "fetch-stocks": "npx ts-node scripts/get-all-stocks.ts",
-    "stock-fetcher-process": "npx ts-node src/data-fetcher.ts",
-    "socket-server": "npx ts-node src/socket.ts",
+    "stock-fetcher-process": "npx ts-node src/data-fetcher/index.ts",
+    "socket-server": "npx ts-node src/sockets/index.ts",
     "test": "echo no"
   },
   "author": "Connor Walker",

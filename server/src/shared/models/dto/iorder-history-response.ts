@@ -1,5 +1,5 @@
-import IUser, { UserFromDbResult } from '../../iuser'
-import IInstrument, { InstrumentFromDbResult } from '../../iinstrument'
+import IUser, { UserFromDbResult } from '../iuser'
+import IInstrument, { InstrumentFromDbResult } from '../iinstrument'
 import { Model } from 'sequelize'
 
 export default interface IOrderHistoryResponse {

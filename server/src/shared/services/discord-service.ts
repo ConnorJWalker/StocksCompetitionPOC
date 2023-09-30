@@ -1,7 +1,7 @@
 import IHttpResult from '../models/ihttp-result'
-import IGuildMember from '../models/discord/guild-member'
+import IGuildMember from '../../api/models/discord/guild-member'
 import Redis from '../config/redis'
-import IDiscordUser, { DiscordUserFromCache, DiscordUserToCache } from '../models/discord/user'
+import IDiscordUser, { DiscordUserFromCache, DiscordUserToCache } from '../../api/models/discord/user'
 
 export class DiscordError extends Error {
     responseCode: number

@@ -1,4 +1,4 @@
-import IInstrument, { InstrumentFromDbResult } from '../../iinstrument'
+import IInstrument, { InstrumentFromDbResult } from '../iinstrument'
 import { Model } from 'sequelize'
 
 export default interface IOpenPositionsResponse {

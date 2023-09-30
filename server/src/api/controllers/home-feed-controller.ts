@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import Redis from '../config/redis'
-import DatabaseService from '../services/database-service'
-import IAccountValueResponse from '../models/dto/responses/iaccount-value-response'
+import Redis from '../../shared/config/redis'
+import DatabaseService from '../../shared/services/database-service'
+import IAccountValueResponse from '../../shared/models/dto/iaccount-value-response'
 
 const GetAccountValues = async (req: Request, res: Response) => {
     const cachedString = await Redis.get('t212-account-values')

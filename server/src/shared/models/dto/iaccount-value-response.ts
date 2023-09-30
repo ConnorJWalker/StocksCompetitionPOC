@@ -1,5 +1,5 @@
-import IUser, { UserFromDbResult } from '../../iuser'
-import IAccountValue, { AccountValueFromDb } from '../../iaccount-value'
+import IUser, { UserFromDbResult } from '../iuser'
+import IAccountValue, { AccountValueFromDb } from '../iaccount-value'
 import { Model } from 'sequelize'
 
 export default interface IAccountValueResponse {

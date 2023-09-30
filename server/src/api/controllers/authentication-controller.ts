@@ -3,7 +3,7 @@ import AuthenticationService from '../services/authentication-service'
 import SignUpValidator from '../utils/sign-up-validator'
 import ISignupForm from '../models/dto/isignup-form'
 import { RateLimitError } from '../models/errors'
-import DiscordService from '../services/discord-service'
+import DiscordService from '../../shared/services/discord-service'
 
 const SignUp = async (req: Request, res: Response) => {
     const signupValidator = new SignUpValidator()

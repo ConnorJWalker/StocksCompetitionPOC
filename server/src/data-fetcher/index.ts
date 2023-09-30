@@ -1,13 +1,13 @@
 import 'dotenv/config'
-import Redis, { SubscriberClient } from './config/redis'
-import DatabaseService from './services/database-service'
-import Trading212Service, { Trading212Error } from './services/trading212-service'
-import IUser, { IUserWithSecrets } from './models/iuser'
-import IOpenPositions, { IPosition } from './models/iopen-positions'
-import { IDbOrderHistory } from './models/iorder-history'
-import { AccountValueResponseFromT212 } from './models/dto/responses/iaccount-value-response'
-import { FailureReason } from './models/ihttp-result'
-import IAccountValue from './models/iaccount-value'
+import Redis, { SubscriberClient } from '../shared/config/redis'
+import DatabaseService from '../shared/services/database-service'
+import Trading212Service, { Trading212Error } from '../shared/services/trading212-service'
+import IUser, { IUserWithSecrets } from '../shared/models/iuser'
+import IOpenPositions, { IPosition } from '../shared/services/iopen-positions'
+import { IDbOrderHistory } from '../shared/models/iorder-history'
+import { AccountValueResponseFromT212 } from '../shared/models/dto/iaccount-value-response'
+import { FailureReason } from '../shared/models/ihttp-result'
+import IAccountValue from '../shared/models/iaccount-value'
 
 // start at max so first api response is stored in database
 let accountValueResponseCount = 50

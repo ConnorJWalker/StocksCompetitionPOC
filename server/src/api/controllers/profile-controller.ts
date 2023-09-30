@@ -1,8 +1,8 @@
 import { Response } from 'express'
 import { RequestWithTargetUser } from '../middleware/get-profile-user'
-import DatabaseService from '../services/database-service'
-import Redis from '../config/redis'
-import IAccountValueResponse from '../models/dto/responses/iaccount-value-response'
+import DatabaseService from '../../shared/services/database-service'
+import Redis from '../../shared/config/redis'
+import IAccountValueResponse from '../../shared/models/dto/iaccount-value-response'
 
 const GetUser = (req: RequestWithTargetUser, res: Response) => {
     return res.json({ ...req.targetUser, apiKey: undefined, password: undefined })

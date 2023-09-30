@@ -9,16 +9,16 @@ import {
     User
 } from '../config/database'
 import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from '../models/iuser'
-import ISignupForm from '../models/dto/isignup-form'
+import ISignupForm from '../../api/models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
 import { Optional } from 'sequelize'
 import IAccountValue from '../models/iaccount-value'
-import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from '../models/iopen-positions'
+import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from './iopen-positions'
 import { IDbOrderHistory } from '../models/iorder-history'
 import IRefreshToken, { RefreshTokenFromDbResult } from '../models/irefresh-token'
-import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/responses/iaccount-value-response'
-import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/responses/iorder-history-response'
-import IOpenPositionsResponse, { OpenPositionsResponseFromDb } from '../models/dto/responses/iopen-positions-response'
+import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/iaccount-value-response'
+import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/iorder-history-response'
+import IOpenPositionsResponse, { OpenPositionsResponseFromDb } from '../models/dto/iopen-positions-response'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,

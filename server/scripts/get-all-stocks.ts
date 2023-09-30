@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import DatabaseService from '../src/services/database-service'
-import Trading212Service from '../src/services/trading212-service'
+import DatabaseService from '../src/shared/services/database-service'
+import Trading212Service from '../src/shared/services/trading212-service'
 
 (async () => {
     if (process.env.HOST_DISCORD === undefined) {

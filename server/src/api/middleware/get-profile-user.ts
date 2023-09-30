@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import {IUserWithSecrets} from '../models/iuser'
-import DatabaseService from '../services/database-service'
+import {IUserWithSecrets} from '../../shared/models/iuser'
+import DatabaseService from '../../shared/services/database-service'
 
 export interface RequestWithTargetUser extends Request {
     targetUser?: IUserWithSecrets

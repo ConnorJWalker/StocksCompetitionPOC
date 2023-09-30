@@ -1,7 +1,7 @@
 import { Server } from 'socket.io'
-import { SubscriberClient } from './config/redis'
-import IAccountValueResponse from './models/dto/responses/iaccount-value-response'
-import IAccountValue from './models/iaccount-value'
+import { SubscriberClient } from '../shared/config/redis'
+import IAccountValueResponse from '../shared/models/dto/iaccount-value-response'
+import IAccountValue from '../shared/models/iaccount-value'
 
 let previousAccountValues: IAccountValueResponse[] = []
 
