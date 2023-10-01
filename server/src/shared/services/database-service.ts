@@ -11,17 +11,19 @@ import {
 import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from '../models/iuser'
 import ISignupForm from '../../api/models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
-import { Optional } from 'sequelize'
+import { Op, Optional } from 'sequelize'
 import IAccountValue from '../models/iaccount-value'
-import IOpenPositions, { IPosition, OpenPositionsFromDbResult } from './iopen-positions'
-import { IDbOrderHistory } from '../models/iorder-history'
-import IRefreshToken, { RefreshTokenFromDbResult } from '../models/irefresh-token'
+import IOpenPositions, { OpenPositionsFromDbResult } from '../models/iopen-positions'
+import { IDbOrderHistory } from '../models/database/iorder-history'
+import IRefreshToken, { RefreshTokenFromDbResult } from '../models/database/irefresh-token'
 import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/iaccount-value-response'
 import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/iorder-history-response'
 import IOpenPositionsResponse, { OpenPositionsResponseFromDb } from '../models/dto/iopen-positions-response'
+import IOpenPositionsUpdates from '../models/database/iopen-positions-updates'
+import { Literal } from 'sequelize/types/utils'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
-    `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`,
+    `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
 )
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
@@ -46,9 +48,11 @@ const FindUserById = async (id: number): Promise<IUser | null> => {
 }
 
 const FindUserByUsername = async (username: string): Promise<IUser | null> => {
-    const user = await User.findOne({ where: {
-        discordUsername: username
-    }})
+    const user = await User.findOne({
+        where: {
+            discordUsername: username
+        }
+    })
 
     return user === null ? null : UserFromDbResult(user)
 }
@@ -144,10 +148,13 @@ const AddAccountValues = async (users: IUser[], accountValues: IAccountValue[]):
     })))
 }
 
-const GetOpenPositions = async (): Promise<IOpenPositions[]> => {
+const GetOpenPositions = async (userIds: number[]): Promise<IOpenPositions[]> => {
     const openPositions = await User.findAll({
+        where: {
+            id: userIds
+        },
         attributes: {
-            exclude: ['apiKey', 'password']
+            exclude: ['password']
         },
         include: [{
             model: OpenPositions,
@@ -171,32 +178,48 @@ const GetOpenPositionsWithInstrument = async (userId: number): Promise<IOpenPosi
     return OpenPositionsResponseFromDb(openPositions)
 }
 
-const UpdateOpenPositions = async (user: IUser, newPositions: IPosition[], updatedPositions: IPosition[], removedPositions: IPosition[]): Promise<void> => {
-    const created = OpenPositions.bulkCreate(newPositions.map(position => ({
-        UserId: user.id,
-        quantity: position.quantity,
-        averagePrice: position.averagePrice,
-        InstrumentId: instrumentIdFromTicker(position.trading212Ticker)
-    })))
+const UpdateOpenPositions = async (openPositionsUpdates: { [key: number]: IOpenPositionsUpdates }): Promise<void> => {
+    const toCreate: Optional<any, string>[] | { UserId: number; quantity: number; averagePrice: number; InstrumentId: Literal }[] = []
+    const toDelete: any[] = []
+    let toUpdate = ''
+    const promises: Promise<any>[] = []
 
-    if (updatedPositions.length > 0) {
-        let updateSql: string = ''
-        updatedPositions.forEach(position => {
-            updateSql += `UPDATE OpenPositions SET quantity = ${Sequalize.escape(position.quantity)}, updatedAt = NOW() `
-                + `WHERE UserId = ${Sequalize.escape(user.id)} AND InstrumentId = ${Sequalize.escape(position.instrumentId!)};`
+    Object.keys(openPositionsUpdates).forEach(key => {
+        const userId = parseInt(key)
+
+        openPositionsUpdates[userId].new.forEach(position => {
+            toCreate.push({
+                UserId: userId,
+                quantity: position.quantity,
+                averagePrice: position.averagePrice,
+                InstrumentId: instrumentIdFromTicker(position.trading212Ticker)
+            })
         })
 
-        await Sequalize.query(updateSql)
-    }
+        openPositionsUpdates[userId].removed.forEach(position => {
+            toDelete.push({
+                UserId: userId,
+                InstrumentId: position.instrumentId
+            })
+        })
 
-    const deleted = OpenPositions.destroy({
-        where: {
-            UserId: user.id,
-            InstrumentId: removedPositions.map(removed => removed.instrumentId!)
-        }
+        openPositionsUpdates[userId].updated.forEach(position => {
+            toUpdate += `UPDATE OpenPositions SET quantity = ${Sequalize.escape(position.quantity)}, updatedAt = NOW() `
+                + `WHERE UserId = ${Sequalize.escape(userId)} AND InstrumentId = ${Sequalize.escape(position.instrumentId!)};`
+        })
     })
 
-    await Promise.all([created, deleted])
+    promises.push(OpenPositions.bulkCreate(toCreate))
+
+    if (toDelete.length !== 0) {
+        promises.push(OpenPositions.destroy({ where: { [Op.or]: toDelete }}))
+    }
+
+    if (toUpdate !== '') {
+        promises.push(Sequalize.query(toUpdate))
+    }
+
+    await Promise.all(promises)
 }
 
 const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
@@ -221,7 +244,7 @@ const GetOrderHistories = async (userId?: number): Promise<IOrderHistoryResponse
                 model: User,
                 required: true,
                 attributes: {
-                    exclude: ['apiKey', 'password', 'createdAt', 'updatedAt']
+                    exclude: ['password', 'createdAt', 'updatedAt']
                 }
             },
             {
@@ -241,7 +264,7 @@ const GetOrderHistories = async (userId?: number): Promise<IOrderHistoryResponse
 const GetAccountValues = async (getAll: boolean = false, discordUsername?: string): Promise<IAccountValueResponse[]> => {
     const values = await User.findAll({
         attributes: {
-            exclude: ['apiKey', 'password']
+            exclude: ['password']
         },
         where: discordUsername === undefined ? undefined : {
             discordUsername
