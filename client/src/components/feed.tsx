@@ -12,6 +12,12 @@ interface props {
 }
 
 const Feed = ({ posts }: props) => {
+    const getPrice = (post: IOrderHistoryResponse) => {
+        return post.order.price === -1
+            ? 'an unknown amount of money'
+            : `${formatPrice(post.order.price, post.order.instrument.currencyCode)} a share`
+    }
+
     return (
         <div className='feed-container'>
             <h2>Feed</h2>
@@ -31,7 +37,7 @@ const Feed = ({ posts }: props) => {
                         </header>
                         <div>
                             { post.order.type === 'buy' ? 'Bought' : 'Sold' } { post.order.quantity } shares of { post.order.instrument.name }
-                            &nbsp;({ post.order.instrument.ticker }) for { formatPrice(post.order.price, post.order.instrument.currencyCode) }
+                            &nbsp;({ post.order.instrument.ticker }) for { getPrice(post) }
                         </div>
                         <footer>
                             <input type="text" placeholder='Comment' />
