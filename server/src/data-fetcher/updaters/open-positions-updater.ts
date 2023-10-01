@@ -6,6 +6,8 @@ import DatabaseService from '../../shared/services/database-service'
 import IOpenPositionsUpdates from '../../shared/models/database/iopen-positions-updates'
 import { IDbOrderHistory } from '../../shared/models/database/iorder-history'
 
+type TickerDict = { [key: string]: number }
+
 export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
     /**
      * New, updated and removed open positions, grouped by user id for storage in database
@@ -24,6 +26,23 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
     private newOrderHistories: IDbOrderHistory[] = []
 
     /**
+     * Dictionary containing trading212 tickers as the key and the stocks current price as the value. Used
+     * to get the value for sell orders that no longer returned by trading212
+     *
+     * @type {TickerDict}
+     * @private
+     */
+    private previousOrderPrices: TickerDict = {}
+
+    /**
+     * Temporary dictionary used to provide values for previousOrderPrices. Value reset every update run
+     *
+     * @type {TickerDict}
+     * @private
+     */
+    private currentOrderPrices: TickerDict = {}
+
+    /**
      * Compares the open positions stored in the database against open positions returned by trading212
      * to determine if the user has bought or sold shares, storing the changed values
      *
@@ -33,6 +52,7 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
         this.users = users
         this.openPositionsUpdates = {}
         this.newOrderHistories = []
+        this.currentOrderPrices = {}
 
         const trading212OpenPositions = await this.getTrading212Values(user => Trading212Service.GetOpenPositions(user))
         const databaseOpenPositions = await DatabaseService.GetOpenPositions(this.users.map(user => user.id))
@@ -52,6 +72,8 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
 
         await DatabaseService.AddOrders(this.newOrderHistories)
         await DatabaseService.UpdateOpenPositions(this.openPositionsUpdates)
+
+        this.previousOrderPrices = this.currentOrderPrices
     }
 
     /**
@@ -77,7 +99,7 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
                 this.newOrderHistories.push({
                     userId: databaseOpenPositions.user.id,
                     type: 'sell',
-                    averagePrice: 0, // how to get???
+                    averagePrice: this.previousOrderPrices[databasePosition.trading212Ticker] === undefined ? -1 : this.previousOrderPrices[databasePosition.trading212Ticker],
                     quantity: databasePosition.quantity,
                     trading212Ticker: databasePosition.trading212Ticker
                 })
@@ -107,7 +129,7 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
 
     /**
      * Compares the open positions values returned by trading212 against set of tickers that have already been updated
-     * to determine which open positions are new
+     * to determine which open positions are new. Stores current stock prices for use in future sell orders
      *
      * @param {Set<string>} handledTickers Set of tickers that have previously been stored, to be ignored by this function
      * @param {IOpenPositions} openPositions List of users open positions returned from trading212
@@ -115,6 +137,8 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
      */
     private async handleNewValues(handledTickers: Set<string>, openPositions: IOpenPositions): Promise<void> {
         this.openPositionsUpdates[openPositions.user.id].new = openPositions.positions.filter(position => {
+            this.currentOrderPrices[position.trading212Ticker] = position.currentPrice!
+
             if (!handledTickers.has(position.trading212Ticker)) {
                 this.newOrderHistories.push({
                     userId: openPositions.user.id,
