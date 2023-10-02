@@ -1,6 +1,6 @@
 import {
     AccountValue,
-    ApiKey,
+    ApiKey, Disqualification,
     Instrument,
     OpenPositions,
     OrderHistory,
@@ -38,6 +38,7 @@ const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Prom
     const formattedUser = UserFromDbResult(user)
 
     await ApiKey.create({ UserId: formattedUser.id, apiKey: signupForm.apiKey })
+    await Disqualification.create({ UserId: formattedUser.id })
 
     return formattedUser
 }
@@ -83,13 +84,22 @@ const GetAllUsers = async (): Promise<IUser[]> => {
 
 const GetAllUsersWithValidApiKeys = async (): Promise<IUserWithSecrets[]> => {
     const users = await User.findAll({
-        include: {
-            model: ApiKey,
-            required: true,
-            where: {
-                isValid: true
+        include: [
+            {
+                model: ApiKey,
+                required: true,
+                where: {
+                    isValid: true
+                }
+            },
+            {
+                model: Disqualification,
+                required: true,
+                where: {
+                    disqualified: false
+                }
             }
-        }
+        ]
     })
 
     return users.map(user => UserWithSecretsFromDbResult(user))
@@ -288,6 +298,48 @@ const InvalidateApiKeys = async (userIds: number[]): Promise<void> => {
     })
 }
 
+const IncrementDisqualificationStrikes = async (userIds: number[]): Promise<void> => {
+    const usersWithInvalidKeys = await ApiKey.findAll({
+        where: {
+            isValid: false
+        }
+    })
+
+     await Disqualification.increment('strikes', {
+        by: 1,
+        where: {
+            UserId: [
+                ...userIds,
+                ...usersWithInvalidKeys.map(user => user.dataValues.UserId)
+            ]
+        }
+    })
+}
+
+const DisqualifyUsers = async (maxStrikes: number): Promise<string[]> => {
+    const [count] = await Disqualification.update({ disqualified: true }, {
+        where: {
+            strikes: {
+                [Op.gte]: maxStrikes
+            }
+        }
+    })
+
+    if (count === 0) return []
+
+    const users = await User.findAll({
+        include: [{
+            model: Disqualification,
+            required: true,
+            where: {
+                disqualified: true
+            }
+        }]
+    })
+
+    return users.map(user => user.dataValues.discordUsername)
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -307,5 +359,7 @@ export default {
     AddOrders,
     GetOrderHistories,
     GetAccountValues,
-    InvalidateApiKeys
+    InvalidateApiKeys,
+    IncrementDisqualificationStrikes,
+    DisqualifyUsers
 }

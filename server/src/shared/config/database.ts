@@ -6,6 +6,7 @@ import AccountValueSchema from './schemas/account-value'
 import OpenPositionsSchema from './schemas/open-positions'
 import OrderHistorySchema from './schemas/order-history'
 import ApiKeySchema from './schemas/api-keys'
+import DisqualificationsSchema from './schemas/disqualifications'
 
 const env = process.env
 
@@ -28,16 +29,19 @@ const accountValue = sequalize.define('AccountValue', AccountValueSchema)
 const openPositions = sequalize.define('OpenPositions', OpenPositionsSchema)
 const orderHistory = sequalize.define('OrderHistory', OrderHistorySchema)
 const apiKey = sequalize.define('ApiKey', ApiKeySchema)
+const disqualification = sequalize.define('Disqualification', DisqualificationsSchema)
 
 user.hasMany(openPositions)
 user.hasMany(accountValue)
 user.hasMany(orderHistory)
 user.hasOne(apiKey)
+user.hasOne(disqualification)
 openPositions.belongsTo(user)
 openPositions.belongsTo(instrument)
 orderHistory.belongsTo(user)
 orderHistory.belongsTo(instrument)
 apiKey.belongsTo(user)
+disqualification.belongsTo(user)
 
 ;(async () => await sequalize.sync())()
 
@@ -49,3 +53,4 @@ export const AccountValue = accountValue
 export const OpenPositions = openPositions
 export const OrderHistory = orderHistory
 export const ApiKey = apiKey
+export const Disqualification = disqualification

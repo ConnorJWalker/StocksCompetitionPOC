@@ -121,6 +121,21 @@ const SendUnauthorisedWarnings = async (discordUsernames: string[]) => {{
 }}
 
 /**
+ * Sends message alerting of user disqualifications
+ *
+ * @param {string[]} discordUsernames Array of discord usernames for disqualified users
+ */
+const SendDisqualificationMessage = async (discordUsernames: string[]) => {
+    const usersString = discordUsernames.join(', ')
+    const message = `${usersString} ${discordUsernames.length > 1 ? 'have' : 'has'} been disqualified`
+
+    await send(`channels/${process.env.DISCORD_CHANNEL_ID}/messages`, 'post', {
+        content: message,
+        tts: false
+    })
+}
+
+/**
  * Sends request to the discord api with required headers, parsing the received response
  *
  * @template T
@@ -151,5 +166,6 @@ export default {
     UserIsInDiscord,
     GetProfilePicture,
     SendWelcomeMessage,
-    SendUnauthorisedWarnings
+    SendUnauthorisedWarnings,
+    SendDisqualificationMessage
 }
