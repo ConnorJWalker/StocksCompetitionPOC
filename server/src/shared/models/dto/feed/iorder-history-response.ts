@@ -1,10 +1,11 @@
-import IUser, { UserFromDbResult } from '../iuser'
-import IInstrument, { InstrumentFromDbResult } from '../iinstrument'
+import IUser, { UserFromDbResult } from '../../iuser'
+import IInstrument, { InstrumentFromDbResult } from '../../iinstrument'
 import { Model } from 'sequelize'
 
 export default interface IOrderHistoryResponse {
     user: IUser
-    order: {
+    type: 'order'
+    content: {
         type: string
         price: number
         quantity: number
@@ -16,7 +17,8 @@ export default interface IOrderHistoryResponse {
 export const OrderHistoryResponseFromDb = (value: Model): IOrderHistoryResponse => {
     return {
         user: UserFromDbResult(value.dataValues.User),
-        order: {
+        type: 'order',
+        content: {
             type: value.dataValues.type,
             price: value.dataValues.averagePrice,
             quantity: value.dataValues.quantity,

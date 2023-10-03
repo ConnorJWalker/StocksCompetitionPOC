@@ -1,9 +1,11 @@
 import {
     AccountValue,
-    ApiKey, Disqualification,
+    ApiKey,
+    Disqualification,
     Instrument,
     OpenPositions,
     OrderHistory,
+    RawSql,
     RefreshToken,
     Sequalize,
     User
@@ -11,16 +13,19 @@ import {
 import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from '../models/iuser'
 import ISignupForm from '../../api/models/dto/isignup-form'
 import IT212Instrument from '../models/trading212/instrument'
-import { Op, Optional } from 'sequelize'
+import { Op, Optional, QueryTypes } from 'sequelize'
 import IAccountValue from '../models/iaccount-value'
 import IOpenPositions, { OpenPositionsFromDbResult } from '../models/iopen-positions'
 import { IDbOrderHistory } from '../models/database/iorder-history'
 import IRefreshToken, { RefreshTokenFromDbResult } from '../models/database/irefresh-token'
 import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/iaccount-value-response'
-import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/iorder-history-response'
+import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/feed/iorder-history-response'
 import IOpenPositionsResponse, { OpenPositionsResponseFromDb } from '../models/dto/iopen-positions-response'
 import IOpenPositionsUpdates from '../models/database/iopen-positions-updates'
 import { Literal } from 'sequelize/types/utils'
+import IFeedUnion from '../models/database/ifeed-union'
+import { DisqualificationResponseFromDb } from '../models/dto/feed/idisqualification-response'
+import { FeedParams } from '../../api/services/feed-service'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
@@ -244,10 +249,10 @@ const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
     })))
 }
 
-const GetOrderHistories = async (userId?: number): Promise<IOrderHistoryResponse[]> => {
-    const values = await OrderHistory.findAll({
-        where: userId === undefined ? undefined : {
-            userId
+const GetOrders = async (orderIds: number[]): Promise<IOrderHistoryResponse[]> => {
+    const orders = await OrderHistory.findAll({
+        where: {
+            id: orderIds
         },
         include: [
             {
@@ -264,11 +269,10 @@ const GetOrderHistories = async (userId?: number): Promise<IOrderHistoryResponse
                     exclude: ['createdAt', 'updatedAt']
                 }
             }
-        ],
-        order: [['id', 'DESC']]
+        ]
     })
 
-    return values.map(value => OrderHistoryResponseFromDb(value))
+    return orders.map(order => OrderHistoryResponseFromDb(order))
 }
 
 const GetAccountValues = async (getAll: boolean = false, discordUsername?: string): Promise<IAccountValueResponse[]> => {
@@ -340,6 +344,43 @@ const DisqualifyUsers = async (maxStrikes: number): Promise<string[]> => {
     return users.map(user => user.dataValues.discordUsername)
 }
 
+const GetDisqualifiedUsers = async (userIds: number[]) => {
+    const disqualifications = await Disqualification.findAll({
+        where: {
+            UserId: userIds
+        },
+        include: {
+            model: User,
+            required: true,
+            attributes: {
+                exclude: ['password']
+            }
+        }
+    })
+
+    return disqualifications.map(disqualification => DisqualificationResponseFromDb(disqualification))
+}
+
+const GetFeedIdUnion = async (limit: number, offset: number, params?: FeedParams): Promise<IFeedUnion[]> => {
+    let condition: boolean | string = true
+    let sql = RawSql.FeedUnion
+
+    if (params !== undefined) {
+        condition = params.for === 'profile'
+            ? `UserId = ${Sequalize.escape(params.userIdentifier)}`
+            : ''
+
+        sql = sql.replace(':condition', condition)
+    }
+
+    const [result, _] = await Sequalize.query(sql, {
+        type: QueryTypes.RAW,
+        replacements: { condition, limit, offset }
+    })
+
+    return result as IFeedUnion[]
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -357,9 +398,11 @@ export default {
     GetOpenPositionsWithInstrument,
     UpdateOpenPositions,
     AddOrders,
-    GetOrderHistories,
+    GetOrders,
     GetAccountValues,
     InvalidateApiKeys,
     IncrementDisqualificationStrikes,
-    DisqualifyUsers
+    DisqualifyUsers,
+    GetDisqualifiedUsers,
+    GetFeedIdUnion
 }

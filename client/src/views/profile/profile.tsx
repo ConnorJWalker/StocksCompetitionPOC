@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
-import UserChart from '../../components/user-chart'
+import UserChart from '../../components/feed/user-chart'
 import { useParams } from 'react-router-dom'
 import UserInfo from './user-info'
-import Feed from '../../components/feed'
 import IProfileLoaderData from '../../models/pages/iprofile-data'
 import '../home.css'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 import { useSocket } from '../../hooks/socket-context'
-import IAccountValueResponse from '../../models/dto/feed/i-account-value-response'
+import IAccountValueResponse from '../../models/dto/feed/iaccount-value-response'
+import Feed from '../../components/feed/feed'
 
 const Profile = () => {
     const [profileData, setProfileData] = useState<IProfileLoaderData | null>(null)

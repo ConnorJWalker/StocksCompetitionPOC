@@ -10,7 +10,7 @@ import {
     LineElement,
     Tooltip
 } from 'chart.js'
-import { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
+import { IAccountValuesResponse } from '../../models/dto/feed/iaccount-value-response'
 
 ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 

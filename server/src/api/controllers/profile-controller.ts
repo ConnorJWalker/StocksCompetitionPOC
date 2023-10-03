@@ -3,6 +3,7 @@ import { RequestWithTargetUser } from '../middleware/get-profile-user'
 import DatabaseService from '../../shared/services/database-service'
 import Redis from '../../shared/config/redis'
 import IAccountValueResponse from '../../shared/models/dto/iaccount-value-response'
+import FeedService from '../services/feed-service'
 
 const GetUser = (req: RequestWithTargetUser, res: Response) => {
     return res.json({ ...req.targetUser, apiKey: undefined, password: undefined })
@@ -34,7 +35,7 @@ const GetAccountValueGraph = async (req: RequestWithTargetUser, res: Response) =
 }
 
 const GetFeed = async (req: RequestWithTargetUser, res: Response) => {
-    return res.json(await DatabaseService.GetOrderHistories(req.targetUser?.id))
+    return res.json(await FeedService.GetFeed(0, { for: 'profile', userIdentifier: req.targetUser!.id }))
 }
 
 export default {

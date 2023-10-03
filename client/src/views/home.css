@@ -47,6 +47,15 @@
     margin: 0 -1em 10px;
 }
 
+.post .disqualified {
+    display: flex;
+    justify-content: space-between;
+}
+
+.post .disqualified p {
+    text-transform: uppercase;
+}
+
 .post header {
     display: flex;
     align-items: center;
@@ -168,6 +177,10 @@
     .post {
         margin-right: unset;
         margin-left: unset;
+    }
+
+    .post .disqualified p {
+        letter-spacing: 15px;
     }
 }
 

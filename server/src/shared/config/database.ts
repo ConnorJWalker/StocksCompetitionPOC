@@ -7,6 +7,7 @@ import OpenPositionsSchema from './schemas/open-positions'
 import OrderHistorySchema from './schemas/order-history'
 import ApiKeySchema from './schemas/api-keys'
 import DisqualificationsSchema from './schemas/disqualifications'
+import * as fs from 'fs'
 
 const env = process.env
 
@@ -43,7 +44,10 @@ orderHistory.belongsTo(instrument)
 apiKey.belongsTo(user)
 disqualification.belongsTo(user)
 
-;(async () => await sequalize.sync())()
+// loading on startup so sync not a major issue
+let unionSql = fs.readFileSync(`${__dirname}/sql/feed-union.sql`).toString()
+
+;(async () => { await sequalize.sync() })()
 
 export const Sequalize = sequalize
 export const User = user
@@ -54,3 +58,7 @@ export const OpenPositions = openPositions
 export const OrderHistory = orderHistory
 export const ApiKey = apiKey
 export const Disqualification = disqualification
+
+export const RawSql = {
+    FeedUnion: unionSql
+}
