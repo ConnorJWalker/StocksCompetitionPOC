@@ -1,4 +1,4 @@
-import IAccountValueResponse from '../models/dto/feed/i-account-value-response'
+import IAccountValueResponse from '../models/dto/feed/iaccount-value-response'
 
 const orderLeaderboards = (response: IAccountValueResponse[]): IAccountValueResponse[] => {
     return response.sort((a, b) => {

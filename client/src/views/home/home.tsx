@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Leaderboards from './leaderboards'
-import UserChart from '../../components/user-chart'
-import Feed from '../../components/feed'
+import UserChart from '../../components/feed/user-chart'
+import Feed from '../../components/feed/feed'
 import IHomeData from '../../models/pages/ihome-data'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 import '../home.css'
 import { useSocket } from '../../hooks/socket-context'
-import IAccountValueResponse from '../../models/dto/feed/i-account-value-response'
+import IAccountValueResponse from '../../models/dto/feed/iaccount-value-response'
 import orderLeaderboards from '../../utils/order-leaderboards'
 
 const Home = () => {

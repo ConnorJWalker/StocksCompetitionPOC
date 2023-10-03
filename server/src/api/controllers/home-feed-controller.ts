@@ -1,16 +1,9 @@
 import { Request, Response } from 'express'
-import Redis from '../../shared/config/redis'
 import DatabaseService from '../../shared/services/database-service'
-import IAccountValueResponse from '../../shared/models/dto/iaccount-value-response'
+import FeedService from '../services/feed-service'
 
 const GetAccountValues = async (req: Request, res: Response) => {
-    const cachedString = await Redis.get('t212-account-values')
-
-    if (cachedString === null) {
-        return res.json(await DatabaseService.GetAccountValues())
-    }
-
-    return res.json(JSON.parse(cachedString) as IAccountValueResponse)
+    return res.json(await FeedService.GetAccountValues())
 }
 
 const GetAccountValueGraph = async (req: Request, res: Response) => {
@@ -21,7 +14,7 @@ const GetAccountValueGraph = async (req: Request, res: Response) => {
 }
 
 const GetFeed = async (req: Request, res: Response) => {
-    return res.json(await DatabaseService.GetOrderHistories())
+    return res.json(await FeedService.GetFeed(0))
 }
 
 export default {

@@ -1,8 +1,7 @@
 import IHttpResult, { IHttpErrorResult } from '../models/ihttp-result'
-import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/i-account-value-response'
+import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/iaccount-value-response'
 import HttpError from '../models/http-error'
 import IHomeData from '../models/pages/ihome-data'
-import IOrderHistoryResponse from '../models/dto/feed/iorder-history-response'
 import useAuthentication from './authentication-context'
 import orderLeaderboards from '../utils/order-leaderboards'
 import IUser from '../models/iuser'
@@ -10,6 +9,7 @@ import IOpenPositionsResponse from '../models/dto/profile/iopen-positions-respon
 import getPositionSuffix from '../utils/get-position-suffix'
 import IProfileLoaderData from '../models/pages/iprofile-data'
 import { useUserContext } from './user-context'
+import IFeedResponse from '../models/dto/feed/ifeed-response'
 
 const useAuthenticatedApi = () => {
     const user = useUserContext()
@@ -58,7 +58,7 @@ const useAuthenticatedApi = () => {
 
         const [chart, feed, leaderboards] = await Promise.all([
             send<IAccountValuesResponse[]>('feed/accountValues/graph'),
-            send<IOrderHistoryResponse[]>('feed'),
+            send<IFeedResponse[]>('feed'),
             send<IAccountValueResponse[]>('feed/accountValues')
         ])
 
@@ -77,7 +77,7 @@ const useAuthenticatedApi = () => {
             send<IAccountValueResponse[]>('feed/accountValues'),
             send<IOpenPositionsResponse[]>(`profile/openPositions/${discordUsername}`),
             send<IAccountValuesResponse[]>(`profile/accountValue/graph/${discordUsername}`),
-            send<IOrderHistoryResponse[]>(`profile/feed/${discordUsername}`)
+            send<IFeedResponse[]>(`profile/feed/${discordUsername}`)
         ])
 
         const sortedLeaderboards = orderLeaderboards(accountValues.content)

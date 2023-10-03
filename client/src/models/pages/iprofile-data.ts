@@ -1,7 +1,7 @@
 import IUser from '../iuser'
-import IAccountValueResponse, { IAccountValuesResponse } from '../dto/feed/i-account-value-response'
+import IAccountValueResponse, { IAccountValuesResponse } from '../dto/feed/iaccount-value-response'
 import IOpenPositionsResponse from '../dto/profile/iopen-positions-response'
-import IOrderHistoryResponse from '../dto/feed/iorder-history-response'
+import IFeedResponse from '../dto/feed/ifeed-response'
 
 export interface IProfileData {
     profileUser: IUser
@@ -15,5 +15,5 @@ export interface IProfileData {
 export default interface IProfileLoaderData {
     userInfo: IProfileData,
     userChart: IAccountValuesResponse[],
-    feed: IOrderHistoryResponse[]
+    feed: IFeedResponse[]
 }
