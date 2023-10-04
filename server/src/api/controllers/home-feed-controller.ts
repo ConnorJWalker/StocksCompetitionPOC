@@ -7,10 +7,9 @@ const GetAccountValues = async (req: Request, res: Response) => {
 }
 
 const GetAccountValueGraph = async (req: Request, res: Response) => {
-    // TODO: add day, week and month return
     const duration = (req.query.duration || 'day') as string
 
-    return res.json(await DatabaseService.GetAccountValues(true))
+    return res.json(await DatabaseService.GetAccountValues(duration))
 }
 
 const GetFeed = async (req: Request, res: Response) => {

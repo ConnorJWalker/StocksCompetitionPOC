@@ -98,9 +98,19 @@ const useAuthenticatedApi = () => {
         }
     }
 
+    const getChart = async (duration: string = 'day', discordUsername?: string): Promise<IAccountValuesResponse[]> => {
+        const endpoint = discordUsername === undefined
+            ? `feed/accountValues/graph?duration=${duration}`
+            : `profile/accountValue/graph/${discordUsername}?duration=${duration}`
+
+        const response = await send<IAccountValuesResponse[]>(endpoint)
+        return response.content
+    }
+
     return {
         getHomeData,
-        getProfileData
+        getProfileData,
+        getChart
     }
 }
 

@@ -17,7 +17,7 @@ const Profile = () => {
     profileDataRef.current = profileData
 
     const { discordUsername } = useParams()
-    const { getProfileData } = useAuthenticatedApi()
+    const { getProfileData, getChart } = useAuthenticatedApi()
     const socket = useSocket()
 
     const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
@@ -38,6 +38,11 @@ const Profile = () => {
         }
     }
 
+    const loadChart = async (duration: string) => {
+        const chart = await getChart(duration, discordUsername)
+        setProfileData({ ...profileDataRef.current!, userChart: chart })
+    }
+
     useEffect(() => {
         if (discordUsername !== previousProfile.current) {
             previousProfile.current = discordUsername!
@@ -54,7 +59,9 @@ const Profile = () => {
 
     return profileData === null ? <></> : (
         <div className='home-container'>
-            <UserChart data={profileData.userChart} />
+            <UserChart
+                data={profileData.userChart}
+                onDurationChange={duration => loadChart(duration)} />
             <UserInfo userInfo={profileData.userInfo} />
             <Feed posts={profileData.feed} />
         </div>

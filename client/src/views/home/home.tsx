@@ -16,7 +16,7 @@ const Home = () => {
 
     homeDataRef.current = homeData
 
-    const { getHomeData } = useAuthenticatedApi()
+    const { getHomeData, getChart } = useAuthenticatedApi()
     const socket = useSocket()
 
     const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
@@ -38,6 +38,11 @@ const Home = () => {
         setHomeData({ ...homeDataRef.current, leaderboards: orderLeaderboards(leaderboards) })
     }
 
+    const loadChart = async (duration: string) => {
+        const chart = await getChart(duration)
+        setHomeData({ ...homeDataRef.current!, chart })
+    }
+
     useEffect(() => {
         if (apiCallsCount.current === 0) {
             apiCallsCount.current += 1
@@ -53,7 +58,9 @@ const Home = () => {
 
     return homeData === null ? <></> : (
         <div className='home-container'>
-            <UserChart data={homeData.chart} />
+            <UserChart
+                data={homeData.chart}
+                onDurationChange={duration => loadChart(duration)} />
             <Leaderboards data={homeData.leaderboards} />
             <Feed posts={homeData.feed} />
         </div>

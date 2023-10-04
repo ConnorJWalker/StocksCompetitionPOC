@@ -16,7 +16,7 @@ export interface FeedParams {
  */
 const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
     const cachedString = await Redis.get('t212-account-values')
-    const accountValues = await DatabaseService.GetAccountValues()
+    const accountValues = await DatabaseService.GetCurrentAccountValues()
 
     if (cachedString === null) return accountValues
 

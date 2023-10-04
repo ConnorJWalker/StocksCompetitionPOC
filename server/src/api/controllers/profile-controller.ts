@@ -23,7 +23,7 @@ const GetAccountValue = async (req: RequestWithTargetUser, res: Response) => {
     }
 
     if (userValue === undefined) {
-        const values = await DatabaseService.GetAccountValues(false, req.targetUser?.discordUsername)
+        const values = await DatabaseService.GetCurrentAccountValues(req.targetUser?.discordUsername)
         userValue = values.find(value => value.user.discordUsername === req.targetUser?.discordUsername)
     }
 
@@ -31,7 +31,9 @@ const GetAccountValue = async (req: RequestWithTargetUser, res: Response) => {
 }
 
 const GetAccountValueGraph = async (req: RequestWithTargetUser, res: Response) => {
-    return res.json(await DatabaseService.GetAccountValues(true, req.targetUser?.discordUsername))
+    const duration = (req.query.duration || 'day') as string
+
+    return res.json(await DatabaseService.GetAccountValues(duration, req.targetUser!.id))
 }
 
 const GetFeed = async (req: RequestWithTargetUser, res: Response) => {

@@ -1,6 +1,7 @@
 import IUser, { UserFromDbResult } from '../iuser'
 import IAccountValue, { AccountValueFromDb } from '../iaccount-value'
 import { Model } from 'sequelize'
+import ParseFloat from '../../utils/parse-float'
 
 export default interface IAccountValueResponse {
     user: IUser,
@@ -32,8 +33,39 @@ export const AccountValueResponseFromDb = (values: Model[], isArray: boolean): I
         return {
             user: UserFromDbResult(value),
             values: value.dataValues.AccountValues.length === 0
-                ? defaultValue
+                ? isArray ? [defaultValue] : defaultValue
                 : isArray ? accountValues : accountValues[0]
         }
     })
+}
+
+export const AccountValueResponseFromRawSql = (values: any): IAccountValueResponse[] => {
+    const usersDict: { [key: number]: IAccountValueResponse } = {}
+    values.forEach((value: any) => {
+        if (!usersDict[value.id]) {
+            usersDict[value.id] = {
+                user: {
+                    id: value.id,
+                    displayName: value.displayName,
+                    discordUsername: value.discordUsername,
+                    profilePicture: value.profilePicture,
+                    displayColour: value.displayColour
+                },
+                values: []
+            }
+        }
+
+        const cash = ParseFloat(value.accountValuesCash, 2)
+        const invested = ParseFloat(value.accountValuesInvested, 2)
+        const gainLoss = ParseFloat(value.accountValuesGainLoss, 2)
+
+        ;(usersDict[value.id].values as IAccountValue[]).push({
+            cash,
+            invested,
+            gainLoss,
+            total: ParseFloat(`${cash + invested + gainLoss}`, 2)
+        })
+    })
+
+    return Object.values(usersDict).map(value => value)
 }

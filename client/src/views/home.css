@@ -4,6 +4,25 @@
     max-height: 80vh;
 }
 
+.chart-duration-container span {
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 75px;
+    display: inline-block;
+    text-align: center;
+    margin-right: 5px;
+    user-select: none;
+}
+
+.chart-duration-container span:not(.selected):hover {
+    background-color: var(--background-colour-alt-light);
+}
+
+.chart-duration-container span.selected {
+    background-color: var(--action-colour);
+}
+
 .leaderboards-container {
     margin-top: 10px;
 }
@@ -186,10 +205,10 @@
 
 @media screen and (min-width: 1500px) {
     .leaderboards-container {
-        grid-row: 1/3;
+        grid-row: 1/4;
     }
 
-    .chart, .feed-container {
+    .chart, .chart-duration-container, .feed-container {
         grid-column: 1;
     }
 }

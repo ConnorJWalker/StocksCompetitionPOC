@@ -18,7 +18,10 @@ import IAccountValue from '../models/iaccount-value'
 import IOpenPositions, { OpenPositionsFromDbResult } from '../models/iopen-positions'
 import { IDbOrderHistory } from '../models/database/iorder-history'
 import IRefreshToken, { RefreshTokenFromDbResult } from '../models/database/irefresh-token'
-import IAccountValueResponse, { AccountValueResponseFromDb } from '../models/dto/iaccount-value-response'
+import IAccountValueResponse, {
+    AccountValueResponseFromDb,
+    AccountValueResponseFromRawSql
+} from '../models/dto/iaccount-value-response'
 import IOrderHistoryResponse, { OrderHistoryResponseFromDb } from '../models/dto/feed/iorder-history-response'
 import IOpenPositionsResponse, { OpenPositionsResponseFromDb } from '../models/dto/iopen-positions-response'
 import IOpenPositionsUpdates from '../models/database/iopen-positions-updates'
@@ -275,7 +278,7 @@ const GetOrders = async (orderIds: number[]): Promise<IOrderHistoryResponse[]> =
     return orders.map(order => OrderHistoryResponseFromDb(order))
 }
 
-const GetAccountValues = async (getAll: boolean = false, discordUsername?: string): Promise<IAccountValueResponse[]> => {
+const GetCurrentAccountValues = async (discordUsername?: string): Promise<IAccountValueResponse[]> => {
     const values = await User.findAll({
         attributes: {
             exclude: ['password']
@@ -287,11 +290,29 @@ const GetAccountValues = async (getAll: boolean = false, discordUsername?: strin
             model: AccountValue,
             required: false,
             order: [['id', 'DESC']],
-            limit: getAll ? undefined : 1
+            limit: 1
         }]
     })
 
-    return AccountValueResponseFromDb(values, getAll)
+    return AccountValueResponseFromDb(values, false)
+}
+
+const GetAccountValues = async (duration: string, id?: number): Promise<IAccountValueResponse[]>  => {
+    let startDate = new Date(Date.now())
+
+    if (duration === 'week') {
+        startDate.setDate(startDate.getDate() - 7)
+    }
+
+    const sql = RawSql.GroupedAccountValues
+        .replace(':condition', id === undefined ? 'true' : `id = ${Sequalize.escape(id)}`)
+
+    const date = duration === 'max' ? new Date().setDate(0) : startDate
+    const [result] = await Sequalize.query(sql, {
+        replacements: { date }
+    })
+
+    return AccountValueResponseFromRawSql(result)
 }
 
 const InvalidateApiKeys = async (userIds: number[]): Promise<void> => {
@@ -399,6 +420,7 @@ export default {
     UpdateOpenPositions,
     AddOrders,
     GetOrders,
+    GetCurrentAccountValues,
     GetAccountValues,
     InvalidateApiKeys,
     IncrementDisqualificationStrikes,

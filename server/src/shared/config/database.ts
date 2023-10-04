@@ -46,6 +46,7 @@ disqualification.belongsTo(user)
 
 // loading on startup so sync not a major issue
 let unionSql = fs.readFileSync(`${__dirname}/sql/feed-union.sql`).toString()
+let groupedAccountValues = fs.readFileSync(`${__dirname}/sql/grouped-account-values.sql`).toString()
 
 ;(async () => { await sequalize.sync() })()
 
@@ -60,5 +61,6 @@ export const ApiKey = apiKey
 export const Disqualification = disqualification
 
 export const RawSql = {
-    FeedUnion: unionSql
+    FeedUnion: unionSql,
+    GroupedAccountValues: groupedAccountValues
 }

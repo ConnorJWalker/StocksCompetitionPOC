@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Line } from 'react-chartjs-2'
 import {
     Chart as ChartJs,
@@ -12,59 +12,83 @@ import {
 } from 'chart.js'
 import { IAccountValuesResponse } from '../../models/dto/feed/iaccount-value-response'
 
-ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
-
 interface props {
-    data: IAccountValuesResponse[]
+    data: IAccountValuesResponse[],
+    onDurationChange: (duration: string) => void
 }
 
-const UserChart = ({ data }: props) => {
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            },
-            tooltip: {
-                callbacks: {
-                    label: (context: any) => {
-                        let label = context.dataset.label || ''
+ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
-                        if (label) label += ': '
+const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false
+        },
+        tooltip: {
+            callbacks: {
+                label: (context: any) => {
+                    let label = context.dataset.label || ''
 
-                        if (context.parsed.y !== null)
-                            label += new Intl.NumberFormat('en-UK', { style: 'currency', currency: 'GBP' }).format(context.parsed.y)
+                    if (label) label += ': '
 
-                        return label
-                    }
+                    if (context.parsed.y !== null)
+                        label += new Intl.NumberFormat('en-UK', { style: 'currency', currency: 'GBP' }).format(context.parsed.y)
+
+                    return label
                 }
             }
-        },
-        scales: {
-            x: {
-                grid: {
-                    display: false
-                }
-            },
-            y: {
-                ticks: {
-                    callback: (value: any) => '£' + value
-                }
-            }
-        },
-        interaction: {
-            mode: 'nearest' as 'nearest',
-            intersect: false
         }
+    },
+    scales: {
+        x: {
+            grid: {
+                display: false
+            }
+        },
+        y: {
+            ticks: {
+                callback: (value: any) => '£' + value
+            }
+        }
+    },
+    interaction: {
+        mode: 'nearest' as 'nearest',
+        intersect: false
     }
+}
 
+const UserChart = ({ data, onDurationChange }: props) => {
+    const [duration, setDuration] = useState(0)
     const mappedData = mapResponse()
 
     return (
-        <div className='chart'>
-            <Line data={mappedData} options={options} />
-        </div>
+        <>
+            <div className='chart'>
+                <Line data={mappedData} options={options} />
+            </div>
+            <span className='chart-duration-container'>
+                <span
+                    className={duration === 0 ? 'selected' : ''}
+                    onClick={() => durationClick(0)}
+                >
+                    Day
+                </span>
+                <span
+                    className={duration === 1 ? 'selected' : ''}
+                    onClick={() => durationClick(1)}
+                >
+                    Week
+                </span>
+                <span
+                    className={duration === 2 ? 'selected' : ''}
+                    onClick={() => durationClick(2)}
+                >
+                    Max
+                </span>
+            </span>
+        </>
     )
 
     function mapResponse(): ChartData<'line'> {
@@ -84,6 +108,12 @@ const UserChart = ({ data }: props) => {
             datasets,
             labels: new Array(highestCount).fill('')
         }
+    }
+
+    function durationClick(index: number) {
+        const durations = ['day', 'week', 'max']
+        setDuration(index)
+        onDurationChange(durations[index])
     }
 }
 

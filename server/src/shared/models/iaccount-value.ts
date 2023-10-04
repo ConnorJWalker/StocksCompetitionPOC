@@ -1,5 +1,6 @@
 import IT212AccountCash from './trading212/account-cash'
 import { Model } from 'sequelize'
+import ParseFloat from '../utils/parse-float'
 
 export default interface IAccountValue {
     discordUsername?: string
@@ -16,10 +17,6 @@ export const AccountValueFromApi = (accountValue: IT212AccountCash): IAccountVal
         total: accountValue.total,
         gainLoss: accountValue.ppl
     }
-}
-
-const ParseFloat = (input: string, decimalPlaces: number): number => {
-    return Number(parseFloat(input).toFixed(decimalPlaces))
 }
 
 export const AccountValueFromDb = (accountValues: Model[]): IAccountValue[] => {
