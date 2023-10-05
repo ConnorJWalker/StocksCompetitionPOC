@@ -299,6 +299,7 @@ const GetCurrentAccountValues = async (discordUsername?: string): Promise<IAccou
 
 const GetAccountValues = async (duration: string, id?: number): Promise<IAccountValueResponse[]>  => {
     let startDate = new Date(Date.now())
+    startDate.setHours(0, 0, 0)
 
     if (duration === 'week') {
         startDate.setDate(startDate.getDate() - 7)
@@ -306,6 +307,10 @@ const GetAccountValues = async (duration: string, id?: number): Promise<IAccount
 
     const sql = RawSql.GroupedAccountValues
         .replace(':condition', id === undefined ? 'true' : `id = ${Sequalize.escape(id)}`)
+        .replace(':groupBy',  duration === 'day'
+            ? 'AccountValues.id'
+            : 'date_format(accountValuesCreatedAt, "%Y%m%d%H"), AccountValues.UserId'
+        )
 
     const date = duration === 'max' ? new Date().setDate(0) : startDate
     const [result] = await Sequalize.query(sql, {

@@ -16,6 +16,6 @@
     FROM Users AS User
     LEFT OUTER JOIN AccountValues AS AccountValues
     ON User.id = AccountValues.UserId AND AccountValues.createdAt >= :date
-    GROUP BY date_format(accountValuesCreatedAt, '%Y%m%d%H'), AccountValues.UserId
+    GROUP BY :groupBy
 ) AS Result
 WHERE :condition;
