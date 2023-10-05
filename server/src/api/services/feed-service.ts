@@ -9,6 +9,8 @@ export interface FeedParams {
     for: 'profile' | 'following'
 }
 
+const feedLimit = 10
+
 /**
  * Retrieves account values from redis and database and returns the merged response
  *
@@ -36,7 +38,7 @@ const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
  * @returns {Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]>} Array of merged posts
  */
 const GetFeed = async (offset: number, params?: FeedParams): Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]> => {
-    const union = await DatabaseService.GetFeedIdUnion(10, offset, params)
+    const union = await DatabaseService.GetFeedIdUnion(feedLimit, feedLimit * offset, params)
     const unionDisqualifications = union.filter(row => row.postType === 'disqualification')
     const unionOrders = union.filter(row => row.postType === 'order')
 

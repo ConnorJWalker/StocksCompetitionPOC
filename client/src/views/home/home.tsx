@@ -14,9 +14,13 @@ const Home = () => {
     const homeDataRef = useRef(homeData)
     const apiCallsCount = useRef(0)
 
+    const [currentPage, setCurrentPage] = useState(1)
+    const loadingContent = useRef(false)
+    const allContentLoaded = useRef(false)
+
     homeDataRef.current = homeData
 
-    const { getHomeData, getChart } = useAuthenticatedApi()
+    const { getHomeData, getChart, getFeed } = useAuthenticatedApi()
     const socket = useSocket()
 
     const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
@@ -43,6 +47,25 @@ const Home = () => {
         setHomeData({ ...homeDataRef.current!, chart })
     }
 
+    const onScroll = async (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+        if (allContentLoaded.current || homeData === null) return
+
+        const target = e.target as HTMLDivElement
+        if (target.scrollHeight - target.scrollTop <= target.clientHeight + 300 && !loadingContent.current) {
+            loadingContent.current = true
+            const feed = await getFeed(currentPage)
+            loadingContent.current = false
+
+            if (feed.length === 0) {
+                allContentLoaded.current = true
+                return
+            }
+
+            setCurrentPage(currentPage + 1)
+            setHomeData({ ...homeData, feed: [ ...homeData.feed, ...feed] })
+        }
+    }
+
     useEffect(() => {
         if (apiCallsCount.current === 0) {
             apiCallsCount.current += 1
@@ -57,7 +80,7 @@ const Home = () => {
     }, [])
 
     return homeData === null ? <></> : (
-        <div className='home-container'>
+        <div className='home-container' onScroll={onScroll}>
             <UserChart
                 data={homeData.chart}
                 onDurationChange={duration => loadChart(duration)} />

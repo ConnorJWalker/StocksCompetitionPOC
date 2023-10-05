@@ -107,10 +107,20 @@ const useAuthenticatedApi = () => {
         return response.content
     }
 
+    const getFeed = async (page: number, discordUsername?: string): Promise<IFeedResponse[]> => {
+        const endpoint = discordUsername === undefined
+            ? `feed?page=${page}`
+            : `profile/feed/${discordUsername}?page=${page}`
+
+        const response = await send<IFeedResponse[]>(endpoint)
+        return response.content
+    }
+
     return {
         getHomeData,
         getProfileData,
-        getChart
+        getChart,
+        getFeed
     }
 }
 

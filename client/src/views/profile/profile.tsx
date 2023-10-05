@@ -16,8 +16,12 @@ const Profile = () => {
 
     profileDataRef.current = profileData
 
+    const allContentLoaded = useRef(false)
+    const loadingContent = useRef(false)
+    const [currentPage, setCurrentPage] = useState(1)
+
     const { discordUsername } = useParams()
-    const { getProfileData, getChart } = useAuthenticatedApi()
+    const { getProfileData, getChart, getFeed } = useAuthenticatedApi()
     const socket = useSocket()
 
     const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
@@ -43,6 +47,25 @@ const Profile = () => {
         setProfileData({ ...profileDataRef.current!, userChart: chart })
     }
 
+    const onScroll = async (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+        if (allContentLoaded.current || profileData === null) return
+
+        const target = e.target as HTMLDivElement
+        if (target.scrollHeight - target.scrollTop <= target.clientHeight + 300 && !loadingContent.current) {
+            loadingContent.current = true
+            const feed = await getFeed(currentPage, discordUsername)
+            loadingContent.current = false
+
+            if (feed.length === 0) {
+                allContentLoaded.current = true
+                return
+            }
+
+            setCurrentPage(currentPage + 1)
+            setProfileData({ ...profileData, feed: [ ...profileData.feed, ...feed] })
+        }
+    }
+
     useEffect(() => {
         if (discordUsername !== previousProfile.current) {
             previousProfile.current = discordUsername!
@@ -58,7 +81,7 @@ const Profile = () => {
     }, [])
 
     return profileData === null ? <></> : (
-        <div className='home-container'>
+        <div className='home-container' onScroll={onScroll}>
             <UserChart
                 data={profileData.userChart}
                 onDurationChange={duration => loadChart(duration)} />

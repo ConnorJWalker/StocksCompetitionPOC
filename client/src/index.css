@@ -13,6 +13,11 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+    width: 1px;
 }
 
 body {
@@ -87,8 +92,12 @@ path {
 .container > main {
     flex: 1;
     padding: 1em;
+    overflow: hidden;
+}
+
+.container > main > div {
+    height: 100%;
     overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .container > nav {
