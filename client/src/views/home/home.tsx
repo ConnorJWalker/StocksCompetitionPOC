@@ -66,6 +66,8 @@ const Home = () => {
     }
 
     useEffect(() => {
+        document.title = 'Stocks Competition - Home'
+
         getHomeData()
             .then(data => setHomeData(data))
             .catch(err => console.error(err))

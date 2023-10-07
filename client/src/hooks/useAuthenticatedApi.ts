@@ -44,7 +44,6 @@ const useAuthenticatedApi = () => {
         })
 
         if (response.status === 401 && newToken === undefined) {
-            console.log('GOT 401')
             if (refreshPromise === null) {
                 refreshPromise = refreshAccessTokens()
             }

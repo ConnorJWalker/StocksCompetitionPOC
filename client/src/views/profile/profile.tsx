@@ -66,6 +66,8 @@ const Profile = () => {
     }
 
     useEffect(() => {
+        document.title = `Stocks Competition - ${discordUsername}`
+
         getProfileData(discordUsername!)
             .then(response => setProfileData(response))
             .catch(err => console.error(err))
