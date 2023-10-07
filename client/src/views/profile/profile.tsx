@@ -12,7 +12,6 @@ import Feed from '../../components/feed/feed'
 const Profile = () => {
     const [profileData, setProfileData] = useState<IProfileLoaderData | null>(null)
     const profileDataRef = useRef(profileData)
-    const previousProfile = useRef('')
 
     profileDataRef.current = profileData
 
@@ -67,12 +66,9 @@ const Profile = () => {
     }
 
     useEffect(() => {
-        if (discordUsername !== previousProfile.current) {
-            previousProfile.current = discordUsername!
-            getProfileData(discordUsername!)
-                .then(response => setProfileData(response))
-                .catch(err => console.error(err))
-        }
+        getProfileData(discordUsername!)
+            .then(response => setProfileData(response))
+            .catch(err => console.error(err))
     }, [discordUsername])
 
     useEffect(() => {

@@ -8,22 +8,52 @@ import IUser from '../models/iuser'
 import IOpenPositionsResponse from '../models/dto/profile/iopen-positions-response'
 import getPositionSuffix from '../utils/get-position-suffix'
 import IProfileLoaderData from '../models/pages/iprofile-data'
-import { useUserContext } from './user-context'
 import IFeedResponse from '../models/dto/feed/ifeed-response'
+import IAuthenticationResponse from '../models/dto/iauthentication-response'
+import { useEffect } from 'react'
+
+let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
 const useAuthenticatedApi = () => {
-    const user = useUserContext()
     const { accessToken, refreshToken, setTokens } = useAuthentication()
 
-    const send = async <T>(endpoint: string, method = 'get', body: object | null = null): Promise<IHttpResult<T>> => {
+    useEffect(() => { refreshPromise = null }, [accessToken])
+
+    const refreshAccessTokens = async (): Promise<IAuthenticationResponse | null> => {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}authentication/refresh`, {
+            method: 'post',
+            headers: new Headers({
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + refreshToken
+            })
+        })
+
+        const body = response.ok ? await response.json() : undefined
+        setTokens(body)
+        return response.ok ? body : null
+    }
+
+    const send = async <T>(endpoint: string, method = 'get', body: object | null = null, newToken?: string): Promise<IHttpResult<T>> => {
         const response = await fetch(`${process.env.REACT_APP_SERVER_URL}${endpoint}`, {
             method,
             body: method === 'get' ? undefined : JSON.stringify(body),
             headers: new Headers({
                 'content-type': 'application/json',
-                'authorization': 'Bearer ' + accessToken,
+                'authorization': 'Bearer ' + (newToken === undefined ? accessToken : newToken),
             })
         })
+
+        if (response.status === 401 && newToken === undefined) {
+            console.log('GOT 401')
+            if (refreshPromise === null) {
+                refreshPromise = refreshAccessTokens()
+            }
+
+            const token = await refreshPromise
+            if (token !== null) {
+                return await send(endpoint, method, body, token.accessToken)
+            }
+        }
 
         const result = {
             ok: response.ok,
@@ -38,24 +68,7 @@ const useAuthenticatedApi = () => {
         return result
     }
 
-    const validateRefreshToken = async () => {
-        // if access token expires in less than 60 seconds
-        if ((user.exp * 1000) - Date.now() < 60 * 1000) {
-            const response = await fetch(`${process.env.REACT_APP_SERVER_URL}authentication/refresh`, {
-                method: 'post',
-                headers: new Headers({
-                    'content-type': 'application/json',
-                    'authorization': 'Bearer ' + refreshToken
-                })
-            })
-
-            setTokens(response.ok ? await response.json() : undefined)
-        }
-    }
-
     const getHomeData = async (): Promise<IHomeData> => {
-        await validateRefreshToken()
-
         const [chart, feed, leaderboards] = await Promise.all([
             send<IAccountValuesResponse[]>('feed/accountValues/graph'),
             send<IFeedResponse[]>('feed'),
@@ -70,8 +83,6 @@ const useAuthenticatedApi = () => {
     }
 
     const getProfileData = async (discordUsername: string): Promise<IProfileLoaderData> => {
-        await validateRefreshToken()
-
         const [userInfo, accountValues, openPositions, userChart, feed] = await Promise.all([
             send<IUser>(`profile/user/${discordUsername}`),
             send<IAccountValueResponse[]>('feed/accountValues'),

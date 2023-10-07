@@ -12,7 +12,6 @@ import orderLeaderboards from '../../utils/order-leaderboards'
 const Home = () => {
     const [homeData, setHomeData] = useState<IHomeData | null>(null)
     const homeDataRef = useRef(homeData)
-    const apiCallsCount = useRef(0)
 
     const [currentPage, setCurrentPage] = useState(1)
     const loadingContent = useRef(false)
@@ -67,13 +66,9 @@ const Home = () => {
     }
 
     useEffect(() => {
-        if (apiCallsCount.current === 0) {
-            apiCallsCount.current += 1
-
-            getHomeData()
-                .then(data => setHomeData(data))
-                .catch(err => console.error(err))
-        }
+        getHomeData()
+            .then(data => setHomeData(data))
+            .catch(err => console.error(err))
 
         socket.on('account-values-update', data => onAccountValuesUpdate(JSON.parse(data)))
         return () => { socket.off('account-values-update') }
