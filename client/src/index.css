@@ -7,6 +7,7 @@
     --action-colour: #1e58a8;
     --action-colour-alt: #1c529e;
     --danger: #d13232;
+    --disable: #77868f;
 }
 
 * {
@@ -52,6 +53,17 @@ button.btn-action {
     background-color: var(--action-colour);
     border: 1px solid var(--action-colour);
     color: var(--font-colour);
+}
+
+button.btn-action[disabled] {
+    background-color: var(--disable);
+    border: 1px solid var(--disable);
+    cursor: not-allowed;
+}
+
+button.btn-action[disabled]:hover, button.btn-action[disabled]:active {
+    background-color: var(--disable);
+    border: 1px solid var(--disable);
 }
 
 button.btn-action:hover, button.btn-pink:active {

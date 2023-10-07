@@ -7,6 +7,7 @@ import OpenPositionsSchema from './schemas/open-positions'
 import OrderHistorySchema from './schemas/order-history'
 import ApiKeySchema from './schemas/api-keys'
 import DisqualificationsSchema from './schemas/disqualifications'
+import FollowerSchema from './schemas/follower'
 import * as fs from 'fs'
 
 const env = process.env
@@ -31,18 +32,24 @@ const openPositions = sequalize.define('OpenPositions', OpenPositionsSchema)
 const orderHistory = sequalize.define('OrderHistory', OrderHistorySchema)
 const apiKey = sequalize.define('ApiKey', ApiKeySchema)
 const disqualification = sequalize.define('Disqualification', DisqualificationsSchema)
+const follower = sequalize.define('Follower', FollowerSchema)
 
 user.hasMany(openPositions)
 user.hasMany(accountValue)
 user.hasMany(orderHistory)
 user.hasOne(apiKey)
 user.hasOne(disqualification)
+user.hasMany(follower, { foreignKey: 'followerId' })
+user.hasMany(follower, { foreignKey: 'followingId' })
+
 openPositions.belongsTo(user)
 openPositions.belongsTo(instrument)
 orderHistory.belongsTo(user)
 orderHistory.belongsTo(instrument)
 apiKey.belongsTo(user)
 disqualification.belongsTo(user)
+follower.belongsTo(user, { foreignKey: 'followerId' })
+follower.belongsTo(user, { foreignKey: 'followingId' })
 
 // loading on startup so sync not a major issue
 let unionSql = fs.readFileSync(`${__dirname}/sql/feed-union.sql`).toString()
@@ -59,6 +66,7 @@ export const OpenPositions = openPositions
 export const OrderHistory = orderHistory
 export const ApiKey = apiKey
 export const Disqualification = disqualification
+export const Follower = follower
 
 export const RawSql = {
     FeedUnion: unionSql,

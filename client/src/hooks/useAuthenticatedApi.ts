@@ -36,7 +36,7 @@ const useAuthenticatedApi = () => {
     const send = async <T>(endpoint: string, method = 'get', body: object | null = null, newToken?: string): Promise<IHttpResult<T>> => {
         const response = await fetch(`${process.env.REACT_APP_SERVER_URL}${endpoint}`, {
             method,
-            body: method === 'get' ? undefined : JSON.stringify(body),
+            body: method === 'get' ? undefined : JSON.stringify(body ?? {}),
             headers: new Headers({
                 'content-type': 'application/json',
                 'authorization': 'Bearer ' + (newToken === undefined ? accessToken : newToken),
@@ -126,11 +126,22 @@ const useAuthenticatedApi = () => {
         return response.content
     }
 
+    const sendFollowRequest = async (discordUsername: string): Promise<void> => {
+        await send(`user/follow/${discordUsername}`, 'post')
+    }
+
+    const getIsUserFollowing = async (discordUsername: string): Promise<boolean> => {
+        const response = await send<{ isFollowing: boolean }>(`user/follow/${discordUsername}`)
+        return response.content.isFollowing
+    }
+
     return {
         getHomeData,
         getProfileData,
         getChart,
-        getFeed
+        getFeed,
+        sendFollowRequest,
+        getIsUserFollowing
     }
 }
 

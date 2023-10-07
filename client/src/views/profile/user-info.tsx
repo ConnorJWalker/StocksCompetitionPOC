@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import formatPrice from '../../utils/format-price'
 import { useUserContext } from '../../hooks/user-context'
 import { IProfileData } from '../../models/pages/iprofile-data'
 import useLogout from '../../hooks/use-logout'
+import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 
 interface props {
     userInfo: IProfileData
@@ -11,6 +12,35 @@ interface props {
 const UserInfo = ({ userInfo }: props) => {
     const user = useUserContext()
     const logout = useLogout()
+    const { sendFollowRequest, getIsUserFollowing } = useAuthenticatedApi()
+
+    const [isFollowing, setIsFollowing] = useState<boolean | null>(null)
+
+    useEffect(() => {
+        getIsUserFollowing(userInfo.profileUser.discordUsername)
+            .then(response => setIsFollowing(response))
+    }, [])
+
+    const toggleFollow = async () => {
+        await sendFollowRequest(userInfo.profileUser.discordUsername)
+        setIsFollowing(!isFollowing)
+    }
+
+    const renderActionButton = () => {
+        if (user.discordUsername === userInfo.profileUser.discordUsername) {
+            return <button className='btn-danger profile-action-button' onClick={logout}>Log Out</button>
+        }
+
+        return (
+            <button
+                className='btn-action profile-action-button'
+                onClick={toggleFollow}
+                disabled={isFollowing === null}
+            >
+                { isFollowing ? 'Follow' : 'Unfollow' }
+            </button>
+        )
+    }
 
     return (
         <div className='leaderboards-container user-info'>
@@ -26,11 +56,7 @@ const UserInfo = ({ userInfo }: props) => {
                     </span>
                 </div>
 
-                {
-                    user.discordUsername === userInfo.profileUser.discordUsername
-                        ? <button className='btn-danger profile-action-button' onClick={logout}>Log Out</button>
-                        : <button className='btn-action profile-action-button'>Follow</button>
-                }
+                { renderActionButton() }
 
                 <h2>Leaderboard Position</h2>
                 <div className='account-value-container'>

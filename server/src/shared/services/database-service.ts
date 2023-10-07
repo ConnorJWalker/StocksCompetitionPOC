@@ -8,7 +8,8 @@ import {
     RawSql,
     RefreshToken,
     Sequalize,
-    User
+    User,
+    Follower
 } from '../config/database'
 import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from '../models/iuser'
 import ISignupForm from '../../api/models/dto/isignup-form'
@@ -407,6 +408,37 @@ const GetFeedIdUnion = async (limit: number, offset: number, params?: FeedParams
     return result as IFeedUnion[]
 }
 
+const ToggleUserFollow = async (followerId: number, followingId: number): Promise<void> => {
+    const followerRecord = await Follower.findOne({
+        where: {
+            followerId,
+            followingId
+        }
+    })
+
+    if (followerRecord === null) {
+        await Follower.create({
+            followerId,
+            followingId
+        })
+
+        return
+    }
+
+    await followerRecord.destroy()
+}
+
+const IsUserFollowing = async (followerId: number, followingId: number): Promise<boolean> => {
+    const isFollowing = await Follower.findOne({
+        where: {
+            followerId,
+            followingId
+        }
+    })
+
+    return isFollowing !== null
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -431,5 +463,7 @@ export default {
     IncrementDisqualificationStrikes,
     DisqualifyUsers,
     GetDisqualifiedUsers,
-    GetFeedIdUnion
+    GetFeedIdUnion,
+    ToggleUserFollow,
+    IsUserFollowing
 }

@@ -1,15 +1,18 @@
 import { Router } from 'express'
 import * as passport from 'passport'
 import authentication from './authentication'
-import profile from './profile'
-import mainFeed from './main-feed'
+import Profile from './profile'
+import MainFeed from './main-feed'
+import User from './user'
 
 const router = Router()
 
 router.use('/authentication', authentication)
 
-router.use('/profile', passport.authenticate('jwt', { session: false }), profile)
+router.use('/profile', passport.authenticate('jwt', { session: false }), Profile)
 
-router.use('/feed', passport.authenticate('jwt', { session: false }), mainFeed)
+router.use('/feed', passport.authenticate('jwt', { session: false }), MainFeed)
+
+router.use('/user', passport.authenticate('jwt', { session: false }), User)
 
 export default router
