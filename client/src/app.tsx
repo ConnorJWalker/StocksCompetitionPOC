@@ -1,12 +1,13 @@
 import React, { useRef } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import io from 'socket.io-client'
-import Home from './views/home/home'
+import Home from './views/home'
 import Profile from './views/profile/profile'
 import AuthenticationForms from './views/authentication/authentication-forms'
 import AuthenticatedRoute from './components/authenticated-route'
 import AuthenticationProvider from './components/authentication-provider'
 import SocketContext from './hooks/socket-context'
+import Following from './views/following'
 
 const App = () => {
     const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!))
@@ -26,7 +27,7 @@ const App = () => {
                 },
                 {
                     path: '/following',
-                    element: <Home />
+                    element: <Following />
                 },
                 {
                     path: '/search',

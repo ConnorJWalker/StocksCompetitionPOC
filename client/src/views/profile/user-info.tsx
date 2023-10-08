@@ -1,33 +1,53 @@
 import React, { useEffect, useState } from 'react'
 import formatPrice from '../../utils/format-price'
 import { useUserContext } from '../../hooks/user-context'
-import { IProfileData } from '../../models/pages/iprofile-data'
+import IProfileData from '../../models/pages/iprofile-data'
 import useLogout from '../../hooks/use-logout'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
+import { useSocket } from '../../hooks/socket-context'
+import IAccountValueResponse from '../../models/dto/feed/iaccount-value-response'
 
 interface props {
-    userInfo: IProfileData
+    discordUsername: string
 }
 
-const UserInfo = ({ userInfo }: props) => {
+const UserInfo = ({ discordUsername }: props) => {
     const user = useUserContext()
     const logout = useLogout()
-    const { sendFollowRequest, getIsUserFollowing } = useAuthenticatedApi()
+    const socket = useSocket()
+    const { getUserInfo, sendFollowRequest } = useAuthenticatedApi()
 
-    const [isFollowing, setIsFollowing] = useState<boolean | null>(null)
-
-    useEffect(() => {
-        getIsUserFollowing(userInfo.profileUser.discordUsername)
-            .then(response => setIsFollowing(response))
-    }, [])
+    const [userInfo, setUserInfo] = useState<IProfileData>()
 
     const toggleFollow = async () => {
-        await sendFollowRequest(userInfo.profileUser.discordUsername)
-        setIsFollowing(!isFollowing)
+        await sendFollowRequest(discordUsername)
+
+        if (userInfo !== undefined) {
+            setUserInfo({ ...userInfo, isFollowing: !userInfo.isFollowing })
+        }
     }
 
+    const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
+        if (userInfo === undefined) return
+
+        const userValue = updatedValues.find(value => value.user.discordUsername === discordUsername)
+        if (userValue === undefined) return
+
+        setUserInfo({ ...userInfo, accountValue: {
+            ...userInfo.accountValue,
+            value: userValue
+        } })
+    }
+
+    useEffect(() => {
+        getUserInfo(discordUsername).then(response => setUserInfo(response))
+
+        socket.on('account-values-update', data => onAccountValuesUpdate(JSON.parse(data)))
+        return () => { socket.off('account-values-update') }
+    }, [])
+
     const renderActionButton = () => {
-        if (user.discordUsername === userInfo.profileUser.discordUsername) {
+        if (user.discordUsername === userInfo?.accountValue.value.user.discordUsername) {
             return <button className='btn-danger profile-action-button' onClick={logout}>Log Out</button>
         }
 
@@ -35,9 +55,9 @@ const UserInfo = ({ userInfo }: props) => {
             <button
                 className='btn-action profile-action-button'
                 onClick={toggleFollow}
-                disabled={isFollowing === null}
+                disabled={userInfo?.isFollowing === undefined}
             >
-                { isFollowing ? 'Follow' : 'Unfollow' }
+                { userInfo?.isFollowing ? 'Unfollow' : 'Follow' }
             </button>
         )
     }
@@ -47,12 +67,12 @@ const UserInfo = ({ userInfo }: props) => {
             <div>
                 <div>
                     <img
-                        src={userInfo.profileUser.profilePicture}
-                        alt={`${userInfo.profileUser.displayName}'s profile picture`}
+                        src={userInfo?.accountValue.value.user.profilePicture}
+                        alt={`${userInfo?.accountValue.value.user.displayName}'s profile picture`}
                         className='profile-picture' />
                     <span>
-                        <h2>{userInfo.profileUser.displayName}</h2>
-                        <p>{userInfo.profileUser.discordUsername}</p>
+                        <h2>{userInfo?.accountValue.value.user.displayName}</h2>
+                        <p>{userInfo?.accountValue.value.user.discordUsername}</p>
                     </span>
                 </div>
 
@@ -60,13 +80,13 @@ const UserInfo = ({ userInfo }: props) => {
 
                 <h2>Leaderboard Position</h2>
                 <div className='account-value-container'>
-                    <p>{ userInfo.accountValue.position } Place:</p>
-                    <p>£{userInfo.accountValue.value?.values.total}</p>
+                    <p>{ userInfo?.accountValue.position } Place:</p>
+                    <p>£{ userInfo?.accountValue.value.values.total }</p>
                 </div>
 
                 <h2>Open Positions</h2>
                 {
-                    userInfo.openPositions.map((position, index) => (
+                    userInfo?.openPositions.map((position, index) => (
                         <div key={index} className='open-position-container'>
                             <header>
                                 <object data={position.instrument.icon} type='image/png'>

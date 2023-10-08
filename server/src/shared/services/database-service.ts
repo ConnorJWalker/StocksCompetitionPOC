@@ -29,7 +29,7 @@ import IOpenPositionsUpdates from '../models/database/iopen-positions-updates'
 import { Literal } from 'sequelize/types/utils'
 import IFeedUnion from '../models/database/ifeed-union'
 import { DisqualificationResponseFromDb } from '../models/dto/feed/idisqualification-response'
-import { FeedParams } from '../../api/services/feed-service'
+import IFeedParams from '../models/database/ifeed-params'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
@@ -279,13 +279,13 @@ const GetOrders = async (orderIds: number[]): Promise<IOrderHistoryResponse[]> =
     return orders.map(order => OrderHistoryResponseFromDb(order))
 }
 
-const GetCurrentAccountValues = async (discordUsername?: string): Promise<IAccountValueResponse[]> => {
+const GetCurrentAccountValues = async (userId?: number): Promise<IAccountValueResponse[]> => {
     const values = await User.findAll({
         attributes: {
             exclude: ['password']
         },
-        where: discordUsername === undefined ? undefined : {
-            discordUsername
+        where: userId === undefined ? undefined : {
+            id: Sequalize.literal(`id IN (SELECT followingId FROM Followers WHERE followerId = ${Sequalize.escape(userId)}) OR id = ${Sequalize.escape(userId)}`)
         },
         include: [{
             model: AccountValue,
@@ -298,7 +298,7 @@ const GetCurrentAccountValues = async (discordUsername?: string): Promise<IAccou
     return AccountValueResponseFromDb(values, false)
 }
 
-const GetAccountValues = async (duration: string, id?: number): Promise<IAccountValueResponse[]>  => {
+const GetAccountValues = async (duration: string, params?: IFeedParams): Promise<IAccountValueResponse[]>  => {
     let startDate = new Date(Date.now())
     startDate.setHours(0, 0, 0)
 
@@ -306,8 +306,16 @@ const GetAccountValues = async (duration: string, id?: number): Promise<IAccount
         startDate.setDate(startDate.getDate() - 7)
     }
 
+    let condition = 'true'
+    if (params !== undefined) {
+        const id = Sequalize.escape(params.userIdentifier)
+        condition = params.for === 'profile'
+            ? `id = ${id}`
+            : `id IN (SELECT followingId FROM Followers WHERE followerId = ${id}) OR id = ${id}`
+    }
+
     const sql = RawSql.GroupedAccountValues
-        .replace(':condition', id === undefined ? 'true' : `id = ${Sequalize.escape(id)}`)
+        .replace(':condition', condition)
         .replace(':groupBy',  duration === 'day'
             ? 'AccountValues.id'
             : 'date_format(accountValuesCreatedAt, "%Y%m%d%H"), AccountValues.UserId'
@@ -388,14 +396,15 @@ const GetDisqualifiedUsers = async (userIds: number[]) => {
     return disqualifications.map(disqualification => DisqualificationResponseFromDb(disqualification))
 }
 
-const GetFeedIdUnion = async (limit: number, offset: number, params?: FeedParams): Promise<IFeedUnion[]> => {
+const GetFeedIdUnion = async (limit: number, offset: number, params?: IFeedParams): Promise<IFeedUnion[]> => {
     let condition: boolean | string = true
     let sql = RawSql.FeedUnion
 
     if (params !== undefined) {
+        const identifier = Sequalize.escape(params.userIdentifier)
         condition = params.for === 'profile'
-            ? `UserId = ${Sequalize.escape(params.userIdentifier)}`
-            : ''
+            ? `UserId = ${identifier}`
+            : `UserId IN (SELECT followingId FROM Followers WHERE followerId = ${identifier}) OR UserId = ${identifier}`
 
         sql = sql.replace(':condition', condition)
     }

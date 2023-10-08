@@ -9,8 +9,6 @@ router.get('/user/:discordUsername', GetProfileUser, ProfileController.GetUser)
 
 router.get('/openPositions/:discordUsername', GetProfileUser, ProfileController.GetOpenPositions)
 
-router.get('/accountValue/:discordUsername', GetProfileUser, ProfileController.GetAccountValue)
-
 router.get('/accountValue/graph/:discordUsername', GetProfileUser, ProfileController.GetAccountValueGraph)
 
 router.get('/feed/:discordUsername', getProfileUser, ProfileController.GetFeed)

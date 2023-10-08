@@ -3,22 +3,19 @@ import DatabaseService from '../../shared/services/database-service'
 import IAccountValueResponse from '../../shared/models/dto/iaccount-value-response'
 import IOrderHistoryResponse from '../../shared/models/dto/feed/iorder-history-response'
 import IDisqualificationResponse from '../../shared/models/dto/feed/idisqualification-response'
-
-export interface FeedParams {
-    userIdentifier: string | number
-    for: 'profile' | 'following'
-}
+import IFeedParams from '../../shared/models/database/ifeed-params'
 
 const feedLimit = 10
 
 /**
  * Retrieves account values from redis and database and returns the merged response
  *
+ * @param {number} userId If defined, fetches account values for users in passed users following list
  * @returns {Promise<IAccountValueResponse[]>} List of users with their current account values
  */
-const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
+const GetAccountValues = async (userId?: number): Promise<IAccountValueResponse[]> => {
     const cachedString = await Redis.get('t212-account-values')
-    const accountValues = await DatabaseService.GetCurrentAccountValues()
+    const accountValues = await DatabaseService.GetCurrentAccountValues(userId)
 
     if (cachedString === null) return accountValues
 
@@ -34,10 +31,10 @@ const GetAccountValues = async (): Promise<IAccountValueResponse[]> => {
  * to form the main, profile or following feed
  *
  * @param {number} offset Number of posts in database to skip
- * @param {FeedParams} params Object containing discord username or user id and the type of feed being requested
+ * @param {IFeedParams} params Object containing discord username or user id and the type of feed being requested
  * @returns {Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]>} Array of merged posts
  */
-const GetFeed = async (offset: number, params?: FeedParams): Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]> => {
+const GetFeed = async (offset: number, params?: IFeedParams): Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]> => {
     const union = await DatabaseService.GetFeedIdUnion(feedLimit, feedLimit * offset, params)
     const unionDisqualifications = union.filter(row => row.postType === 'disqualification')
     const unionOrders = union.filter(row => row.postType === 'order')

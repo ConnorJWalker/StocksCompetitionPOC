@@ -1,18 +1,25 @@
 import IHttpResult, { IHttpErrorResult } from '../models/ihttp-result'
 import IAccountValueResponse, { IAccountValuesResponse } from '../models/dto/feed/iaccount-value-response'
 import HttpError from '../models/http-error'
-import IHomeData from '../models/pages/ihome-data'
 import useAuthentication from './authentication-context'
 import orderLeaderboards from '../utils/order-leaderboards'
-import IUser from '../models/iuser'
 import IOpenPositionsResponse from '../models/dto/profile/iopen-positions-response'
 import getPositionSuffix from '../utils/get-position-suffix'
-import IProfileLoaderData from '../models/pages/iprofile-data'
+import IProfileData from '../models/pages/iprofile-data'
 import IFeedResponse from '../models/dto/feed/ifeed-response'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
 import { useEffect } from 'react'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
+
+let loadingContent = false
+let allContentLoaded = false
+let currentPage = 0
+
+interface Params {
+    discordUsername?: string
+    followingOnly?: boolean
+}
 
 const useAuthenticatedApi = () => {
     const { accessToken, refreshToken, setTokens } = useAuthentication()
@@ -67,27 +74,11 @@ const useAuthenticatedApi = () => {
         return result
     }
 
-    const getHomeData = async (): Promise<IHomeData> => {
-        const [chart, feed, leaderboards] = await Promise.all([
-            send<IAccountValuesResponse[]>('feed/accountValues/graph'),
-            send<IFeedResponse[]>('feed'),
-            send<IAccountValueResponse[]>('feed/accountValues')
-        ])
-
-        return {
-            chart: chart.content,
-            feed: feed.content,
-            leaderboards: orderLeaderboards(leaderboards.content)
-        }
-    }
-
-    const getProfileData = async (discordUsername: string): Promise<IProfileLoaderData> => {
-        const [userInfo, accountValues, openPositions, userChart, feed] = await Promise.all([
-            send<IUser>(`profile/user/${discordUsername}`),
+    const getUserInfo = async (discordUsername: string): Promise<IProfileData> => {
+        const [isFollowing, accountValues, openPositions] = await Promise.all([
+            send<{ isFollowing: boolean }>(`user/follow/${discordUsername}`),
             send<IAccountValueResponse[]>('feed/accountValues'),
-            send<IOpenPositionsResponse[]>(`profile/openPositions/${discordUsername}`),
-            send<IAccountValuesResponse[]>(`profile/accountValue/graph/${discordUsername}`),
-            send<IFeedResponse[]>(`profile/feed/${discordUsername}`)
+            send<IOpenPositionsResponse[]>(`profile/openPositions/${discordUsername}`)
         ])
 
         const sortedLeaderboards = orderLeaderboards(accountValues.content)
@@ -95,53 +86,69 @@ const useAuthenticatedApi = () => {
         const userAccountValue = sortedLeaderboards.find(value => value.user.discordUsername === discordUsername)
 
         return {
-            userInfo: {
-                profileUser: userInfo.content,
-                accountValue: {
-                    position: position + getPositionSuffix(position),
-                    value: userAccountValue
-                },
-                openPositions: openPositions.content
+            isFollowing: isFollowing.content.isFollowing,
+            accountValue: {
+                position: position + getPositionSuffix(position),
+                value: userAccountValue!
             },
-            userChart: userChart.content,
-            feed: feed.content
+            openPositions: openPositions.content
         }
     }
 
-    const getChart = async (duration: string = 'day', discordUsername?: string): Promise<IAccountValuesResponse[]> => {
-        const endpoint = discordUsername === undefined
-            ? `feed/accountValues/graph?duration=${duration}`
-            : `profile/accountValue/graph/${discordUsername}?duration=${duration}`
+    const getChart = async (duration: string = 'day', params?: Params): Promise<IAccountValuesResponse[]> => {
+        let endpoint = `feed/accountValues/graph?duration=${duration}`
+
+        if (params?.followingOnly !== undefined || params?.discordUsername !== undefined) {
+            endpoint = params.discordUsername === undefined
+                ? `following/accountValues/graph?duration=${duration}`
+                : `profile/accountValue/graph/${params.discordUsername}?duration=${duration}`
+        }
 
         const response = await send<IAccountValuesResponse[]>(endpoint)
         return response.content
     }
 
-    const getFeed = async (page: number, discordUsername?: string): Promise<IFeedResponse[]> => {
-        const endpoint = discordUsername === undefined
-            ? `feed?page=${page}`
-            : `profile/feed/${discordUsername}?page=${page}`
+    const getFeed = async (params?: Params): Promise<[boolean, IFeedResponse[]]> => {
+        if (loadingContent || allContentLoaded) return [false, []]
 
-        const response = await send<IFeedResponse[]>(endpoint)
-        return response.content
+        loadingContent = true
+        let endpoint = `feed?page=${currentPage}`
+        if (params !== undefined) {
+            endpoint = params?.discordUsername === undefined
+                ? `following?page=${currentPage}`
+                : `profile/feed/${params.discordUsername}?page=${currentPage}`
+        }
+
+        const response = (await send<IFeedResponse[]>(endpoint)).content
+        if (response.length === 0) allContentLoaded = true
+
+        currentPage++
+        loadingContent = false
+        return [true, response]
     }
 
     const sendFollowRequest = async (discordUsername: string): Promise<void> => {
         await send(`user/follow/${discordUsername}`, 'post')
     }
 
-    const getIsUserFollowing = async (discordUsername: string): Promise<boolean> => {
-        const response = await send<{ isFollowing: boolean }>(`user/follow/${discordUsername}`)
-        return response.content.isFollowing
+    const getLeaderboards = async (controller: string): Promise<IAccountValueResponse[]> => {
+        const response = await send<IAccountValueResponse[]>(`${controller}/accountValues`)
+        return orderLeaderboards(response.content)
+    }
+
+    const resetPagination = () => {
+        loadingContent = false
+        allContentLoaded = false
+        currentPage = 0
     }
 
     return {
-        getHomeData,
-        getProfileData,
+        getUserInfo,
         getChart,
         getFeed,
         sendFollowRequest,
-        getIsUserFollowing
+        getLeaderboards,
+        resetPagination
     }
 }
 

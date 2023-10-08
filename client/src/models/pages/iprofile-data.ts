@@ -1,19 +1,11 @@
-import IUser from '../iuser'
-import IAccountValueResponse, { IAccountValuesResponse } from '../dto/feed/iaccount-value-response'
+import IAccountValueResponse from '../dto/feed/iaccount-value-response'
 import IOpenPositionsResponse from '../dto/profile/iopen-positions-response'
-import IFeedResponse from '../dto/feed/ifeed-response'
 
-export interface IProfileData {
-    profileUser: IUser
+export default interface IProfileData {
+    isFollowing: boolean
     accountValue: {
         position: string
-        value?: IAccountValueResponse
+        value: IAccountValueResponse
     }
     openPositions: IOpenPositionsResponse[]
-}
-
-export default interface IProfileLoaderData {
-    userInfo: IProfileData,
-    userChart: IAccountValuesResponse[],
-    feed: IFeedResponse[]
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Line } from 'react-chartjs-2'
 import {
     Chart as ChartJs,
@@ -11,10 +11,12 @@ import {
     Tooltip
 } from 'chart.js'
 import { IAccountValuesResponse } from '../../models/dto/feed/iaccount-value-response'
+import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 
 interface props {
-    data: IAccountValuesResponse[],
-    onDurationChange: (duration: string) => void
+    controller?: string,
+    discordUsername?: string
+    followingOnly?: boolean
 }
 
 ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
@@ -59,9 +61,44 @@ const options = {
     }
 }
 
-const UserChart = ({ data, onDurationChange }: props) => {
+const durations = ['day', 'week', 'max']
+
+const UserChart = ({ discordUsername, followingOnly }: props) => {
     const [duration, setDuration] = useState(0)
-    const mappedData = mapResponse()
+    const [mappedData, setMappedData] = useState<ChartData<'line'>>({ datasets: [], labels: [] })
+
+    const { getChart } = useAuthenticatedApi()
+
+    const durationClick = async (index: number) => {
+        const response = await getChart(durations[index], { discordUsername, followingOnly })
+
+        setDuration(index)
+        setMappedData(mapResponse(response))
+    }
+
+    const mapResponse = (values: IAccountValuesResponse[]): ChartData<'line'> => {
+        let highestCount = 0
+        values.forEach(value => highestCount = Math.max(highestCount, value.values.length))
+
+        const datasets = values.map(value => ({
+            label: value.user.displayName,
+            data: new Array(highestCount - value.values.length).fill(null)
+                .concat(value.values.map(point => point.total)),
+            borderColor: value.user.displayColour,
+            backgroundColor: value.user.displayColour,
+            pointRadius: 0
+        }))
+
+        return {
+            datasets,
+            labels: new Array(highestCount).fill('')
+        }
+    }
+
+    useEffect(() => {
+        getChart(durations[0], { discordUsername, followingOnly })
+            .then(response => setMappedData(mapResponse(response)))
+    }, [])
 
     return (
         <>
@@ -90,31 +127,6 @@ const UserChart = ({ data, onDurationChange }: props) => {
             </span>
         </>
     )
-
-    function mapResponse(): ChartData<'line'> {
-        let highestCount = 0
-        data.forEach(value => highestCount = Math.max(highestCount, value.values.length))
-
-        const datasets = data.map(value => ({
-            label: value.user.displayName,
-            data: new Array(highestCount - value.values.length).fill(null)
-                .concat(value.values.map(point => point.total)),
-            borderColor: value.user.displayColour,
-            backgroundColor: value.user.displayColour,
-            pointRadius: 0
-        }))
-
-        return {
-            datasets,
-            labels: new Array(highestCount).fill('')
-        }
-    }
-
-    function durationClick(index: number) {
-        const durations = ['day', 'week', 'max']
-        setDuration(index)
-        onDurationChange(durations[index])
-    }
 }
 
 export default UserChart
