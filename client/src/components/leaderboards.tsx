@@ -21,19 +21,18 @@ const Leaderboards = ({ controller }: props) => {
 
     const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
         const leaderboards = accountValuesRef.current
-
         updatedValues.forEach(value => {
             const userIndex = leaderboards.findIndex(user => user.user.id === value.user.id)
 
             if (userIndex === undefined || userIndex === -1 && controller !== 'following') {
-                accountValues.push(value)
+                leaderboards.push(value)
                 return
             }
 
             leaderboards[userIndex] = value
         })
 
-        setAccountValues(orderLeaderboards(leaderboards))
+        setAccountValues([...orderLeaderboards(leaderboards)])
     }
 
     useEffect(() => {
