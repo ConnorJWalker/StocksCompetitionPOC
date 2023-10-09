@@ -7,6 +7,7 @@ export default class SignUpValidator {
 
     public validateDisplayName(displayName: string): string[] {
         this.validationErrors.displayName = []
+        displayName = displayName.trim()
 
         if (!displayName) {
             this.validationErrors.displayName.push('Display Name is required')

@@ -30,6 +30,7 @@ import { Literal } from 'sequelize/types/utils'
 import IFeedUnion from '../models/database/ifeed-union'
 import { DisqualificationResponseFromDb } from '../models/dto/feed/idisqualification-response'
 import IFeedParams from '../models/database/ifeed-params'
+import Redis from '../config/redis'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
@@ -48,6 +49,8 @@ const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Prom
 
     await ApiKey.create({ UserId: formattedUser.id, apiKey: signupForm.apiKey })
     await Disqualification.create({ UserId: formattedUser.id })
+
+    await Redis.publish('user-update', '')
 
     return formattedUser
 }
@@ -81,6 +84,26 @@ const FindUserByUsernameWithSecrets = async (username: string): Promise<IUserWit
     return user === null ? null : UserWithSecretsFromDbResult(user)
 }
 
+const UpdateDisplayName = async (userId: number, displayName: string) => {
+    await User.update({ displayName }, {
+        where: {
+            id: userId
+        }
+    })
+
+    await Redis.publish('user-update', '')
+}
+
+const UpdateDiscordProfilePicture = async (userId: number, discordProfilePicture: string) => {
+    await User.update({ profilePicture: discordProfilePicture }, {
+        where: {
+            id: userId
+        }
+    })
+
+    await Redis.publish('user-update', '')
+}
+
 const GetAllUsers = async (): Promise<IUser[]> => {
     const users = await User.findAll({
         attributes: {
@@ -112,6 +135,19 @@ const GetAllUsersWithValidApiKeys = async (): Promise<IUserWithSecrets[]> => {
     })
 
     return users.map(user => UserWithSecretsFromDbResult(user))
+}
+
+const SetApiKey = async (apiKey: string, userId: number) => {
+    await ApiKey.update({
+        isValid: true,
+        apiKey
+    }, {
+        where: {
+            UserId: userId
+        }
+    })
+
+    await Redis.publish('user-update', '')
 }
 
 const GetRefreshToken = async (token: string): Promise<IRefreshToken | null> => {
@@ -448,13 +484,53 @@ const IsUserFollowing = async (followerId: number, followingId: number): Promise
     return isFollowing !== null
 }
 
+const GetFollowingList = async (usedId: number): Promise<IUser[]> => {
+    const users = await User.findAll({
+        attributes: {
+            exclude: ['password']
+        },
+        include: {
+            model: Follower,
+            required: true,
+            where: {
+                followerId: usedId
+            }
+        }
+    })
+
+    return users.map(user => UserFromDbResult(user))
+}
+
+const UserApiKeyIsValid = async (userId: number): Promise<boolean> => {
+    const user = await User.findOne({
+        attributes: {
+            exclude: ['password']
+        },
+        where: {
+            id: userId
+        },
+        include: {
+            model: ApiKey,
+            required: true,
+            where: {
+                isValid: true
+            }
+        }
+    })
+
+    return user !== null
+}
+
 export default {
     CreateUser,
     FindUserById,
     FindUserByUsername,
     FindUserByUsernameWithSecrets,
+    UpdateDisplayName,
+    UpdateDiscordProfilePicture,
     GetAllUsers,
     GetAllUsersWithValidApiKeys,
+    SetApiKey,
     GetRefreshToken,
     InvalidateRefreshTokenFamily,
     MarkRefreshTokenAsUsed,
@@ -474,5 +550,7 @@ export default {
     GetDisqualifiedUsers,
     GetFeedIdUnion,
     ToggleUserFollow,
-    IsUserFollowing
+    IsUserFollowing,
+    GetFollowingList,
+    UserApiKeyIsValid
 }

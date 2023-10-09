@@ -3,7 +3,6 @@ import Leaderboards from '../components/leaderboards'
 import UserChart from '../components/feed/user-chart'
 import Feed from '../components/feed/feed'
 import useAuthenticatedApi from '../hooks/useAuthenticatedApi'
-import './home.css'
 import IFeedResponse from '../models/dto/feed/ifeed-response'
 
 

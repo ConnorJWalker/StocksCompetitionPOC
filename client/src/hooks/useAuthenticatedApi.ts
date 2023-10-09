@@ -9,6 +9,7 @@ import IProfileData from '../models/pages/iprofile-data'
 import IFeedResponse from '../models/dto/feed/ifeed-response'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
 import { useEffect } from 'react'
+import IUser from '../models/iuser'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
@@ -42,7 +43,7 @@ const useAuthenticatedApi = () => {
 
     const send = async <T>(endpoint: string, method = 'get', body: object | null = null, newToken?: string): Promise<IHttpResult<T>> => {
         const response = await fetch(`${process.env.REACT_APP_SERVER_URL}${endpoint}`, {
-            method,
+            method: method.toUpperCase(),
             body: method === 'get' ? undefined : JSON.stringify(body ?? {}),
             headers: new Headers({
                 'content-type': 'application/json',
@@ -131,9 +132,40 @@ const useAuthenticatedApi = () => {
         await send(`user/follow/${discordUsername}`, 'post')
     }
 
+    const getFollowing = async (): Promise<IUser[]> => {
+        const response = await send<IUser[]>('user/follow')
+        return response.content
+    }
+
     const getLeaderboards = async (controller: string): Promise<IAccountValueResponse[]> => {
         const response = await send<IAccountValueResponse[]>(`${controller}/accountValues`)
         return orderLeaderboards(response.content)
+    }
+
+    const getApiKeyIsValid = async (): Promise<boolean> => {
+        const response = await send<{isValid: boolean}>('user/apikey')
+        return response.content.isValid
+    }
+
+    const setApiKey = async (apiKey: string): Promise<void> => {
+        const response = await send('user/apikey', 'patch', { apiKey })
+        if (response.ok) return
+
+        throw new HttpError(response as IHttpResult<IHttpErrorResult>)
+    }
+
+    const setDisplayName = async (displayName: string) => {
+        const response = await send('user/displayName', 'patch', { displayName })
+        if (response.ok) return
+
+        throw new HttpError(response as IHttpResult<IHttpErrorResult>)
+    }
+
+    const setProfilePicture = async () => {
+        const response = await send('user/profilePicture', 'patch')
+        if (response.ok) return
+
+        throw new HttpError(response as IHttpResult<IHttpErrorResult>)
     }
 
     const resetPagination = () => {
@@ -147,7 +179,12 @@ const useAuthenticatedApi = () => {
         getChart,
         getFeed,
         sendFollowRequest,
+        getFollowing,
         getLeaderboards,
+        getApiKeyIsValid,
+        setApiKey,
+        setDisplayName,
+        setProfilePicture,
         resetPagination
     }
 }

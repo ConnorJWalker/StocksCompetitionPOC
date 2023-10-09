@@ -76,7 +76,7 @@ export default class SignUpValidator {
         }
     }
 
-    private async validateApiKey(apiKey: string) {
+    public async validateApiKey(apiKey: string) {
         if (apiKey === undefined) return
 
         const [success, reason] = await Trading212Service.ValidateApiKey(apiKey)

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import formatPrice from '../../utils/format-price'
 import { useUserContext } from '../../hooks/user-context'
 import IProfileData from '../../models/pages/iprofile-data'
-import useLogout from '../../hooks/use-logout'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 import { useSocket } from '../../hooks/socket-context'
 import IAccountValueResponse from '../../models/dto/feed/iaccount-value-response'
+import { useNavigate } from 'react-router-dom'
 
 interface props {
     discordUsername: string
@@ -13,8 +13,8 @@ interface props {
 
 const UserInfo = ({ discordUsername }: props) => {
     const user = useUserContext()
-    const logout = useLogout()
     const socket = useSocket()
+    const navigate = useNavigate()
     const { getUserInfo, sendFollowRequest } = useAuthenticatedApi()
 
     const [userInfo, setUserInfo] = useState<IProfileData>()
@@ -48,7 +48,7 @@ const UserInfo = ({ discordUsername }: props) => {
 
     const renderActionButton = () => {
         if (user.discordUsername === userInfo?.accountValue.value.user.discordUsername) {
-            return <button className='btn-danger profile-action-button' onClick={logout}>Log Out</button>
+            return <button className='btn-action profile-action-button' onClick={() => navigate('/settings')}>Settings</button>
         }
 
         return (

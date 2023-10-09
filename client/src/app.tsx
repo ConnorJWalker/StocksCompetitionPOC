@@ -8,6 +8,7 @@ import AuthenticatedRoute from './components/authenticated-route'
 import AuthenticationProvider from './components/authentication-provider'
 import SocketContext from './hooks/socket-context'
 import Following from './views/following'
+import Settings from './views/settings'
 
 const App = () => {
     const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!))
@@ -36,6 +37,10 @@ const App = () => {
                 {
                     path: '/profile/:discordUsername',
                     element: <Profile />
+                },
+                {
+                    path: '/settings',
+                    element: <Settings />
                 }
             ]
         }
