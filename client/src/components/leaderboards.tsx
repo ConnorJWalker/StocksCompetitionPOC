@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
-import IAccountValueResponse from '../models/dto/feed/iaccount-value-response'
 import { useNavigate } from 'react-router-dom'
 import useAuthenticatedApi from '../hooks/useAuthenticatedApi'
 import { useSocket } from '../hooks/socket-context'
 import orderLeaderboards from '../utils/order-leaderboards'
+import IAccountValueResponse from '../models/dto/feed/iaccount-value-response'
+import IAccountValueUpdate from '../models/dto/iaccount-value-update'
 
 interface props {
     controller: 'feed' | 'following'
@@ -19,9 +20,9 @@ const Leaderboards = ({ controller }: props) => {
 
     accountValuesRef.current = accountValues
 
-    const onAccountValuesUpdate = (updatedValues: IAccountValueResponse[]) => {
+    const onAccountValuesUpdate = (updatedValues: IAccountValueUpdate) => {
         const leaderboards = accountValuesRef.current
-        updatedValues.forEach(value => {
+        updatedValues.values.forEach(value => {
             const userIndex = leaderboards.findIndex(user => user.user.id === value.user.id)
 
             if (userIndex === undefined || userIndex === -1 && controller !== 'following') {

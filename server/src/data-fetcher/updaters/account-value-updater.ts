@@ -74,7 +74,11 @@ export default class AccountValueUpdater extends UpdaterBase<IAccountValue> {
             this.calculateUserStrikes(accountValues)
         }
 
-        const redisValues = JSON.stringify(AccountValueResponseFromT212(accountValues, this.users))
+        const redisValues = JSON.stringify({
+            savedToDatabase: this.responseCount === this.updateDatabaseAt,
+            values: AccountValueResponseFromT212(accountValues, this.users)
+        })
+
         await Redis.set('t212-account-values', redisValues)
         await Redis.publish('account-values-update', redisValues)
 
