@@ -4,6 +4,7 @@ import SignUpValidator from '../utils/sign-up-validator'
 import ISignupForm from '../models/dto/isignup-form'
 import { RateLimitError } from '../models/errors'
 import DiscordService from '../../shared/services/discord-service'
+import IAuthenticationResponse from '../models/dto/iauthentication-response'
 
 const SignUp = async (req: Request, res: Response) => {
     const signupValidator = new SignUpValidator()
@@ -46,6 +47,20 @@ const LogIn = async (req: Request, res: Response) => {
     }
 
     return res.json(authenticationResponse)
+}
+
+const LogOut = async (req: Request, res: Response)=> {
+    const all = (req.query['all'] as string | undefined) === 'true'
+    if (!req.body || !req.body.accessToken || !req.body.refreshToken) {
+        return res.status(400).json({ error: 'authentication tokens are required' })
+    }
+
+    const body = req.body as IAuthenticationResponse
+    const success = all
+        ? await AuthenticationService.LogoutAll(body)
+        : await AuthenticationService.Logout(body)
+
+    return res.status(success ? 200 : 403).json({})
 }
 
 const Refresh = async (req: Request, res: Response) => {
@@ -92,6 +107,7 @@ const GetProfilePicture = async (req: Request, res: Response) => {
 export default {
     SignUp,
     LogIn,
+    LogOut,
     Refresh,
     ValidateDiscordUsername,
     GetProfilePicture

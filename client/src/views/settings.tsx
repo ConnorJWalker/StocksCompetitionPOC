@@ -168,8 +168,8 @@ const Settings = () => {
             <section>
                 <h2>Authentication</h2>
                 <span className='authentication-buttons'>
-                    <button className='btn-danger' onClick={logout}>Logout</button>
-                    <button className='btn-danger'>Logout All</button>
+                    <button className='btn-danger' onClick={() => logout()}>Logout</button>
+                    <button className='btn-danger' onClick={() => logout(true)}>Logout All</button>
                 </span>
             </section>
         </div>

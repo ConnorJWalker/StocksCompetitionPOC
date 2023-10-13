@@ -50,6 +50,10 @@ const useApi = () => {
         throw new HttpError(response as IHttpResult<IHttpErrorResult>)
     }
 
+    const sendLogout = async (tokens: IAuthenticationResponse, logoutAll: boolean): Promise<IHttpResult<any>> => {
+        return await send(`authentication/logout?all=${logoutAll}`, 'post', tokens)
+    }
+
     const getDiscordProfilePicture = async (discordUsername: string): Promise<string | undefined> => {
         const response = await send<IProfilePicture>(`authentication/profile-picture/${discordUsername}`)
 
@@ -60,6 +64,7 @@ const useApi = () => {
     return {
         login,
         signup,
+        sendLogout,
         getDiscordProfilePicture
     }
 }

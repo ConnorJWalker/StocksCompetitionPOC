@@ -7,6 +7,8 @@ router.post('/signup', AuthenticationController.SignUp)
 
 router.post('/login', AuthenticationController.LogIn)
 
+router.post('/logout', AuthenticationController.LogOut)
+
 router.post('/refresh', AuthenticationController.Refresh)
 
 router.get('/validate-username/:discordUsername', AuthenticationController.ValidateDiscordUsername)

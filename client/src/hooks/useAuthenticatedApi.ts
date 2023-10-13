@@ -10,6 +10,7 @@ import IFeedResponse from '../models/dto/feed/ifeed-response'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
 import { useEffect } from 'react'
 import IUser from '../models/iuser'
+import useApi from './useApi'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
@@ -24,6 +25,7 @@ interface Params {
 
 const useAuthenticatedApi = () => {
     const { accessToken, refreshToken, setTokens } = useAuthentication()
+    const { sendLogout } = useApi()
 
     useEffect(() => { refreshPromise = null }, [accessToken])
 
@@ -60,6 +62,10 @@ const useAuthenticatedApi = () => {
             if (token !== null) {
                 return await send(endpoint, method, body, token.accessToken)
             }
+        }
+        else if (response.status === 401) {
+            await sendLogout({ accessToken: accessToken!, refreshToken: refreshToken! }, false)
+            throw new Error('unauthorized')
         }
 
         const result = {

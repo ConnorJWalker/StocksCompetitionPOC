@@ -159,12 +159,18 @@ const InvalidateRefreshTokenFamily = async (family: string): Promise<void> => {
     await RefreshToken.update({ invalid: true }, { where: { family } })
 }
 
+const InvalidateUsersRefreshTokens = async (userId: number): Promise<void> => {
+    await RefreshToken.update({ invalid: true }, { where: {
+        UserId: userId
+    } })
+}
+
 const MarkRefreshTokenAsUsed = async (id: number): Promise<void> => {
     await RefreshToken.update({ used: true }, { where: { id } })
 }
 
-const CreateRefreshToken = async (family: string, token: string): Promise<void> => {
-    await RefreshToken.create({ family, token })
+const CreateRefreshToken = async (family: string, token: string, userId: number): Promise<void> => {
+    await RefreshToken.create({ family, token, UserId: userId })
 }
 
 const UpdateStocksList = async (stocks: IT212Instrument[]): Promise<number> => {
@@ -533,6 +539,7 @@ export default {
     SetApiKey,
     GetRefreshToken,
     InvalidateRefreshTokenFamily,
+    InvalidateUsersRefreshTokens,
     MarkRefreshTokenAsUsed,
     CreateRefreshToken,
     UpdateStocksList,

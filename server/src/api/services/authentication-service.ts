@@ -6,6 +6,7 @@ import DatabaseService from '../../shared/services/database-service'
 import IUser from '../../shared/models/iuser'
 import ILoginForm from '../models/dto/ilogin-form'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
+import Redis from '../../shared/config/redis'
 
 /**
  * Creates a new user in the database and creates authentication tokens containing the user's sign up
@@ -19,7 +20,7 @@ const SignUp = async (signupForm: ISignupForm): Promise<IAuthenticationResponse>
     const user = await DatabaseService.CreateUser(signupForm, hashedPassword)
 
     const authenticationTokens = createToken(user)
-    await DatabaseService.CreateRefreshToken(crypto.randomUUID(), authenticationTokens.refreshToken)
+    await DatabaseService.CreateRefreshToken(crypto.randomUUID(), authenticationTokens.refreshToken, user.id)
 
     return authenticationTokens
 }
@@ -41,7 +42,7 @@ const LogIn = async (loginForm: ILoginForm): Promise<IAuthenticationResponse | n
     }
 
     const authenticationTokens = createToken(user)
-    await DatabaseService.CreateRefreshToken(crypto.randomUUID(), authenticationTokens.refreshToken)
+    await DatabaseService.CreateRefreshToken(crypto.randomUUID(), authenticationTokens.refreshToken, user.id)
 
     return authenticationTokens
 }
@@ -78,9 +79,48 @@ const Refresh = async (token: string): Promise<IAuthenticationResponse | null> =
 
     const authenticationTokens = createToken(user!)
 
-    await DatabaseService.CreateRefreshToken(storedToken.family, authenticationTokens.refreshToken)
+    await DatabaseService.CreateRefreshToken(storedToken.family, authenticationTokens.refreshToken, user.id)
 
     return authenticationTokens
+}
+
+/**
+ * Invalidates refresh token family of users authentication tokens and adds access token to temporary
+ * cache storage as logged out
+ *
+ * @param {IAuthenticationResponse} tokens Authentication tokens for user to log out
+ * @returns {Promise<boolean>} True if successfully invalidated tokens
+ */
+const Logout = async (tokens: IAuthenticationResponse): Promise<boolean> => {
+    const refreshToken = await DatabaseService.GetRefreshToken(tokens.refreshToken)
+    if (refreshToken === null) return false
+
+    await DatabaseService.InvalidateRefreshTokenFamily(refreshToken.family)
+    await Redis.setEx(`logged-out:${tokens.accessToken}`, 60 * 20, '')
+
+    return true
+}
+
+/**
+ * Invalidates all refresh token families belonging to the users and adds user id and current
+ * timestamp to cache as logged out all
+ *
+ * @param {IAuthenticationResponse} tokens Authentication tokens for user to log out
+ * @returns {Promise<boolean>} True if successfully invalidated tokens
+ */
+const LogoutAll = async (tokens: IAuthenticationResponse): Promise<boolean> => {
+    let user: IUser | undefined
+    try {
+        user = jwt.verify(tokens.accessToken, process.env.JWT_SECRET as jwt.Secret) as IUser
+    }
+    catch {
+        return false
+    }
+
+    await DatabaseService.InvalidateUsersRefreshTokens(user.id)
+    await Redis.setEx(`logged-out-all:${user.id}`, 60 * 20, Date.now().toString())
+
+    return true
 }
 
 /**
@@ -116,5 +156,7 @@ function createToken(user: IUser): IAuthenticationResponse {
 export default {
     SignUp,
     LogIn,
-    Refresh
+    Refresh,
+    Logout,
+    LogoutAll
 }
