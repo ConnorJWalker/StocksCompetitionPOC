@@ -6,6 +6,7 @@ import IT212AccountCash from '../models/trading212/account-cash'
 import IT212Instrument from '../models/trading212/instrument'
 import Redis from '../config/redis'
 import { IUserWithSecrets } from '../models/iuser'
+import IT212Exchange from '../models/trading212/exchange'
 
 const failureCodes: { [key: number]: FailureReason } = {
     401: FailureReason.Unauthorised,
@@ -84,6 +85,15 @@ const GetAllStocks = async (apiKey: string): Promise<IT212Instrument[]> => {
     throw new Trading212Error(`Could not fetch all stocks: ${result.statusCode}`, getFailureCode(result.statusCode))
 }
 
+const GetExchangeList = async (apiKey: string): Promise<IT212Exchange[]> => {
+    const result = await send<IT212Exchange[]>('equity/metadata/exchanges', apiKey)
+    if (result.ok) {
+        return result.content!
+    }
+
+    throw new Trading212Error(`Could not fetch exchange list: ${result.statusCode}`, getFailureCode(result.statusCode))
+}
+
 const send = async <T>(endpoint: string, apiKey: string, method: string = 'get'): Promise<IHttpResult<T | null>> => {
     const response = await fetch(`${process.env.T212_URL}${endpoint}`, {
         method,
@@ -103,5 +113,6 @@ export default {
     ValidateApiKey,
     GetOpenPositions,
     GetCash,
-    GetAllStocks
+    GetAllStocks,
+    GetExchangeList
 }

@@ -5,6 +5,7 @@ import { IUserWithSecrets } from '../shared/models/iuser'
 import OpenPositionsUpdater from './updaters/open-positions-updater'
 import AccountValueUpdater from './updaters/account-value-updater'
 import DiscordService from '../shared/services/discord-service'
+import MarketUpdater from './updaters/market-updater'
 
 const maxDisqualificationStrikes = parseInt(process.env.MAX_DISQUALIFICATION_STRIKES!)
 const updateDatabaseAt = parseInt(process.env.UPDATE_DATABASE_AT!)
@@ -17,6 +18,7 @@ SubscriberClient.subscribe('user-update', () => usersRequiresUpdate = true).then
 
 const openPositionsUpdater = new OpenPositionsUpdater()
 const accountValuesUpdater = new AccountValueUpdater(updateDatabaseAt, maxCashPercentage)
+let marketUpdater: MarketUpdater | undefined = undefined
 
 /**
  * Gets array of unauthorised users from updaters and marks their keys as invalid in database, sending warning
@@ -48,6 +50,7 @@ const handleUnauthorisedUsers = async () => {
  * disqualification message and removing them from the competition if max strikes has been reached
  */
 const handleDisqualifications = async () => {
+    if (!marketUpdater?.shouldStrikeUsers()) return
     if (accountValuesUpdater.userIdsToStrike.length === 0) return
 
     await DatabaseService.IncrementDisqualificationStrikes(accountValuesUpdater.userIdsToStrike)
@@ -78,7 +81,19 @@ setInterval(async () => {
         usersRequiresUpdate = false
     }
 
-    await Promise.all([ accountValuesUpdater.update(users), openPositionsUpdater.update(users) ])
-    await handleUnauthorisedUsers()
-    await handleDisqualifications()
+    if (marketUpdater === undefined) {
+        const user = await DatabaseService.FindUserByUsernameWithSecrets(process.env.HOST_DISCORD!)
+        if (user === null) throw new Error('Could not find host discord in users table')
+
+        marketUpdater = new MarketUpdater(user.apiKey)
+        await marketUpdater.update()
+    }
+
+    if (marketUpdater.shouldUpdateAccountValues()) {
+        await Promise.all([ accountValuesUpdater.update(users), openPositionsUpdater.update(users) ])
+        await handleUnauthorisedUsers()
+        await handleDisqualifications()
+    }
+
+    await marketUpdater.update()
 }, 6000)
