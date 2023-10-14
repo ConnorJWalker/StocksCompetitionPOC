@@ -4,6 +4,7 @@ import IAccountValueResponse from '../../shared/models/dto/iaccount-value-respon
 import IOrderHistoryResponse from '../../shared/models/dto/feed/iorder-history-response'
 import IDisqualificationResponse from '../../shared/models/dto/feed/idisqualification-response'
 import IFeedParams from '../../shared/models/database/ifeed-params'
+import { Sequalize } from '../../shared/config/database'
 
 const feedLimit = 10
 
@@ -24,6 +25,31 @@ const GetAccountValues = async (userId?: number): Promise<IAccountValueResponse[
         const cachedValue = cachedAccountValues.find(cachedValue => cachedValue.user.id === value.user.id)
         return cachedValue === undefined ? value : cachedValue
     })
+}
+
+const GetAccountGraph = async (duration: string, params?: IFeedParams) => {
+    let startDate = new Date(Date.now())
+    startDate.setHours(0, 0, 0)
+
+    if (duration === 'day' && (startDate.getDay() === 0 || startDate.getDay() === 6)) {
+        startDate.setDate(startDate.getDate() - (startDate.getDay() === 0 ? 2 : 1))
+    }
+    else if (duration === 'week') {
+        startDate.setDate(startDate.getDate() - 7)
+    }
+    else if (duration === 'max') {
+        startDate.setDate(0)
+    }
+
+    let condition = 'true'
+    if (params !== undefined) {
+        const id = Sequalize.escape(params.userIdentifier)
+        condition = params.for === 'profile'
+            ? `id = ${id}`
+            : `id IN (SELECT followingId FROM Followers WHERE followerId = ${id}) OR id = ${id}`
+    }
+
+    return await DatabaseService.GetAccountValues(startDate, duration, condition)
 }
 
 /**
@@ -56,5 +82,6 @@ const GetFeed = async (offset: number, params?: IFeedParams): Promise<(IOrderHis
 
 export default {
     GetAccountValues,
+    GetAccountGraph,
     GetFeed
 }

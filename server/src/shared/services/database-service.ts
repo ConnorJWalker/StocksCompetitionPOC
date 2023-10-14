@@ -340,22 +340,7 @@ const GetCurrentAccountValues = async (userId?: number): Promise<IAccountValueRe
     return AccountValueResponseFromDb(values, false)
 }
 
-const GetAccountValues = async (duration: string, params?: IFeedParams): Promise<IAccountValueResponse[]>  => {
-    let startDate = new Date(Date.now())
-    startDate.setHours(0, 0, 0)
-
-    if (duration === 'week') {
-        startDate.setDate(startDate.getDate() - 7)
-    }
-
-    let condition = 'true'
-    if (params !== undefined) {
-        const id = Sequalize.escape(params.userIdentifier)
-        condition = params.for === 'profile'
-            ? `id = ${id}`
-            : `id IN (SELECT followingId FROM Followers WHERE followerId = ${id}) OR id = ${id}`
-    }
-
+const GetAccountValues = async (startDate: Date, duration: string, condition: string): Promise<IAccountValueResponse[]>  => {
     const sql = RawSql.GroupedAccountValues
         .replace(':condition', condition)
         .replace(':groupBy',  duration === 'day'
@@ -363,9 +348,8 @@ const GetAccountValues = async (duration: string, params?: IFeedParams): Promise
             : 'date_format(accountValuesCreatedAt, "%Y%m%d%H"), AccountValues.UserId'
         )
 
-    const date = duration === 'max' ? new Date().setDate(0) : startDate
     const [result] = await Sequalize.query(sql, {
-        replacements: { date }
+        replacements: { date: startDate }
     })
 
     return AccountValueResponseFromRawSql(result)

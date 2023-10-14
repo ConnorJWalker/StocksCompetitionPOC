@@ -14,7 +14,7 @@ const GetOpenPositions = async (req: RequestWithTargetUser, res: Response) => {
 const GetAccountValueGraph = async (req: RequestWithTargetUser, res: Response) => {
     const duration = (req.query.duration || 'day') as string
 
-    return res.json(await DatabaseService.GetAccountValues(duration, {
+    return res.json(await FeedService.GetAccountGraph(duration, {
         for: 'profile',
         userIdentifier: req.targetUser!.id
     }))
