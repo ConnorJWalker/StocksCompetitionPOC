@@ -212,6 +212,10 @@ path {
     display: flex;
 }
 
+.chart-options-container .expand:hover, .chart-duration-container .expand:active {
+    opacity: 0.5;
+}
+
 .chart-options-container .expand svg {
     width: 1.5em;
 }

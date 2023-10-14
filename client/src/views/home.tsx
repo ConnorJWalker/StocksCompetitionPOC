@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Leaderboards from '../components/leaderboards'
+import Leaderboards from '../components/feed/leaderboards'
 import UserChart from '../components/feed/user-chart'
 import Feed from '../components/feed/feed'
 import useAuthenticatedApi from '../hooks/useAuthenticatedApi'

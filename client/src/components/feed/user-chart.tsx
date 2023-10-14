@@ -58,7 +58,7 @@ const options = {
         },
         y: {
             ticks: {
-                callback: (value: any) => '£' + value
+                callback: (value: any) => '£' + Math.floor(value)
             }
         }
     },
@@ -85,13 +85,6 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
     durationRef.current = duration
 
     let chartReference = useRef<ChartJSOrUndefined<"line", (number | Point | null)[], unknown> | null>(null)
-
-    const durationClick = async (index: number) => {
-        const response = await getChart(durations[index], { discordUsername, followingOnly })
-
-        setDuration(index)
-        setMappedData(mapResponse(response))
-    }
 
     const mapResponse = (values: IAccountValuesResponse[]): ChartData<'line'> => {
         let newHighestCount = 0
@@ -171,12 +164,14 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
     }
 
     useEffect(() => {
-        getChart(durations[0], { discordUsername, followingOnly })
-            .then(response => setMappedData(mapResponse(response)))
-
             socket.on('account-values-update', data => onAccountValuesUpdate(JSON.parse(data)))
             return () => { socket.off('account-values-update') }
     }, [])
+
+    useEffect(() => {
+        getChart(durations[duration], { discordUsername, followingOnly })
+            .then(response => setMappedData(mapResponse(response)))
+    }, [duration])
 
     return (
         <>
@@ -187,19 +182,19 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
                 <span className='chart-duration-container'>
                     <span
                         className={duration === 0 ? 'selected' : ''}
-                        onClick={() => durationClick(0)}
+                        onClick={() => setDuration(0)}
                     >
                         Day
                     </span>
                     <span
                         className={duration === 1 ? 'selected' : ''}
-                        onClick={() => durationClick(1)}
+                        onClick={() => setDuration(1)}
                     >
                         Week
                     </span>
                     <span
                         className={duration === 2 ? 'selected' : ''}
-                        onClick={() => durationClick(2)}
+                        onClick={() => setDuration(2)}
                     >
                         Max
                     </span>

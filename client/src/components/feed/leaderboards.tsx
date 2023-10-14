@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useAuthenticatedApi from '../hooks/useAuthenticatedApi'
-import { useSocket } from '../hooks/socket-context'
-import orderLeaderboards from '../utils/order-leaderboards'
-import IAccountValueResponse from '../models/dto/feed/iaccount-value-response'
-import IAccountValueUpdate from '../models/dto/iaccount-value-update'
+import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
+import { useSocket } from '../../hooks/socket-context'
+import orderLeaderboards from '../../utils/order-leaderboards'
+import IAccountValueResponse from '../../models/dto/feed/iaccount-value-response'
+import IAccountValueUpdate from '../../models/dto/iaccount-value-update'
 
 interface props {
     controller: 'feed' | 'following'
