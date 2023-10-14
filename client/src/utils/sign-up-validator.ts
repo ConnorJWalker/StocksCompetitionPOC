@@ -18,6 +18,14 @@ export default class SignUpValidator {
             this.validationErrors.displayName.push('Display name must be 3 characters or more')
         }
 
+        if (displayName.length > 32) {
+            this.validationErrors.displayName.push('Display name must be 32 characters or less')
+        }
+
+        if (displayName.indexOf(':') !== -1) {
+            this.validationErrors.displayName.push(': is a forbidden character')
+        }
+
         return this.validationErrors.displayName
     }
 

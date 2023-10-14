@@ -22,6 +22,8 @@ export default class SignUpValidator {
 
         this.validateRequiredFields(body)
 
+        this.validateDisplayName(body.displayName)
+
         if (body.password !== body.passwordConfirm) {
             this.addError('passwordConfirm', 'passwords must match')
         }
@@ -51,6 +53,22 @@ export default class SignUpValidator {
                 this.addError(field, `${field} is required`)
             }
         })
+    }
+
+    public validateDisplayName(displayName: string) {
+        displayName = displayName.trim()
+
+        if (displayName.length < 3) {
+            this.addError('displayName', 'display name must be 3 characters or more')
+        }
+
+        if (displayName.length > 32) {
+            this.addError('displayName', 'display name must be 32 characters or less')
+        }
+
+        if (displayName.indexOf(':') !== -1) {
+            this.addError('displayName', ': is a forbidden character')
+        }
     }
 
     public async validateDiscordUsername(discordUsername: string) {

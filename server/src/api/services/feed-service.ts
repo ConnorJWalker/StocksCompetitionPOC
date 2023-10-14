@@ -23,7 +23,7 @@ const GetAccountValues = async (userId?: number): Promise<IAccountValueResponse[
     const cachedAccountValues = JSON.parse(cachedString).values as IAccountValueResponse[]
     return accountValues.map(value => {
         const cachedValue = cachedAccountValues.find(cachedValue => cachedValue.user.id === value.user.id)
-        return cachedValue === undefined ? value : cachedValue
+        return cachedValue === undefined ? value : { user: value.user, values: cachedValue.values }
     })
 }
 

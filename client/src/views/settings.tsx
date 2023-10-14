@@ -54,7 +54,9 @@ const Settings = () => {
         }
         catch (e) {
             if (e instanceof HttpError) {
-                setDisplayNameErrors([ e.response?.error ?? 'error' ])
+                if (e.response?.errors) {
+                    setDisplayNameErrors(e.response.errors as unknown as string[])
+                }
                 return
             }
 

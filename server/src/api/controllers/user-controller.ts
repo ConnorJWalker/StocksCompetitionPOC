@@ -53,7 +53,14 @@ const UpdateApiKey = async (req: RequestWithTargetUser, res: Response) => {
 }
 
 const UpdateDisplayName = async (req: RequestWithTargetUser, res: Response) => {
-    if (!req.body.displayName) return res.status(400).json({ error: 'Display name is required' })
+    if (!req.body.displayName) return res.status(400).json({ errors: ['display name is required'] })
+
+    const validator = new SignUpValidator()
+    validator.validateDisplayName(req.body.displayName)
+
+    if (validator.validationErrors['displayName'] !== undefined) {
+        return res.status(400).json({ errors: validator.validationErrors['displayName'] })
+    }
 
     await DatabaseService.UpdateDisplayName(req.authenticatedUser!.id, req.body.displayName)
     return res.status(200).json({})
