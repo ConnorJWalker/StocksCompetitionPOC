@@ -1,0 +1,21 @@
+{
+  "name": "stockscomptetition",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start --workspaces --if-present",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Connor Walker",
+  "license": "ISC",
+  "workspaces": [
+    "applications/api",
+    "applications/data-fetcher",
+    "applications/socket-server",
+    "applications/client",
+    "shared/server",
+    "shared/models"
+  ]
+}

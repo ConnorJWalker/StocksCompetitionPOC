@@ -1,0 +1,27 @@
+services:
+  api:
+    container_name: api
+    build:
+        context: ./
+        dockerfile: applications/api/Dockerfile
+    ports:
+      - 4000:4000
+  socket-server:
+    container_name: socket-server
+    build:
+      context: ./
+      dockerfile: applications/socket-server/Dockerfile
+    ports:
+      - 4001:4001
+  data-fetcher:
+    container_name: data-fetcher
+    build:
+      context: ./
+      dockerfile: applications/data-fetcher/Dockerfile
+  client:
+    container_name: client
+    build:
+      context: ./
+      dockerfile: applications/client/Dockerfile
+    ports:
+      - 80:3000
