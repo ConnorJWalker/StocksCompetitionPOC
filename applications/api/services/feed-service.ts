@@ -61,6 +61,7 @@ const GetAccountGraph = async (duration: string, params?: IFeedParams) => {
  * @returns {Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]>} Array of merged posts
  */
 const GetFeed = async (offset: number, params?: IFeedParams): Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]> => {
+    offset = offset === 0 ? 0 : offset -1
     const union = await DatabaseService.GetFeedIdUnion(feedLimit, feedLimit * offset, params)
     const unionDisqualifications = union.filter(row => row.postType === 'disqualification')
     const unionOrders = union.filter(row => row.postType === 'order')
