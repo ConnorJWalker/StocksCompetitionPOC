@@ -171,7 +171,7 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
     useEffect(() => {
         getChart(durations[duration], { discordUsername, followingOnly })
             .then(response => setMappedData(mapResponse(response)))
-    }, [duration])
+    }, [duration, discordUsername])
 
     return (
         <>

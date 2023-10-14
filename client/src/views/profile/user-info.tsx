@@ -40,11 +40,13 @@ const UserInfo = ({ discordUsername }: props) => {
     }
 
     useEffect(() => {
-        getUserInfo(discordUsername).then(response => setUserInfo(response))
-
         socket.on('account-values-update', data => onAccountValuesUpdate(JSON.parse(data)))
         return () => { socket.off('account-values-update') }
     }, [])
+
+    useEffect(() => {
+        getUserInfo(discordUsername).then(response => setUserInfo(response))
+    }, [discordUsername])
 
     const renderActionButton = () => {
         if (user.discordUsername === userInfo?.accountValue.value.user.discordUsername) {
