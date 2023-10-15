@@ -57,18 +57,19 @@ const GetAccountGraph = async (duration: string, params?: IFeedParams) => {
  * to form the main, profile or following feed
  *
  * @param {number} offset Number of posts in database to skip
+ * @param {number} userId Id of the user requesting the feed
  * @param {IFeedParams} params Object containing discord username or user id and the type of feed being requested
  * @returns {Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]>} Array of merged posts
  */
-const GetFeed = async (offset: number, params?: IFeedParams): Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]> => {
+const GetFeed = async (offset: number, userId: number, params?: IFeedParams): Promise<(IOrderHistoryResponse | IDisqualificationResponse)[]> => {
     offset = offset === 0 ? 0 : offset -1
     const union = await DatabaseService.GetFeedIdUnion(feedLimit, feedLimit * offset, params)
     const unionDisqualifications = union.filter(row => row.postType === 'disqualification')
     const unionOrders = union.filter(row => row.postType === 'order')
 
     const [disqualifications, orders] = await Promise.all([
-        DatabaseService.GetDisqualifiedUsers(unionDisqualifications.map(disqualification => disqualification.UserId)),
-        DatabaseService.GetOrders(unionOrders.map(order => order.id))
+        DatabaseService.GetDisqualifiedUsers(unionDisqualifications.map(disqualification => disqualification.UserId), userId),
+        DatabaseService.GetOrders(unionOrders.map(order => order.id), userId)
     ])
 
     return [...disqualifications , ...orders].sort((value1, value2) => {

@@ -22,7 +22,7 @@ const GetAccountValueGraph = async (req: RequestWithTargetUser, res: Response) =
 
 const GetFeed = async (req: RequestWithTargetUser, res: Response) => {
     const page = req.query.page === undefined ? 0 : parseInt(req.query.page as string)
-    return res.json(await FeedService.GetFeed(page, { for: 'profile', userIdentifier: req.targetUser!.id }))
+    return res.json(await FeedService.GetFeed(page, req.authenticatedUser!.id, { for: 'profile', userIdentifier: req.targetUser!.id }))
 }
 
 export default {

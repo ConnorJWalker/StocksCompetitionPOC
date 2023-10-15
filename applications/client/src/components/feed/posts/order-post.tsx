@@ -7,6 +7,7 @@ import PostFooter from './post-footer'
 
 interface props {
     user: IUser
+    id: number
     order: IOrder
 }
 
@@ -16,7 +17,7 @@ const getPrice = (price: number, currencyCode: string) => {
         : `${ formatPrice(price, currencyCode) } a share`
 }
 
-const OrderPost = ({ user, order }: props) => {
+const OrderPost = ({ user, id, order }: props) => {
     return (
         <div className='post'>
             <PostHeader user={user} date={order.date} />
@@ -24,7 +25,7 @@ const OrderPost = ({ user, order }: props) => {
                 { order.type === 'buy' ? 'Bought' : 'Sold' } { order.quantity } shares of { order.instrument.name }
                 &nbsp;({ order.instrument.ticker }) for { getPrice(order.price, order.instrument.currencyCode) }
             </div>
-            <PostFooter />
+            <PostFooter id={id} postType='order' reactions={order.reactions} />
         </div>
     )
 }

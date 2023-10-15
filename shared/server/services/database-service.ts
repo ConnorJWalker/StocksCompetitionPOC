@@ -1,4 +1,4 @@
-import { Op, Optional, QueryTypes } from 'sequelize'
+import { Op, Optional, ProjectionAlias, QueryTypes } from 'sequelize'
 import { Literal } from 'sequelize/types/utils'
 import {
     AccountValue,
@@ -36,6 +36,29 @@ import Redis from '../config/redis'
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
 )
+
+const getPostReactionsAttributes = (tableName: string, postType: string, userId: number): (string | ProjectionAlias)[] => ([
+    [
+        Sequalize.literal(`(SELECT COUNT(*) FROM Reactions AS reactions 
+            WHERE reactions.PostId = ${tableName}.id AND postType = "${postType}" AND type = 0)`),
+        'likes'
+    ],
+    [
+        Sequalize.literal(`(SELECT COUNT(*) FROM Reactions AS reactions 
+            WHERE reactions.PostId = ${tableName}.id AND postType = "${postType}" AND type = 1)`),
+        'dislikes'
+    ],
+    [
+        Sequalize.literal(`(SELECT COUNT(*) FROM Reactions AS reactions
+            WHERE reactions.PostId = ${tableName}.id AND postType = "${postType}" AND type = 0 AND UserId = ${Sequalize.escape(userId)})`),
+        'userHasLiked'
+    ],
+    [
+        Sequalize.literal(`(SELECT COUNT(*) FROM Reactions AS reactions 
+            WHERE reactions.PostId = ${tableName}.id AND postType = "${postType}" AND type = 1 AND UserId = ${Sequalize.escape(userId)})`),
+        'userHasDisliked'
+    ]
+])
 
 const CreateUser = async (signupForm: ISignupForm, hashedPassword: string): Promise<IUser> => {
     const user = await User.create({
@@ -296,8 +319,11 @@ const AddOrders = async (orders: IDbOrderHistory[]): Promise<void> => {
     })))
 }
 
-const GetOrders = async (orderIds: number[]): Promise<IOrderHistoryResponse[]> => {
+const GetOrders = async (orderIds: number[], userId: number): Promise<IOrderHistoryResponse[]> => {
     const orders = await OrderHistory.findAll({
+        attributes: {
+            include: getPostReactionsAttributes('OrderHistory', 'order', userId)
+        },
         where: {
             id: orderIds
         },
@@ -406,8 +432,11 @@ const DisqualifyUsers = async (maxStrikes: number): Promise<string[]> => {
     return users.map(user => user.dataValues.discordUsername)
 }
 
-const GetDisqualifiedUsers = async (userIds: number[]) => {
+const GetDisqualifiedUsers = async (userIds: number[], userId: number) => {
     const disqualifications = await Disqualification.findAll({
+        attributes: {
+            include: getPostReactionsAttributes('Disqualification', 'disqualification', userId)
+        },
         where: {
             UserId: userIds
         },

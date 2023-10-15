@@ -180,6 +180,10 @@ const useAuthenticatedApi = () => {
         currentPage = 0
     }
 
+    const sendReaction = async (type: number, postType: string, postId: number) => {
+        await send(`post/reaction/${type}/${postType}/${postId}`, 'post')
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -191,7 +195,8 @@ const useAuthenticatedApi = () => {
         setApiKey,
         setDisplayName,
         setProfilePicture,
-        resetPagination
+        resetPagination,
+        sendReaction
     }
 }
 

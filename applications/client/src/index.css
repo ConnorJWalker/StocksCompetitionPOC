@@ -304,6 +304,10 @@ path {
     display: flex;
 }
 
+.post footer small {
+    color: var(--font-colour);
+}
+
 .post footer input {
     flex: 1;
     background-color: var(--background-colour-alt-light);
@@ -321,10 +325,6 @@ path {
 
 .post footer button.selected {
     filter: unset;
-}
-
-.like-button {
-    display: inline-block;
 }
 
 .profile-action-button {

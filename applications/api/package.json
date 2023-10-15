@@ -4,7 +4,7 @@
   "description": "Stocks competition rest api",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node index.ts",
+    "start": "nodemon index.ts",
     "test": "echo \"No\" && exit 1"
   },
   "dependencies": {

@@ -6,10 +6,11 @@ import PostFooter from './post-footer'
 
 interface props {
     user: IUser
+    id: number
     disqualification: IDisqualification
 }
 
-const DisqualificationPost = ({ user, disqualification }: props) => {
+const DisqualificationPost = ({ user, id, disqualification }: props) => {
     return (
         <div className='post'>
             <PostHeader user={user} date={disqualification.date} />
@@ -18,7 +19,7 @@ const DisqualificationPost = ({ user, disqualification }: props) => {
                 <p>Disqualified</p>
                 <span>🚨🚨🚨</span>
             </div>
-            <PostFooter />
+            <PostFooter id={id} postType='disqualification' reactions={disqualification.reactions} />
         </div>
     )
 }
