@@ -154,6 +154,11 @@ path {
 
     .container > nav span {
         padding: 25px 0;
+        margin: 0 4px;
+    }
+
+    .selected {
+        margin: 0 !important;
     }
 
     .container > nav .selected::after {
@@ -163,7 +168,7 @@ path {
     .container > nav .selected::before {
         width: 2px;
         height: 80%;
-        margin-right: 5px;
+        margin-right: 6px;
         border-radius: 5px;
         display: inline-block;
         background-color: white;

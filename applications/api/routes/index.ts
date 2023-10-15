@@ -5,6 +5,7 @@ import Profile from './profile'
 import MainFeed from './main-feed'
 import User from './user'
 import FollowerFeed from './follower-feed'
+import Post from './post'
 
 const router = Router()
 
@@ -17,5 +18,7 @@ router.use('/feed', passport.authenticate('jwt', { session: false }), MainFeed)
 router.use('/user', passport.authenticate('jwt', { session: false }), User)
 
 router.use('/following', passport.authenticate('jwt', { session: false }), FollowerFeed)
+
+router.use('/post', passport.authenticate('jwt', { session: false }), Post)
 
 export default router

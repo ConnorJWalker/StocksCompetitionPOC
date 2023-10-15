@@ -11,7 +11,8 @@ import {
     RefreshToken,
     Sequalize,
     User,
-    Follower
+    Follower,
+    Reaction
 } from '../config/database'
 import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from 'shared-models/iuser'
 import ISignupForm from 'shared-models/dto/isignup-form'
@@ -511,6 +512,50 @@ const UserApiKeyIsValid = async (userId: number): Promise<boolean> => {
     return user !== null
 }
 
+const PostExists = async (id: number, type: string): Promise<boolean> => {
+    switch (type) {
+        case 'order': return await OrderHistory.findByPk(id) !== null
+        case 'disqualification':
+            const disqualification = await Disqualification.findOne({
+                where: {
+                    id,
+                    disqualified: true
+                }
+            })
+
+            return disqualification !== null
+        default: return false
+    }
+}
+
+const AddReaction = async (userId: number, postId: number, postType: string, reactionType: number): Promise<void> => {
+    const reaction = await Reaction.findOne({
+        where: {
+            UserId: userId,
+            PostId: postId,
+            postType: postType
+        }
+    })
+
+    if (reaction === null) {
+        await Reaction.create({
+            UserId: userId,
+            PostId: postId,
+            postType: postType,
+            type: reactionType
+        })
+
+        return
+    }
+
+    if (reaction.dataValues.type === reactionType) {
+        await reaction.destroy()
+        return
+    }
+
+    await reaction.update({ type: reactionType })
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -543,5 +588,7 @@ export default {
     ToggleUserFollow,
     IsUserFollowing,
     GetFollowingList,
-    UserApiKeyIsValid
+    UserApiKeyIsValid,
+    PostExists,
+    AddReaction
 }

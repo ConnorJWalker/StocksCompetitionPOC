@@ -8,6 +8,7 @@ import OrderHistorySchema from './schemas/order-history'
 import ApiKeySchema from './schemas/api-keys'
 import DisqualificationsSchema from './schemas/disqualifications'
 import FollowerSchema from './schemas/follower'
+import ReactionSchema from './schemas/reactions'
 import * as fs from 'fs'
 
 const env = process.env
@@ -33,6 +34,7 @@ const orderHistory = sequalize.define('OrderHistory', OrderHistorySchema)
 const apiKey = sequalize.define('ApiKey', ApiKeySchema)
 const disqualification = sequalize.define('Disqualification', DisqualificationsSchema)
 const follower = sequalize.define('Follower', FollowerSchema)
+const reaction = sequalize.define('Reaction', ReactionSchema)
 
 user.hasMany(refreshToken)
 user.hasMany(openPositions)
@@ -69,6 +71,7 @@ export const OrderHistory = orderHistory
 export const ApiKey = apiKey
 export const Disqualification = disqualification
 export const Follower = follower
+export const Reaction = reaction
 
 export const RawSql = {
     FeedUnion: unionSql,
