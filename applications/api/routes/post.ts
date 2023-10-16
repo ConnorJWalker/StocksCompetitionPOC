@@ -5,4 +5,6 @@ const router = Router()
 
 router.post('/reaction/:type/:postType/:postId', PostController.AddReaction)
 
+router.post('/comment/:postType/:postId', PostController.AddComment)
+
 export default router

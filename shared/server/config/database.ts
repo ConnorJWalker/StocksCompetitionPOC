@@ -9,6 +9,7 @@ import ApiKeySchema from './schemas/api-keys'
 import DisqualificationsSchema from './schemas/disqualifications'
 import FollowerSchema from './schemas/follower'
 import ReactionSchema from './schemas/reactions'
+import CommentSchema from './schemas/comment'
 import * as fs from 'fs'
 
 const env = process.env
@@ -35,6 +36,7 @@ const apiKey = sequalize.define('ApiKey', ApiKeySchema)
 const disqualification = sequalize.define('Disqualification', DisqualificationsSchema)
 const follower = sequalize.define('Follower', FollowerSchema)
 const reaction = sequalize.define('Reaction', ReactionSchema)
+const comment = sequalize.define('Comment', CommentSchema)
 
 user.hasMany(refreshToken)
 user.hasMany(openPositions)
@@ -44,6 +46,21 @@ user.hasOne(apiKey)
 user.hasOne(disqualification)
 user.hasMany(follower, { foreignKey: 'followerId' })
 user.hasMany(follower, { foreignKey: 'followingId' })
+user.hasMany(comment)
+disqualification.hasMany(comment, {
+    foreignKey: 'PostId',
+    constraints: false,
+    scope: {
+        postType: 'disqualification'
+    }
+})
+orderHistory.hasMany(comment, {
+    foreignKey: 'PostId',
+    constraints: false,
+    scope: {
+        postType: 'order'
+    }
+})
 
 refreshToken.belongsTo(user)
 openPositions.belongsTo(user)
@@ -54,6 +71,9 @@ apiKey.belongsTo(user)
 disqualification.belongsTo(user)
 follower.belongsTo(user, { foreignKey: 'followerId' })
 follower.belongsTo(user, { foreignKey: 'followingId' })
+comment.belongsTo(user)
+comment.belongsTo(disqualification, { foreignKey: 'PostId', constraints: false})
+comment.belongsTo(orderHistory, { foreignKey: 'PostId', constraints: false })
 
 // loading on startup so sync not a major issue
 let unionSql = fs.readFileSync(`${__dirname}/sql/feed-union.sql`).toString()
@@ -72,6 +92,7 @@ export const ApiKey = apiKey
 export const Disqualification = disqualification
 export const Follower = follower
 export const Reaction = reaction
+export const Comment = comment
 
 export const RawSql = {
     FeedUnion: unionSql,

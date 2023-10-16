@@ -12,7 +12,8 @@ import {
     Sequalize,
     User,
     Follower,
-    Reaction
+    Reaction,
+    Comment
 } from '../config/database'
 import IUser, { IUserWithSecrets, UserFromDbResult, UserWithSecretsFromDbResult } from 'shared-models/iuser'
 import ISignupForm from 'shared-models/dto/isignup-form'
@@ -585,6 +586,15 @@ const AddReaction = async (userId: number, postId: number, postType: string, rea
     await reaction.update({ type: reactionType })
 }
 
+const AddComment = async (userId: number, postId: number, postType: string, body: string) => {
+    await Comment.create({
+        UserId: userId,
+        PostId: postId,
+        postType,
+        body
+    })
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -619,5 +629,6 @@ export default {
     GetFollowingList,
     UserApiKeyIsValid,
     PostExists,
-    AddReaction
+    AddReaction,
+    AddComment
 }
