@@ -1,4 +1,4 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, STRING } from 'sequelize'
 
 export default {
     id: {
@@ -11,6 +11,10 @@ export default {
         allowNull: false,
         foreignKey: true,
         type: DataTypes.INTEGER
+    },
+    postType: {
+        allowNull: false,
+        type: STRING(16)
     },
     body: {
         allowNull: false,

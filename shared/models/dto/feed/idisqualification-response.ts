@@ -1,6 +1,7 @@
 import IUser, { UserFromDbResult } from '../../iuser'
 import { Model } from 'sequelize'
 import IReactionsResponse from './ireactions-response'
+import ICommentResponse, { CommentFromDbResult } from './icomment-response'
 
 export default interface IDisqualificationResponse {
     user: IUser
@@ -9,6 +10,7 @@ export default interface IDisqualificationResponse {
     content: {
         date: string
         reactions: IReactionsResponse
+        comments: ICommentResponse[]
     }
 }
 
@@ -24,6 +26,7 @@ export const DisqualificationResponseFromDb = (value: Model): IDisqualificationR
             dislikes: value.dataValues.dislikes,
             userHasLiked: value.dataValues.userHasLiked === 1,
             userHasDisliked: value.dataValues.userHasDisliked === 1
-        }
+        },
+        comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment))
     }
 })

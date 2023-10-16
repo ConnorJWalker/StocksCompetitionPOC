@@ -2,6 +2,7 @@ import IUser, { UserFromDbResult } from '../../iuser'
 import IInstrument, { InstrumentFromDbResult } from '../../iinstrument'
 import { Model } from 'sequelize'
 import IReactionsResponse from './ireactions-response'
+import ICommentResponse, { CommentFromDbResult } from './icomment-response'
 
 export default interface IOrderHistoryResponse {
     user: IUser
@@ -14,6 +15,7 @@ export default interface IOrderHistoryResponse {
         date: string
         instrument: IInstrument
         reactions: IReactionsResponse
+        comments: ICommentResponse[]
     }
 }
 
@@ -33,7 +35,8 @@ export const OrderHistoryResponseFromDb = (value: Model): IOrderHistoryResponse 
                 dislikes: value.dataValues.dislikes,
                 userHasLiked: value.dataValues.userHasLiked === 1,
                 userHasDisliked: value.dataValues.userHasDisliked === 1
-            }
+            },
+            comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment))
         }
     }
 }

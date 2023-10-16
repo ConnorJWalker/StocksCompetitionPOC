@@ -342,6 +342,17 @@ const GetOrders = async (orderIds: number[], userId: number): Promise<IOrderHist
                 attributes: {
                     exclude: ['createdAt', 'updatedAt']
                 }
+            },
+            {
+                model: Comment,
+                required: false,
+                include: [{
+                    model: User,
+                    required: true,
+                    attributes: {
+                        exclude: ['password']
+                    }
+                }]
             }
         ]
     })
@@ -441,13 +452,26 @@ const GetDisqualifiedUsers = async (userIds: number[], userId: number) => {
         where: {
             UserId: userIds
         },
-        include: {
-            model: User,
-            required: true,
-            attributes: {
-                exclude: ['password']
+        include: [
+            {
+                model: User,
+                required: true,
+                attributes: {
+                    exclude: ['password']
+                }
+            },
+            {
+                model: Comment,
+                required: false,
+                include: [{
+                    model: User,
+                    required: true,
+                    attributes: {
+                        exclude: ['password']
+                    }
+                }]
             }
-        }
+        ]
     })
 
     return disqualifications.map(disqualification => DisqualificationResponseFromDb(disqualification))

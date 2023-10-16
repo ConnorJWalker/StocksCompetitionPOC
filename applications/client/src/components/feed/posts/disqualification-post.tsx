@@ -19,7 +19,7 @@ const DisqualificationPost = ({ user, id, disqualification }: props) => {
                 <p>Disqualified</p>
                 <span>🚨🚨🚨</span>
             </div>
-            <PostFooter id={id} postType='disqualification' reactions={disqualification.reactions} />
+            <PostFooter id={id} postType='disqualification' reactions={disqualification.reactions} comments={disqualification.comments} />
         </div>
     )
 }

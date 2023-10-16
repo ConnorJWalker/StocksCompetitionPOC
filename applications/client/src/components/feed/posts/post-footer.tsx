@@ -1,20 +1,29 @@
 import React, { useRef, useState } from 'react'
 import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
 import IReactions from '../../../models/dto/feed/ireactions'
+import IComment from '../../../models/dto/feed/icomment'
+import Comment from '../comment'
+import SendIcon from '../../icons/send-icon'
+import { useUserContext } from '../../../hooks/user-context'
 
 interface props {
     id: number
     postType: string
     reactions: IReactions
+    comments: IComment[]
 }
 
-const PostFooter = ({ id, postType, reactions }: props) => {
+const PostFooter = ({ id, postType, reactions, comments }: props) => {
+    const [commentInput, setCommentInput] = useState('')
+    const [showSendButton, setShowSendButton] = useState(false)
+    const [currentComments, setCurrentComments] = useState(comments)
     const [currentReactions, setCurrentReactions] = useState(reactions)
     const currentReactionsRef = useRef(reactions)
 
     currentReactionsRef.current = currentReactions
 
-    const { sendReaction } = useAuthenticatedApi()
+    const user = useUserContext()
+    const { sendReaction, sendComment } = useAuthenticatedApi()
 
     const onReactionClick = async (type: number) => {
         await sendReaction(type, postType, id)
@@ -60,17 +69,54 @@ const PostFooter = ({ id, postType, reactions }: props) => {
         setCurrentReactions({ ...currentReactionsRef.current })
     }
 
+    const sendCommentButtonClick = async () => {
+        await sendComment(postType, id, commentInput)
+        setCurrentComments([
+            {
+                user,
+                id: -1,
+                content: {
+                    body: commentInput,
+                    date: new Date(Date.now()).toUTCString()
+                }
+            },
+            ...currentComments
+        ])
+
+        setCommentInput('')
+    }
+
     return (
         <footer>
-            <input type='text' placeholder='Comment' />
-            <span>
-                <button className={`${currentReactions?.userHasDisliked ? 'selected' : ''}`} onClick={() => onReactionClick(1)}>
-                    <span>💥</span> <small> { currentReactions?.dislikes || 0 }</small>
-                </button>
-                <button className={`${currentReactions?.userHasLiked ? 'selected' : ''}`} onClick={() => onReactionClick(0)}>
-                    <span>🚀</span> <small>{ currentReactions?.likes || 0 }</small>
-                </button>
-            </span>
+            <section className='post-actions'>
+                <span className='comment-input'>
+                    <input
+                        type='text'
+                        placeholder='Comment'
+                        value={commentInput}
+                        onFocus={() => setShowSendButton(true)}
+                        onBlur={() => setShowSendButton(false) }
+                        onChange={e => setCommentInput(e.target.value)} />
+                    <button
+                        disabled={commentInput.trim().length < 3 || commentInput.trim().length > 128}
+                        style={{ display: showSendButton || commentInput.trim().length > 1 ? '' : 'none' }}
+                        onClick={sendCommentButtonClick}
+                    >
+                        <SendIcon />
+                    </button>
+                </span>
+                <span>
+                    <button className={`reaction-button ${currentReactions?.userHasDisliked ? 'selected' : ''}`} onClick={() => onReactionClick(1)}>
+                        <span>💥</span> <small>{ currentReactions?.dislikes || 0 }</small>
+                    </button>
+                    <button className={`reaction-button ${currentReactions?.userHasLiked ? 'selected' : ''}`} onClick={() => onReactionClick(0)}>
+                        <span>🚀</span> <small>{ currentReactions?.likes || 0 }</small>
+                    </button>
+                </span>
+            </section>
+            <section className='post-comments'>
+                { currentComments.map((comment, index) => <Comment comment={comment} key={index} />) }
+            </section>
         </footer>
     )
 }
