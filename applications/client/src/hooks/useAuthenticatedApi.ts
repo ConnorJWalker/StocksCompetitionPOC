@@ -184,8 +184,9 @@ const useAuthenticatedApi = () => {
         await send(`post/reaction/${type}/${postType}/${postId}`, 'post')
     }
 
-    const sendComment = async (postType: string, postId: number, body: string) => {
-        await send(`post/comment/${postType}/${postId}`, 'post', { body })
+    const sendComment = async (postType: string, postId: number, body: string): Promise<number> => {
+        const response = await send<{ id: number }>(`post/comment/${postType}/${postId}`, 'post', { body })
+        return response.content.id
     }
 
     return {

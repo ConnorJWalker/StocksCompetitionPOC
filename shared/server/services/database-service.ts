@@ -351,9 +351,12 @@ const GetOrders = async (orderIds: number[], userId: number): Promise<IOrderHist
                     required: true,
                     attributes: {
                         exclude: ['password']
-                    }
-                }]
+                    },
+                }],
             }
+        ],
+        order: [
+            [Comment, 'id', 'desc']
         ]
     })
 
@@ -469,9 +472,10 @@ const GetDisqualifiedUsers = async (userIds: number[], userId: number) => {
                     attributes: {
                         exclude: ['password']
                     }
-                }]
+                }],
             }
-        ]
+        ],
+        order: [[Comment, 'id', 'desc']]
     })
 
     return disqualifications.map(disqualification => DisqualificationResponseFromDb(disqualification))
@@ -610,13 +614,15 @@ const AddReaction = async (userId: number, postId: number, postType: string, rea
     await reaction.update({ type: reactionType })
 }
 
-const AddComment = async (userId: number, postId: number, postType: string, body: string) => {
-    await Comment.create({
+const AddComment = async (userId: number, postId: number, postType: string, body: string): Promise<number> => {
+    const comment = await Comment.create({
         UserId: userId,
         PostId: postId,
         postType,
         body
     })
+
+    return comment.dataValues.id
 }
 
 export default {

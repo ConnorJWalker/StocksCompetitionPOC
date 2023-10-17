@@ -70,11 +70,11 @@ const PostFooter = ({ id, postType, reactions, comments }: props) => {
     }
 
     const sendCommentButtonClick = async () => {
-        await sendComment(postType, id, commentInput)
+        const commentId = await sendComment(postType, id, commentInput)
         setCurrentComments([
             {
                 user,
-                id: -1,
+                id: commentId,
                 content: {
                     body: commentInput,
                     date: new Date(Date.now()).toUTCString()

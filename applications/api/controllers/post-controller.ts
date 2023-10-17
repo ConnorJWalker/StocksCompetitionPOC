@@ -57,8 +57,8 @@ const AddComment = async (req: RequestWithTargetUser, res: Response) => {
         return res.status(404).json({ error: 'post was not found' })
     }
 
-    await DatabaseService.AddComment(req.authenticatedUser!.id, postId, req.params.postType, req.body.body)
-    return res.status(201).json({})
+    const commentId = await DatabaseService.AddComment(req.authenticatedUser!.id, postId, req.params.postType, req.body.body)
+    return res.status(201).json({ id: commentId })
 }
 
 export default {
