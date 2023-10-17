@@ -11,6 +11,7 @@ export default interface IDisqualificationResponse {
         date: string
         reactions: IReactionsResponse
         comments: ICommentResponse[]
+        commentCount: number
     }
 }
 
@@ -27,6 +28,7 @@ export const DisqualificationResponseFromDb = (value: Model): IDisqualificationR
             userHasLiked: value.dataValues.userHasLiked === 1,
             userHasDisliked: value.dataValues.userHasDisliked === 1
         },
-        comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment))
+        comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment)),
+        commentCount: value.dataValues.commentCount
     }
 })

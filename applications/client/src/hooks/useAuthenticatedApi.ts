@@ -11,6 +11,7 @@ import IAuthenticationResponse from '../models/dto/iauthentication-response'
 import { useEffect } from 'react'
 import IUser from '../models/iuser'
 import useApi from './useApi'
+import IComment from '../models/dto/feed/icomment'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
@@ -189,6 +190,11 @@ const useAuthenticatedApi = () => {
         return response.content.id
     }
 
+    const getComments = async (postType: string, postId: number, skip: number): Promise<IComment[]> => {
+        const response = await send<IComment[]>(`post/comment/${postType}/${postId}?skip=${skip}`)
+        return response.content
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -202,7 +208,8 @@ const useAuthenticatedApi = () => {
         setProfilePicture,
         resetPagination,
         sendReaction,
-        sendComment
+        sendComment,
+        getComments
     }
 }
 

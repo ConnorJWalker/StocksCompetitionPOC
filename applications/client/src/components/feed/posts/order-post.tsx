@@ -25,7 +25,12 @@ const OrderPost = ({ user, id, order }: props) => {
                 { order.type === 'buy' ? 'Bought' : 'Sold' } { order.quantity } shares of { order.instrument.name }
                 &nbsp;({ order.instrument.ticker }) for { getPrice(order.price, order.instrument.currencyCode) }
             </div>
-            <PostFooter id={id} postType='order' reactions={order.reactions} comments={order.comments} />
+            <PostFooter
+                id={id}
+                postType='order'
+                reactions={order.reactions}
+                comments={order.comments}
+                serverCommentCount={order.commentCount} />
         </div>
     )
 }

@@ -313,6 +313,7 @@ path {
     flex: 1;
     align-items: center;
     margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .post-actions .comment-input button {
@@ -378,6 +379,13 @@ path {
 
 .comment-content h4 {
     margin-bottom: 5px;
+}
+
+.load-comments {
+    color: var(--font-colour);
+    padding: 0 0 1px;
+    border: none;
+    border-bottom: 1px solid var(--font-colour);
 }
 
 .profile-action-button {

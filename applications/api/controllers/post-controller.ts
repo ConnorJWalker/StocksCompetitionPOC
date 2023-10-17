@@ -38,6 +38,13 @@ const AddReaction = async (req: RequestWithTargetUser, res: Response) => {
     return res.status(200).json({})
 }
 
+const GetComments = async (req: RequestWithTargetUser, res: Response) => {
+    const skip = req.query['skip'] === undefined ? 0 : parseInt(req.query['skip'] as string)
+    const comments = await DatabaseService.GetComments(parseInt(req.params.postId), req.params.postType, skip)
+
+    return res.status(comments.length === 0 ? 204 : 200).json(comments)
+}
+
 const AddComment = async (req: RequestWithTargetUser, res: Response) => {
     let error = validatePostTypes(req, false)
     if (error !== null) {
@@ -63,5 +70,6 @@ const AddComment = async (req: RequestWithTargetUser, res: Response) => {
 
 export default {
     AddReaction,
+    GetComments,
     AddComment
 }

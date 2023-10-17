@@ -11,19 +11,24 @@ interface props {
     postType: string
     reactions: IReactions
     comments: IComment[]
+    serverCommentCount: number
 }
 
-const PostFooter = ({ id, postType, reactions, comments }: props) => {
+const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: props) => {
     const [commentInput, setCommentInput] = useState('')
     const [showSendButton, setShowSendButton] = useState(false)
+    const [disableLoadCommentsButton, setDisableLoadCommentsButton] = useState(false)
     const [currentComments, setCurrentComments] = useState(comments)
     const [currentReactions, setCurrentReactions] = useState(reactions)
+
     const currentReactionsRef = useRef(reactions)
+    const currentCommentsRef = useRef(comments)
 
     currentReactionsRef.current = currentReactions
+    currentCommentsRef.current = currentComments
 
     const user = useUserContext()
-    const { sendReaction, sendComment } = useAuthenticatedApi()
+    const { sendReaction, sendComment, getComments } = useAuthenticatedApi()
 
     const onReactionClick = async (type: number) => {
         await sendReaction(type, postType, id)
@@ -86,6 +91,15 @@ const PostFooter = ({ id, postType, reactions, comments }: props) => {
         setCommentInput('')
     }
 
+    const loadCommentsButtonClick = async () => {
+        setDisableLoadCommentsButton(true)
+
+        const comments = await getComments(postType, id, currentCommentsRef.current.length)
+        setCurrentComments([ ...currentCommentsRef.current, ...comments ])
+
+        setDisableLoadCommentsButton(false)
+    }
+
     return (
         <footer>
             <section className='post-actions'>
@@ -116,6 +130,8 @@ const PostFooter = ({ id, postType, reactions, comments }: props) => {
             </section>
             <section className='post-comments'>
                 { currentComments.map((comment, index) => <Comment comment={comment} key={index} />) }
+                { (currentComments.length < serverCommentCount) &&
+                    <button className='load-comments' disabled={disableLoadCommentsButton} onClick={loadCommentsButtonClick}>Load more comments</button> }
             </section>
         </footer>
     )

@@ -5,4 +5,5 @@ export default interface IDisqualification {
     date: number
     reactions: IReactions
     comments: IComment[]
+    commentCount: number
 }

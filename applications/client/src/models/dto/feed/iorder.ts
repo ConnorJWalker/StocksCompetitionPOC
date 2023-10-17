@@ -10,4 +10,5 @@ export default interface IOrder {
     instrument: IInstrument
     reactions: IReactions
     comments: IComment[]
+    commentCount: number
 }

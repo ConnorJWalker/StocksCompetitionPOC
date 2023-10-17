@@ -33,6 +33,7 @@ import IFeedUnion from 'shared-models/database/ifeed-union'
 import { DisqualificationResponseFromDb } from 'shared-models/dto/feed/idisqualification-response'
 import IFeedParams from 'shared-models/database/ifeed-params'
 import Redis from '../config/redis'
+import ICommentResponse, { CommentFromDbResult } from 'shared-models/dto/feed/icomment-response'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
@@ -58,6 +59,10 @@ const getPostReactionsAttributes = (tableName: string, postType: string, userId:
         Sequalize.literal(`(SELECT COUNT(*) FROM Reactions AS reactions 
             WHERE reactions.PostId = ${tableName}.id AND postType = "${postType}" AND type = 1 AND UserId = ${Sequalize.escape(userId)})`),
         'userHasDisliked'
+    ],
+    [
+        Sequalize.literal(`(SELECT COUNT(*) FROM Comments WHERE postType = "${postType}" AND PostId = ${tableName}.id)`),
+        'commentCount'
     ]
 ])
 
@@ -353,10 +358,10 @@ const GetOrders = async (orderIds: number[], userId: number): Promise<IOrderHist
                         exclude: ['password']
                     },
                 }],
+                separate: true,
+                limit: 2,
+                order: [['id', 'desc']]
             }
-        ],
-        order: [
-            [Comment, 'id', 'desc']
         ]
     })
 
@@ -473,9 +478,11 @@ const GetDisqualifiedUsers = async (userIds: number[], userId: number) => {
                         exclude: ['password']
                     }
                 }],
+                separate: true,
+                limit: 2,
+                order: [['id', 'desc']]
             }
-        ],
-        order: [[Comment, 'id', 'desc']]
+        ]
     })
 
     return disqualifications.map(disqualification => DisqualificationResponseFromDb(disqualification))
@@ -614,6 +621,27 @@ const AddReaction = async (userId: number, postId: number, postType: string, rea
     await reaction.update({ type: reactionType })
 }
 
+const GetComments = async (postId: number, postType: string, skip: number): Promise<ICommentResponse[]> => {
+    const comments = await Comment.findAll({
+        where: {
+            PostId: postId,
+            postType
+        },
+        include: {
+            model: User,
+            required: true,
+            attributes: {
+                exclude: ['password']
+            }
+        },
+        limit: 3,
+        offset: skip,
+        order: [['id', 'desc']]
+    })
+
+    return comments.map(comment => CommentFromDbResult(comment))
+}
+
 const AddComment = async (userId: number, postId: number, postType: string, body: string): Promise<number> => {
     const comment = await Comment.create({
         UserId: userId,
@@ -660,5 +688,6 @@ export default {
     UserApiKeyIsValid,
     PostExists,
     AddReaction,
+    GetComments,
     AddComment
 }

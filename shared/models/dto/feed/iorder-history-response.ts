@@ -16,6 +16,7 @@ export default interface IOrderHistoryResponse {
         instrument: IInstrument
         reactions: IReactionsResponse
         comments: ICommentResponse[]
+        commentCount: number
     }
 }
 
@@ -36,7 +37,8 @@ export const OrderHistoryResponseFromDb = (value: Model): IOrderHistoryResponse 
                 userHasLiked: value.dataValues.userHasLiked === 1,
                 userHasDisliked: value.dataValues.userHasDisliked === 1
             },
-            comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment))
+            comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment)),
+            commentCount: value.dataValues.commentCount
         }
     }
 }
