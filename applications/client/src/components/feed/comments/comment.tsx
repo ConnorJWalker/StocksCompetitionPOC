@@ -4,6 +4,7 @@ import { useUserContext } from '../../../hooks/user-context'
 import CommentMenu from './comment-menu'
 import CommentInput from './comment-input'
 import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
+import Reactions from '../reactions'
 
 interface props {
     comment: IComment
@@ -39,14 +40,7 @@ const Comment = ({ comment, onDeleteClick }: props) => {
                             : commentBody
                     }
                 </div>
-                <span>
-                    <button className={`reaction-button`}>
-                        <span>💥</span> <small>0</small>
-                    </button>
-                    <button className={`reaction-button`}>
-                        <span>🚀</span> <small>0</small>
-                    </button>
-                </span>
+                <Reactions id={comment.id} postType={'comment'} reactions={comment.reactions} />
             </div>
         </div>
     )

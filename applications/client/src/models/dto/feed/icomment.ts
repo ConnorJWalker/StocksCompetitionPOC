@@ -1,4 +1,5 @@
 import IUser from '../../iuser'
+import IReactions from './ireactions'
 
 export default interface IComment {
     user: IUser
@@ -7,4 +8,5 @@ export default interface IComment {
         body: string
         date: string
     }
+    reactions: IReactions
 }

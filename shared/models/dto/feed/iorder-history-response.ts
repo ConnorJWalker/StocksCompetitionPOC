@@ -1,7 +1,7 @@
 import IUser, { UserFromDbResult } from '../../iuser'
 import IInstrument, { InstrumentFromDbResult } from '../../iinstrument'
 import { Model } from 'sequelize'
-import IReactionsResponse from './ireactions-response'
+import IReactionsResponse, { ReactionsFromDbResult } from './ireactions-response'
 import ICommentResponse, { CommentFromDbResult } from './icomment-response'
 
 export default interface IOrderHistoryResponse {
@@ -31,12 +31,7 @@ export const OrderHistoryResponseFromDb = (value: Model): IOrderHistoryResponse 
             quantity: value.dataValues.quantity,
             date: value.dataValues.createdAt,
             instrument: InstrumentFromDbResult(value.dataValues.Instrument),
-            reactions: {
-                likes: value.dataValues.likes,
-                dislikes: value.dataValues.dislikes,
-                userHasLiked: value.dataValues.userHasLiked === 1,
-                userHasDisliked: value.dataValues.userHasDisliked === 1
-            },
+            reactions: ReactionsFromDbResult(value),
             comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment)),
             commentCount: value.dataValues.commentCount
         }

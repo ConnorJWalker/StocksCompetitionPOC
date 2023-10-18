@@ -350,6 +350,9 @@ const GetOrders = async (orderIds: number[], userId: number): Promise<IOrderHist
             },
             {
                 model: Comment,
+                attributes: {
+                    include: getPostReactionsAttributes('Comment', 'comment', userId)
+                },
                 required: false,
                 include: [{
                     model: User,
@@ -470,6 +473,9 @@ const GetDisqualifiedUsers = async (userIds: number[], userId: number) => {
             },
             {
                 model: Comment,
+                attributes: {
+                    include: getPostReactionsAttributes('Comment', 'comment', userId)
+                },
                 required: false,
                 include: [{
                     model: User,
@@ -589,6 +595,7 @@ const PostExists = async (id: number, type: string): Promise<boolean> => {
             })
 
             return disqualification !== null
+        case 'comment': return await Comment.findByPk(id) !== null
         default: return false
     }
 }

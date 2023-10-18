@@ -346,14 +346,14 @@ path {
     outline: none;
 }
 
-.post .reaction-button {
+.reaction-button {
     filter: grayscale(100%);
     padding: 5px;
     border: none;
     font-size: 1.25em;
 }
 
-.post footer button.selected {
+.reaction-button.selected {
     filter: unset;
 }
 

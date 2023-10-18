@@ -1,5 +1,6 @@
 import IUser, { UserFromDbResult } from '../../iuser'
 import { Model } from 'sequelize'
+import IReactionsResponse, { ReactionsFromDbResult } from './ireactions-response'
 
 export default interface ICommentResponse {
     user: IUser
@@ -8,6 +9,7 @@ export default interface ICommentResponse {
         body: string
         date: string
     }
+    reactions: IReactionsResponse
 }
 
 export const CommentFromDbResult = (value: Model): ICommentResponse => ({
@@ -16,5 +18,6 @@ export const CommentFromDbResult = (value: Model): ICommentResponse => ({
     content: {
         body: value.dataValues.body,
         date: value.dataValues.createdAt
-    }
+    },
+    reactions: ReactionsFromDbResult(value)
 })

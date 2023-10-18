@@ -1,6 +1,6 @@
 import IUser, { UserFromDbResult } from '../../iuser'
 import { Model } from 'sequelize'
-import IReactionsResponse from './ireactions-response'
+import IReactionsResponse, { ReactionsFromDbResult } from './ireactions-response'
 import ICommentResponse, { CommentFromDbResult } from './icomment-response'
 
 export default interface IDisqualificationResponse {
@@ -22,12 +22,7 @@ export const DisqualificationResponseFromDb = (value: Model): IDisqualificationR
     content: {
         // row created on user creation, last update is disqualification
         date: value.dataValues.updatedAt,
-        reactions: {
-            likes: value.dataValues.likes,
-            dislikes: value.dataValues.dislikes,
-            userHasLiked: value.dataValues.userHasLiked === 1,
-            userHasDisliked: value.dataValues.userHasDisliked === 1
-        },
+        reactions: ReactionsFromDbResult(value),
         comments: value.dataValues.Comments.map((comment: Model) => CommentFromDbResult(comment)),
         commentCount: value.dataValues.commentCount
     }
