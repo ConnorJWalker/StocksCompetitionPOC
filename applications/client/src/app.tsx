@@ -10,6 +10,7 @@ import SocketContext from './hooks/socket-context'
 import Following from './views/following'
 import Settings from './views/settings'
 import AdminSettings from './views/admin-settings'
+import Error from './views/Error'
 
 const App = () => {
     const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!))
@@ -17,7 +18,8 @@ const App = () => {
     const router = createBrowserRouter([
         {
             path: '/login',
-            element: <AuthenticationForms />
+            element: <AuthenticationForms />,
+            errorElement: <Error />
         },
         {
             path: '/',
@@ -47,7 +49,8 @@ const App = () => {
                     path: '/settings/:discordUsername',
                     element: <AdminSettings />
                 }
-            ]
+            ],
+            errorElement: <Error />
         }
     ])
 

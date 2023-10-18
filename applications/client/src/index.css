@@ -600,3 +600,18 @@ path {
         margin-top: 10px;
     }
 }
+
+/* Errors Page Style */
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 15%;
+    color: var(--font-colour);
+}
+
+.error-container a {
+    margin-top: 25px;
+    text-decoration: underline;
+    font-style: oblique;
+}
