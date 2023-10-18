@@ -2,17 +2,9 @@ import { DataTypes } from 'sequelize'
 
 export default {
     id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        primaryKey: true
     },
-    quantity: {
-        allowNull: false,
-        type: DataTypes.DECIMAL(15, 5)
-    },
-    averagePrice: {
-        allowNull: false,
-        type: DataTypes.DECIMAL(10, 2)
-    }
+    quantity: DataTypes.DECIMAL,
+    averagePrice: DataTypes.DECIMAL
 }

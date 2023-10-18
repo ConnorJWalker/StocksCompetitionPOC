@@ -2,27 +2,11 @@ import { DataTypes } from 'sequelize'
 
 export default {
     id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        primaryKey: true
     },
-    family: {
-        allowNull: false,
-        type: DataTypes.UUID
-    },
-    token: {
-        allowNull: false,
-        type: DataTypes.STRING(1024)
-    },
-    used: {
-        allowNull: false,
-        defaultValue: false,
-        type: DataTypes.BOOLEAN
-    },
-    invalid: {
-        allowNull: false,
-        defaultValue: false,
-        type: DataTypes.BOOLEAN
-    }
+    family: DataTypes.UUID,
+    token: DataTypes.STRING,
+    used: DataTypes.BOOLEAN,
+    invalid: DataTypes.BOOLEAN
 }

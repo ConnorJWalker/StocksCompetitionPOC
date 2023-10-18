@@ -1,23 +1,11 @@
-import { DataTypes, STRING } from 'sequelize'
+import { DataTypes } from 'sequelize'
 
 export default {
     id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        primaryKey: true
     },
-    PostId: {
-        allowNull: false,
-        foreignKey: true,
-        type: DataTypes.INTEGER
-    },
-    postType: {
-        allowNull: false,
-        type: STRING(16)
-    },
-    body: {
-        allowNull: false,
-        type: DataTypes.TEXT
-    }
+    PostId: DataTypes.INTEGER,
+    postType: DataTypes.STRING,
+    body: DataTypes.TEXT
 }

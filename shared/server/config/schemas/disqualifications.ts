@@ -2,19 +2,9 @@ import { DataTypes } from 'sequelize'
 
 export default {
     id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER
-    },
-    strikes: {
-        allowNull: false,
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        primaryKey: true
     },
-    disqualified: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-    }
+    strikes: DataTypes.INTEGER,
+    disqualified: DataTypes.BOOLEAN,
 }

@@ -79,8 +79,6 @@ comment.belongsTo(orderHistory, { foreignKey: 'PostId', constraints: false })
 let unionSql = fs.readFileSync(`${__dirname}/sql/feed-union.sql`).toString()
 let groupedAccountValues = fs.readFileSync(`${__dirname}/sql/grouped-account-values.sql`).toString()
 
-;(async () => { await sequalize.sync({ alter: true }) })()
-
 export const Sequalize = sequalize
 export const User = user
 export const RefreshToken = refreshToken

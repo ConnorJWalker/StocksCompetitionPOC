@@ -7,6 +7,7 @@ dist/
 
 .env
 .env.client
+database/database.json
 
 /.pnp
 .pnp.js

@@ -17,5 +17,8 @@
     "applications/client",
     "shared/server",
     "shared/models"
-  ]
+  ],
+  "devDependencies": {
+    "sequelize-cli": "^6.6.1"
+  }
 }
