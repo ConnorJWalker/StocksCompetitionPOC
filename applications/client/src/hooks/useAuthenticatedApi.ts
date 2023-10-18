@@ -195,7 +195,11 @@ const useAuthenticatedApi = () => {
         return response.content
     }
 
-    const deleteComment = async (commentId: number) => {
+    const editComment = async (commentId: number, body:string): Promise<void> => {
+        await send(`post/comment/${commentId}`, 'patch', { body })
+    }
+
+    const deleteComment = async (commentId: number): Promise<void> => {
         await send(`post/comment/${commentId}`, 'delete')
     }
 
@@ -214,6 +218,7 @@ const useAuthenticatedApi = () => {
         sendReaction,
         sendComment,
         getComments,
+        editComment,
         deleteComment
     }
 }

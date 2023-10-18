@@ -666,7 +666,11 @@ const AddComment = async (userId: number, postId: number, postType: string, body
     return comment.dataValues.id
 }
 
-const DeleteComment = async (commentId: number) => {
+const EditComment = async (commentId: number, body: string): Promise<void> => {
+    await Comment.update({ body }, { where: { id: commentId }})
+}
+
+const DeleteComment = async (commentId: number): Promise<void> => {
     await Comment.destroy({ where: { id: commentId } })
 }
 
@@ -708,5 +712,6 @@ export default {
     GetComments,
     GetComment,
     AddComment,
+    EditComment,
     DeleteComment
 }

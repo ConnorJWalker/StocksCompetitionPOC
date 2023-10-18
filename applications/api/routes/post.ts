@@ -10,6 +10,8 @@ router.get('/comment/:postType/:postId', PostController.GetComments)
 
 router.post('/comment/:postType/:postId', PostController.AddComment)
 
+router.patch('/comment/:commentId', canAlterComment, PostController.EditComment)
+
 router.delete('/comment/:commentId', canAlterComment, PostController.DeleteComment)
 
 export default router

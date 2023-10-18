@@ -21,6 +21,18 @@ const validatePostTypes = (req: RequestWithTargetUser, validateReactions: boolea
     return null
 }
 
+const validateCommentBody = (body: string | undefined): string | null => {
+    if (!body || body.length < 3) {
+        return 'Body must be at least 3 characters long'
+    }
+
+    if (body.length > 128) {
+        return 'Body must be less than 128 characters'
+    }
+
+    return null
+}
+
 const AddReaction = async (req: RequestWithTargetUser, res: Response) => {
     let error = validatePostTypes(req, true)
     if (error !== null) {
@@ -47,16 +59,9 @@ const GetComments = async (req: RequestWithTargetUser, res: Response) => {
 
 const AddComment = async (req: RequestWithTargetUser, res: Response) => {
     let error = validatePostTypes(req, false)
+    error = error === null ? validateCommentBody(req.body.body) : error
     if (error !== null) {
         return res.status(400).json({ error })
-    }
-
-    if (!req.body.body || req.body.body.length < 3) {
-        return res.status(400).json({ error: 'Body must be at least 3 characters long' })
-    }
-
-    if (req.body.body.length > 128) {
-        return res.status(400).json({ error: 'Body must be less than 128 characters' })
     }
 
     const postId = parseInt(req.params.postId)
@@ -68,6 +73,16 @@ const AddComment = async (req: RequestWithTargetUser, res: Response) => {
     return res.status(201).json({ id: commentId })
 }
 
+const EditComment = async (req: RequestWithTargetUser, res: Response) => {
+    const error = validateCommentBody(req.body.body)
+    if (error !== null) {
+        return res.status(400).json({ error })
+    }
+
+    await DatabaseService.EditComment(parseInt(req.params.commentId), req.body.body)
+    return res.status(200).json({})
+}
+
 const DeleteComment = async (req: RequestWithTargetUser, res: Response) => {
     await DatabaseService.DeleteComment(parseInt(req.params.commentId))
     return res.status(200).json({})
@@ -77,5 +92,6 @@ export default {
     AddReaction,
     GetComments,
     AddComment,
+    EditComment,
     DeleteComment
 }

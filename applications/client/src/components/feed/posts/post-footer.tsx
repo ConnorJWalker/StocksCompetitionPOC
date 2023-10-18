@@ -3,8 +3,8 @@ import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
 import IReactions from '../../../models/dto/feed/ireactions'
 import IComment from '../../../models/dto/feed/icomment'
 import Comment from '../comments/comment'
-import SendIcon from '../../icons/send-icon'
 import { useUserContext } from '../../../hooks/user-context'
+import CommentInput from '../comments/comment-input'
 
 interface props {
     id: number
@@ -15,8 +15,6 @@ interface props {
 }
 
 const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: props) => {
-    const [commentInput, setCommentInput] = useState('')
-    const [showSendButton, setShowSendButton] = useState(false)
     const [disableLoadCommentsButton, setDisableLoadCommentsButton] = useState(false)
     const [currentComments, setCurrentComments] = useState(comments)
     const [currentReactions, setCurrentReactions] = useState(reactions)
@@ -74,21 +72,19 @@ const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: p
         setCurrentReactions({ ...currentReactionsRef.current })
     }
 
-    const sendCommentButtonClick = async () => {
-        const commentId = await sendComment(postType, id, commentInput)
+    const sendCommentButtonClick = async (content: string) => {
+        const commentId = await sendComment(postType, id, content)
         setCurrentComments([
             {
                 user,
                 id: commentId,
                 content: {
-                    body: commentInput,
+                    body: content,
                     date: new Date(Date.now()).toUTCString()
                 }
             },
             ...currentComments
         ])
-
-        setCommentInput('')
     }
 
     const loadCommentsButtonClick = async () => {
@@ -108,22 +104,7 @@ const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: p
     return (
         <footer>
             <section className='post-actions'>
-                <span className='comment-input'>
-                    <input
-                        type='text'
-                        placeholder='Comment'
-                        value={commentInput}
-                        onFocus={() => setShowSendButton(true)}
-                        onBlur={() => setShowSendButton(false) }
-                        onChange={e => setCommentInput(e.target.value)} />
-                    <button
-                        disabled={commentInput.trim().length < 3 || commentInput.trim().length > 128}
-                        style={{ display: showSendButton || commentInput.trim().length > 1 ? '' : 'none' }}
-                        onClick={sendCommentButtonClick}
-                    >
-                        <SendIcon />
-                    </button>
-                </span>
+                <CommentInput onSendClick={sendCommentButtonClick} />
                 <span>
                     <button className={`reaction-button ${currentReactions?.userHasDisliked ? 'selected' : ''}`} onClick={() => onReactionClick(1)}>
                         <span>💥</span> <small>{ currentReactions?.dislikes || 0 }</small>

@@ -4,7 +4,7 @@ import EditIcon from '../../icons/edit-icon'
 
 interface props {
     onDeleteClick: () => Promise<void>
-    onEditClick: () => Promise<void>
+    onEditClick: () => void
 }
 
 const CommentMenu = ({ onDeleteClick, onEditClick }: props) => {
@@ -13,7 +13,7 @@ const CommentMenu = ({ onDeleteClick, onEditClick }: props) => {
     const hamburgerRef = useRef<HTMLDivElement>(null)
     const dropdownRef = useRef<HTMLUListElement>(null)
 
-    const buttonClick = async (callback: () => Promise<void>) => {
+    const buttonClick = async (callback: () => (Promise<void> | void)) => {
         await callback()
         setMenuVisible(false)
     }

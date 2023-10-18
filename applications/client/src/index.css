@@ -125,6 +125,7 @@ path {
 .container > nav img, .container > nav svg {
     width: 2em;
     height: 2em;
+    cursor: pointer;
 }
 
 .container > nav .selected::after {
@@ -308,15 +309,14 @@ path {
     color: var(--font-colour);
 }
 
-.post-actions .comment-input {
+.comment-input {
     display: flex;
     flex: 1;
     align-items: center;
     margin-right: 10px;
-    margin-bottom: 10px;
 }
 
-.post-actions .comment-input button {
+.comment-input button {
     border: unset;
     padding: 0 10px;
     background-color: var(--background-colour-alt-light);
@@ -324,17 +324,17 @@ path {
     color: var(--font-colour);
 }
 
-.post-actions .comment-input button:disabled {
+.comment-input button:disabled {
     color: var(--background-colour-alt);
 }
 
-.post-actions .comment-input svg {
+.comment-input svg {
     margin-bottom: -3px;
     width: 20px;
     height: 20px;
 }
 
-.post-actions .comment-input input {
+.comment-input input {
     flex: 1;
     background-color: var(--background-colour-alt-light);
     border: 1px solid var(--background-colour-alt-light);
@@ -342,7 +342,7 @@ path {
     border-radius: unset;
 }
 
-.post-actions .comment-input input:focus, .post-actions .comment-input input:active {
+.comment-input input:focus, .comment-input input:active {
     outline: none;
 }
 
@@ -360,6 +360,10 @@ path {
 .comment {
     display: flex;
     margin: 10px;
+}
+
+.comment:first-of-type {
+    margin-top: 20px;
 }
 
 .comment img {
