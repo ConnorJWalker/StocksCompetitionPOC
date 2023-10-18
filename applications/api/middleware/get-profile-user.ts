@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
-import IUser, {IUserWithSecrets} from 'shared-models/iuser'
+import { IUserWithSecrets } from 'shared-models/iuser'
 import DatabaseService from 'shared-server/services/database-service'
 
 export interface RequestWithTargetUser extends Request {
     targetUser?: IUserWithSecrets
-    authenticatedUser?: IUser
+    authenticatedUser?: IUserWithSecrets
 }
 
 const FetchProfileUser = async (req: RequestWithTargetUser, res: Response, next: NextFunction) => {

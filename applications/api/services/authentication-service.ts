@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt'
 import ISignupForm from 'shared-models/dto/isignup-form'
 import DatabaseService from 'shared-server/services/database-service'
 import Redis from 'shared-server/config/redis'
-import IUser from 'shared-models/iuser'
+import { IUserWithSecrets } from 'shared-models/iuser'
 import ILoginForm from '../models/dto/ilogin-form'
 import IAuthenticationResponse from '../models/dto/iauthentication-response'
 
@@ -19,7 +19,7 @@ const SignUp = async (signupForm: ISignupForm): Promise<IAuthenticationResponse>
     const hashedPassword = await bcrypt.hash(signupForm.password, 10)
     const user = await DatabaseService.CreateUser(signupForm, hashedPassword)
 
-    const authenticationTokens = createToken(user)
+    const authenticationTokens = createToken({ ...user as IUserWithSecrets, isAdmin: false })
     await DatabaseService.CreateRefreshToken(crypto.randomUUID(), authenticationTokens.refreshToken, user.id)
 
     return authenticationTokens
@@ -61,9 +61,9 @@ const Refresh = async (token: string): Promise<IAuthenticationResponse | null> =
         return null
     }
 
-    let user: IUser | undefined
+    let user: IUserWithSecrets | undefined
     try {
-        user = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET as jwt.Secret) as IUser
+        user = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET as jwt.Secret) as IUserWithSecrets
     }
     catch {
         await DatabaseService.InvalidateRefreshTokenFamily(storedToken.family)
@@ -109,9 +109,9 @@ const Logout = async (tokens: IAuthenticationResponse): Promise<boolean> => {
  * @returns {Promise<boolean>} True if successfully invalidated tokens
  */
 const LogoutAll = async (tokens: IAuthenticationResponse): Promise<boolean> => {
-    let user: IUser | undefined
+    let user: IUserWithSecrets | undefined
     try {
-        user = jwt.verify(tokens.accessToken, process.env.JWT_SECRET as jwt.Secret) as IUser
+        user = jwt.verify(tokens.accessToken, process.env.JWT_SECRET as jwt.Secret) as IUserWithSecrets
     }
     catch {
         return false
@@ -129,14 +129,15 @@ const LogoutAll = async (tokens: IAuthenticationResponse): Promise<boolean> => {
  * @param {IUser} user Object containing user information to encode
  * @returns {IAuthenticationResponse} Object containing the new access and refresh tokens
  */
-function createToken(user: IUser): IAuthenticationResponse {
+function createToken(user: IUserWithSecrets): IAuthenticationResponse {
     // remove potential additional fields such as previous jwt claims or user secrets
-    const payload: IUser = {
+    const payload = {
         id: user.id,
         displayName: user.displayName,
         discordUsername: user.discordUsername,
         profilePicture: user.profilePicture,
-        displayColour: user.displayColour
+        displayColour: user.displayColour,
+        isAdmin: user.isAdmin
     }
 
     return {

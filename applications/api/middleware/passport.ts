@@ -1,6 +1,6 @@
 import * as passport from 'passport'
 import { StrategyOptions, Strategy, ExtractJwt, VerifiedCallback } from 'passport-jwt'
-import IUser from 'shared-models/iuser'
+import { IUserWithSecrets } from 'shared-models/iuser'
 import { RequestWithTargetUser } from './get-profile-user'
 import Redis from 'shared-server/config/redis'
 
@@ -11,7 +11,7 @@ const options: StrategyOptions = {
 }
 
 passport.use(new Strategy(options, async (req: RequestWithTargetUser, jwtPayload: any, done: VerifiedCallback) => {
-    const user = jwtPayload as IUser
+    const user = jwtPayload as IUserWithSecrets
 
     const token = req.header('Authorization')!.split(' ')[1]
     const [loggedOutAccessToken, loggedOutAll] = await Promise.all([

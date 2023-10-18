@@ -5,4 +5,5 @@ export default interface IUser {
     profilePicture: string
     displayColour: string
     exp: number
+    isAdmin?: boolean
 }

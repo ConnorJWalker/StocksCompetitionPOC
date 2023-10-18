@@ -30,7 +30,7 @@ const Comment = ({ comment, onDeleteClick }: props) => {
                 <div className='comment-content'>
                     <span className='comment-header'>
                         <h4>{ comment.user.displayName }</h4>
-                        { user.id === comment.user.id &&
+                        { (user.id === comment.user.id || user?.isAdmin) &&
                             <CommentMenu onEditClick={() => setInEditMode(!inEditMode)} onDeleteClick={onDeleteClick} /> }
                     </span>
                     {

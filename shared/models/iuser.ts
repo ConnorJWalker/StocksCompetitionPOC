@@ -11,6 +11,7 @@ export default interface IUser {
 export interface IUserWithSecrets extends IUser {
     password: string
     apiKey: string
+    isAdmin: boolean
 }
 
 export const UserFromDbResult = (user: Model): IUser => {
@@ -27,6 +28,7 @@ export const UserWithSecretsFromDbResult = (user: Model): IUserWithSecrets => {
     return {
         ...UserFromDbResult(user),
         password: user.dataValues.password,
-        apiKey: user.dataValues.ApiKey.dataValues.apiKey
+        apiKey: user.dataValues.ApiKey.dataValues.apiKey,
+        isAdmin: user.dataValues.isAdmin
     }
 }

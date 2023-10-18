@@ -8,7 +8,7 @@ const CanAlterComment = async (req: RequestWithTargetUser, res: Response, next: 
         return res.status(404).json({})
     }
 
-    if (comment.user.id !== req.authenticatedUser!.id) {
+    if (!req.authenticatedUser!.isAdmin && comment.user.id !== req.authenticatedUser!.id) {
         return res.status(403).json({ error: 'Cannot edit other users comments' })
     }
 
