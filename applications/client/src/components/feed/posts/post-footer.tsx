@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
 import IReactions from '../../../models/dto/feed/ireactions'
 import IComment from '../../../models/dto/feed/icomment'
-import Comment from '../comment'
+import Comment from '../comments/comment'
 import SendIcon from '../../icons/send-icon'
 import { useUserContext } from '../../../hooks/user-context'
 
@@ -28,7 +28,7 @@ const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: p
     currentCommentsRef.current = currentComments
 
     const user = useUserContext()
-    const { sendReaction, sendComment, getComments } = useAuthenticatedApi()
+    const { sendReaction, sendComment, getComments, deleteComment } = useAuthenticatedApi()
 
     const onReactionClick = async (type: number) => {
         await sendReaction(type, postType, id)
@@ -100,6 +100,11 @@ const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: p
         setDisableLoadCommentsButton(false)
     }
 
+    const deleteCommentButtonClick = async (commentId: number) => {
+        await deleteComment(commentId)
+        setCurrentComments(currentComments.filter(comment => comment.id !== commentId))
+    }
+
     return (
         <footer>
             <section className='post-actions'>
@@ -129,7 +134,12 @@ const PostFooter = ({ id, postType, reactions, comments, serverCommentCount }: p
                 </span>
             </section>
             <section className='post-comments'>
-                { currentComments.map((comment, index) => <Comment comment={comment} key={index} />) }
+                { currentComments.map((comment, index) =>
+                    <Comment
+                        comment={comment}
+                        onDeleteClick={() => deleteCommentButtonClick(comment.id)}
+                        key={index} />)
+                }
                 { (currentComments.length < serverCommentCount) &&
                     <button className='load-comments' disabled={disableLoadCommentsButton} onClick={loadCommentsButtonClick}>Load more comments</button> }
             </section>

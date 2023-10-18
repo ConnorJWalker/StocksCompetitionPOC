@@ -68,8 +68,14 @@ const AddComment = async (req: RequestWithTargetUser, res: Response) => {
     return res.status(201).json({ id: commentId })
 }
 
+const DeleteComment = async (req: RequestWithTargetUser, res: Response) => {
+    await DatabaseService.DeleteComment(parseInt(req.params.commentId))
+    return res.status(200).json({})
+}
+
 export default {
     AddReaction,
     GetComments,
-    AddComment
+    AddComment,
+    DeleteComment
 }

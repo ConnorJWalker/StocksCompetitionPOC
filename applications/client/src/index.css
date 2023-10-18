@@ -368,6 +368,12 @@ path {
     margin-right: 10px;
 }
 
+.comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .comment-content-container {
     width: 80%;
 }
@@ -379,6 +385,46 @@ path {
 
 .comment-content h4 {
     margin-bottom: 5px;
+}
+
+.hamburger {
+    display: flex;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.hamburger > div {
+    width: 3px;
+    height: 3px;
+    background-color: var(--font-colour);
+    margin-left: 5px;
+}
+
+.comment-menu-options {
+    list-style: none;
+    position: absolute;
+    right: 0;
+    width: fit-content;
+    background-color: var(--background-colour-alt);
+    margin-top: 10px;
+    border: 1px solid var(--font-colour);
+    cursor: pointer;
+}
+
+.comment-menu-options li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.comment-menu-options li:hover, .comment-menu-options li:active {
+    background-color: var(--background-colour-alt-light);
+}
+
+.comment-menu-options svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
 }
 
 .load-comments {

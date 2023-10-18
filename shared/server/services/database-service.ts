@@ -642,6 +642,19 @@ const GetComments = async (postId: number, postType: string, skip: number): Prom
     return comments.map(comment => CommentFromDbResult(comment))
 }
 
+const GetComment = async (commentId: number): Promise<ICommentResponse | null> => {
+    const comment = await Comment.findByPk(commentId, {
+        include: {
+            model: User,
+            required: true,
+            attributes: {
+                exclude: ['password']
+            }
+        }
+    })
+    return comment === null ? null : CommentFromDbResult(comment)
+}
+
 const AddComment = async (userId: number, postId: number, postType: string, body: string): Promise<number> => {
     const comment = await Comment.create({
         UserId: userId,
@@ -651,6 +664,10 @@ const AddComment = async (userId: number, postId: number, postType: string, body
     })
 
     return comment.dataValues.id
+}
+
+const DeleteComment = async (commentId: number) => {
+    await Comment.destroy({ where: { id: commentId } })
 }
 
 export default {
@@ -689,5 +706,7 @@ export default {
     PostExists,
     AddReaction,
     GetComments,
-    AddComment
+    GetComment,
+    AddComment,
+    DeleteComment
 }

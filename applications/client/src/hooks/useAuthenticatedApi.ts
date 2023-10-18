@@ -195,6 +195,10 @@ const useAuthenticatedApi = () => {
         return response.content
     }
 
+    const deleteComment = async (commentId: number) => {
+        await send(`post/comment/${commentId}`, 'delete')
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -209,7 +213,8 @@ const useAuthenticatedApi = () => {
         resetPagination,
         sendReaction,
         sendComment,
-        getComments
+        getComments,
+        deleteComment
     }
 }
 
