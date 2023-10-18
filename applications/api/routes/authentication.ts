@@ -1,15 +1,16 @@
 import { Router } from 'express'
+import { authenticationLimiter } from '../middleware/rate-limit'
 import AuthenticationController from '../controllers/authentication-controller'
 
 const router = Router()
 
-router.post('/signup', AuthenticationController.SignUp)
+router.post('/signup', authenticationLimiter, AuthenticationController.SignUp)
 
-router.post('/login', AuthenticationController.LogIn)
+router.post('/login', authenticationLimiter, AuthenticationController.LogIn)
 
-router.post('/logout', AuthenticationController.LogOut)
+router.post('/logout', authenticationLimiter, AuthenticationController.LogOut)
 
-router.post('/refresh', AuthenticationController.Refresh)
+router.post('/refresh', authenticationLimiter, AuthenticationController.Refresh)
 
 router.get('/validate-username/:discordUsername', AuthenticationController.ValidateDiscordUsername)
 
