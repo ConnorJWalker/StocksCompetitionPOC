@@ -161,8 +161,12 @@ const useAuthenticatedApi = () => {
         throw new HttpError(response as IHttpResult<IHttpErrorResult>)
     }
 
-    const setDisplayName = async (displayName: string) => {
-        const response = await send('user/displayName', 'patch', { displayName })
+    const setDisplayName = async (displayName: string, discordUsername?: string) => {
+        const endpoint = discordUsername === undefined
+            ? 'user/displayName'
+            : `user/displayName/${discordUsername}`
+
+        const response = await send(endpoint, 'patch', { displayName })
         if (response.ok) return
 
         throw new HttpError(response as IHttpResult<IHttpErrorResult>)

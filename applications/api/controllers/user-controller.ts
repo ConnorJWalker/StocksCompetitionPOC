@@ -5,6 +5,15 @@ import DatabaseService from 'shared-server/services/database-service'
 import databaseService from 'shared-server/services/database-service'
 import DiscordService from 'shared-server/services/discord-service'
 
+const getDisplayNameErrors = (req: RequestWithTargetUser): string[] => {
+    if (!req.body.displayName) return ['display name is required']
+
+    const validator = new SignUpValidator()
+    validator.validateDisplayName(req.body.displayName)
+
+    return validator.validationErrors['displayName'] || []
+}
+
 const Follow = async (req: RequestWithTargetUser, res: Response) => {
     if (req.targetUser!.id === req.authenticatedUser!.id) {
         return res.status(400).json({ error: 'You cannot follow yourself' })
@@ -53,16 +62,22 @@ const UpdateApiKey = async (req: RequestWithTargetUser, res: Response) => {
 }
 
 const UpdateDisplayName = async (req: RequestWithTargetUser, res: Response) => {
-    if (!req.body.displayName) return res.status(400).json({ errors: ['display name is required'] })
-
-    const validator = new SignUpValidator()
-    validator.validateDisplayName(req.body.displayName)
-
-    if (validator.validationErrors['displayName'] !== undefined) {
-        return res.status(400).json({ errors: validator.validationErrors['displayName'] })
+    const errors = getDisplayNameErrors(req)
+    if (errors.length !== 0) {
+        return res.status(400).json({ errors })
     }
 
     await DatabaseService.UpdateDisplayName(req.authenticatedUser!.id, req.body.displayName)
+    return res.status(200).json({})
+}
+
+const AdminUpdateDisplayName = async (req: RequestWithTargetUser, res: Response) => {
+    const errors = getDisplayNameErrors(req)
+    if (errors.length !== 0) {
+        return res.status(400).json({ errors })
+    }
+
+    await DatabaseService.UpdateDisplayName(req.targetUser!.id, req.body.displayName)
     return res.status(200).json({})
 }
 
@@ -80,5 +95,6 @@ export default {
     ApiKeyIsValid,
     UpdateApiKey,
     UpdateDisplayName,
+    AdminUpdateDisplayName,
     UpdateDiscordProfilePicture
 }

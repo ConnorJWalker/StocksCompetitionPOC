@@ -9,6 +9,7 @@ import AuthenticationProvider from './components/authentication-provider'
 import SocketContext from './hooks/socket-context'
 import Following from './views/following'
 import Settings from './views/settings'
+import AdminSettings from './views/admin-settings'
 
 const App = () => {
     const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!))
@@ -41,6 +42,10 @@ const App = () => {
                 {
                     path: '/settings',
                     element: <Settings />
+                },
+                {
+                    path: '/settings/:discordUsername',
+                    element: <AdminSettings />
                 }
             ]
         }
