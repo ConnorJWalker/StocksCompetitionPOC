@@ -12,7 +12,7 @@ interface props {
 }
 
 const getPrice = (price: number, currencyCode: string) => {
-    return price === -1
+    return price == -1
         ? 'an unknown amount of money'
         : `${ formatPrice(price, currencyCode) } a share`
 }

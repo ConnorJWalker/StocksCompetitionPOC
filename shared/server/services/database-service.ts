@@ -669,7 +669,7 @@ const AddComment = async (userId: number, postId: number, postType: string, body
         postType,
         body
     })
-
+    
     return comment.dataValues.id
 }
 

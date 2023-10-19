@@ -274,7 +274,7 @@ path {
 
 .post {
     background-color: var(--background-colour-alt);
-    margin: 0 -1em 10px;
+    margin-bottom: 10px;
 }
 
 .post .disqualified {

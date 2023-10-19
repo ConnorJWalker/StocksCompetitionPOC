@@ -9,9 +9,12 @@ interface props {
 
 const CommentMenu = ({ onDeleteClick, onEditClick }: props) => {
     const [menuVisible, setMenuVisible] = useState(false)
+    const menuVisibleRef = useRef(false)
 
     const hamburgerRef = useRef<HTMLDivElement>(null)
     const dropdownRef = useRef<HTMLUListElement>(null)
+
+    menuVisibleRef.current = menuVisible
 
     const buttonClick = async (callback: () => (Promise<void> | void)) => {
         await callback()
@@ -27,9 +30,20 @@ const CommentMenu = ({ onDeleteClick, onEditClick }: props) => {
         }
     }
 
+    const handleScroll = () => {
+        if (menuVisibleRef.current) {
+            setMenuVisible(false)
+        }
+    }
+
     useEffect(() => {
         document.addEventListener('mousedown', handleOutsideClick)
-        return () => document.removeEventListener('mousedown', handleOutsideClick)
+        document.querySelector('.home-container')?.addEventListener('scroll', handleScroll)
+
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick)
+            document.querySelector('.home-container')?.removeEventListener('scroll', handleScroll)
+        }
     }, [])
 
     return (
