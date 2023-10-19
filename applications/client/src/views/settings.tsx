@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useUserContext } from '../hooks/user-context'
+import React, { useContext, useEffect, useState } from 'react'
+import UserContext from '../hooks/user-context'
 import IUser from '../models/iuser'
 import useAuthenticatedApi from '../hooks/useAuthenticatedApi'
 import useLogout from '../hooks/use-logout'
@@ -9,14 +9,14 @@ import SignUpValidator from '../utils/sign-up-validator'
 
 const Settings = () => {
     const validator = new SignUpValidator()
-    const user = useUserContext()
+    const { user, setUser } = useContext(UserContext)
     const [following, setFollowing] = useState<IUser[]>([])
 
     const [apiKeyField, setApiKeyField] = useState('')
     const [apiKeyIsValid, setApiKeyIsValid] = useState<boolean>()
     const [apiKeyErrors, setApiKeyErrors] = useState<string[]>([])
 
-    const [displayNameField, setDisplayNameField] = useState(user.displayName)
+    const [displayNameField, setDisplayNameField] = useState(user!.displayName)
     const [displayNameErrors, setDisplayNameErrors] = useState<string[]>([])
     const [displayNameSuccess, setDisplayNameSuccess] = useState(false)
 
@@ -39,7 +39,7 @@ const Settings = () => {
     const onDisplayNameSubmit = async () => {
         setDisplayNameErrors([])
         setDisplayNameSuccess(false)
-        if (displayNameField.trim() === user.displayName) return
+        if (displayNameField.trim() === user?.displayName) return
 
         const validationErrors = validator.validateDisplayName(displayNameField)
         if (validationErrors.length !== 0) {
@@ -51,6 +51,7 @@ const Settings = () => {
             await setDisplayName(displayNameField)
             setDisplayNameErrors([])
             setDisplayNameSuccess(true)
+            setUser({ ...user!, displayName: displayNameField })
         }
         catch (e) {
             if (e instanceof HttpError) {
@@ -93,8 +94,9 @@ const Settings = () => {
 
     const onRefreshProfilePictureClick = async () => {
         try {
-            await setProfilePicture()
+            const profilePicture = await setProfilePicture()
             setProfilePictureSuccess(true)
+            setUser({ ...user!, profilePicture })
         }
         catch (e) {
             if (e instanceof HttpError) {
@@ -112,8 +114,8 @@ const Settings = () => {
                 <div className='profile-info'>
                     <img
                         className='profile-picture'
-                        src={user.profilePicture}
-                        alt={user.displayName + 's profile picture'} />
+                        src={user?.profilePicture}
+                        alt={user?.displayName + 's profile picture'} />
                     <div>
                         <label htmlFor='display-name'>Display Name</label>
                         <input

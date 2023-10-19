@@ -172,9 +172,9 @@ const useAuthenticatedApi = () => {
         throw new HttpError(response as IHttpResult<IHttpErrorResult>)
     }
 
-    const setProfilePicture = async () => {
-        const response = await send('user/profilePicture', 'patch')
-        if (response.ok) return
+    const setProfilePicture = async (): Promise<string> => {
+        const response = await send<{ profilePicture: string }>('user/profilePicture', 'patch')
+        if (response.ok) return response.content.profilePicture
 
         throw new HttpError(response as IHttpResult<IHttpErrorResult>)
     }

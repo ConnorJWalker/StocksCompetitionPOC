@@ -49,7 +49,7 @@ const AuthenticationProvider = ({ children }: props) => {
 
     return (
         <AuthenticationContext.Provider value={contextValue}>
-            <UserContext.Provider value={user!}>
+            <UserContext.Provider value={{ user: user!, setUser }}>
                 { children }
             </UserContext.Provider>
         </AuthenticationContext.Provider>

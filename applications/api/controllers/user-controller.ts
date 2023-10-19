@@ -85,7 +85,7 @@ const UpdateDiscordProfilePicture = async (req: RequestWithTargetUser, res: Resp
     const discordProfilePicture = await DiscordService.GetProfilePicture(req.authenticatedUser!.discordUsername)
     await DatabaseService.UpdateDiscordProfilePicture(req.authenticatedUser!.id, discordProfilePicture)
 
-    return res.status(200).json({})
+    return res.status(200).json({ profilePicture: discordProfilePicture })
 }
 
 export default {
