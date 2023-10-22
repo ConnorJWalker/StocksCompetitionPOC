@@ -21,11 +21,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Change directories
-        run: cd applications/client
-
       - name: Install dependencies
-        run: npm ci
+        run: cd applications/client && npm ci
 
       - name: Build client
         env:
@@ -33,10 +30,7 @@ jobs:
           REACT_APP_SERVER_URL: ${{ secrets.SERVER_URL }}
           REACT_APP_SOCKET_URL: ${{ secrets.SOCKET_URL }}
           CI: false
-        run: npm run build
-
-      - name: Return to root directory
-        run: cd ../../
+        run: cd applications/client && npm run build
 
       - name: Deploy to Github pages
         uses: peaceiris/actions-gh-pages@v3
