@@ -32,6 +32,7 @@ jobs:
           REACT_APP_URL: ${{ secrets.APP_URL }}
           REACT_APP_SERVER_URL: ${{ secrets.SERVER_URL }}
           REACT_APP_SOCKET_URL: ${{ secrets.SOCKET_URL }}
+          CI: false
         run: npm run build
 
       - name: Return to root directory
