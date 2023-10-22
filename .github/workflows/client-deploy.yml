@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Change directories
         run: cd applications/client
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build client
         env:
