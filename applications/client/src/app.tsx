@@ -35,7 +35,7 @@ const App = () => {
                 },
                 {
                     path: '/search',
-                    element: <Home />
+                    element: <h1>Not done yet</h1>
                 },
                 {
                     path: '/profile/:discordUsername',
