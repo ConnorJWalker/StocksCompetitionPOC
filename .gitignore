@@ -10,6 +10,8 @@ build/
 .env.client
 database/database.json
 
+*.pem
+
 /.pnp
 .pnp.js
 

@@ -1,16 +1,18 @@
 import { createClient } from 'redis'
 
+const { REDIS_HOST, REDIS_PORT } = process.env
+
 const client = createClient({
+    url: `redis://${REDIS_HOST!}:${REDIS_PORT!}`,
     socket: {
-        host: process.env.REDIS_HOST!,
-        port: parseInt(process.env.REDIS_PORT!)
+        connectTimeout: 50000
     }
 })
 
 const subscriberClient = createClient({
+    url: `redis://${REDIS_HOST!}:${REDIS_PORT!}`,
     socket: {
-        host: process.env.REDIS_HOST!,
-        port: parseInt(process.env.REDIS_PORT!)
+        connectTimeout: 50000
     }
 })
 

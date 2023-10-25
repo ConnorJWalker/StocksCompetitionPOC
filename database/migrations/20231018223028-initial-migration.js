@@ -60,7 +60,9 @@ module.exports = {
                     allowNull: false,
                     defaultValue: false,
                     type: DataTypes.BOOLEAN
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('Instruments', {
                 id: {
@@ -89,7 +91,9 @@ module.exports = {
                     allowNull: false,
                     unique: true,
                     type: DataTypes.STRING
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             })
         ])
 
@@ -113,7 +117,9 @@ module.exports = {
                 gainLoss: {
                     allowNull: false,
                     type: DataTypes.DECIMAL(10, 2)
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('ApiKeys', {
                 id: {
@@ -131,7 +137,9 @@ module.exports = {
                 apiKey: {
                     allowNull: false,
                     type: DataTypes.STRING
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('Comments', {
                 id: {
@@ -153,7 +161,9 @@ module.exports = {
                 body: {
                     allowNull: false,
                     type: DataTypes.TEXT
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('Disqualifications', {
                 id: {
@@ -172,7 +182,9 @@ module.exports = {
                     allowNull: false,
                     type: DataTypes.BOOLEAN,
                     defaultValue: false
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('Followers', {
                 id: {
@@ -183,6 +195,8 @@ module.exports = {
                 },
                 followerId: userInclude,
                 followingId: userInclude,
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('OpenPositions', {
                 id: {
@@ -200,7 +214,9 @@ module.exports = {
                 averagePrice: {
                     allowNull: false,
                     type: DataTypes.DECIMAL(10, 2)
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('OrderHistories', {
                 id: {
@@ -222,7 +238,9 @@ module.exports = {
                 quantity: {
                     allowNull: false,
                     type: DataTypes.DECIMAL(15, 5)
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('Reactions', {
                 id: {
@@ -243,7 +261,9 @@ module.exports = {
                 type: {
                     allowNull: false,
                     type: DataTypes.INTEGER
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
             queryInterface.createTable('RefreshTokens', {
                 id: {
@@ -270,7 +290,9 @@ module.exports = {
                     allowNull: false,
                     defaultValue: false,
                     type: DataTypes.BOOLEAN
-                }
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE
             }),
         ])
 

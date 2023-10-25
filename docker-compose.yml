@@ -2,22 +2,34 @@ services:
   api:
     container_name: api
     build:
-        context: ./
-        dockerfile: applications/api/Dockerfile
+      context: ./
+      dockerfile: applications/api/Dockerfile
+    depends_on:
+      - redis
     ports:
       - 4000:4000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   socket-server:
     container_name: socket-server
     build:
       context: ./
       dockerfile: applications/socket-server/Dockerfile
+    depends_on:
+      - redis
     ports:
       - 4001:4001
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   data-fetcher:
     container_name: data-fetcher
     build:
       context: ./
       dockerfile: applications/data-fetcher/Dockerfile
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   client:
     container_name: client
     build:
@@ -25,3 +37,13 @@ services:
       dockerfile: applications/client/Dockerfile
     ports:
       - 80:3000
+      - 3000:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - api
+  redis:
+    container_name: redis-container
+    image: "redis:latest"
+    ports:
+      - 6379:6379
