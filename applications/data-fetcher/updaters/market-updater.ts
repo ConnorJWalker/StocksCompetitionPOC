@@ -149,7 +149,7 @@ export default class MarketUpdater {
     private async updateInstrumentsTable() {
         // Make sure instruments table hasn't been updated and then the program closed and rerun
         const redisLastUpdated = await Redis.get('instruments-last-updated')
-        if (redisLastUpdated === null || parseInt(redisLastUpdated) === new Date(Date.now()).getDate()) {
+        if (redisLastUpdated !== null && parseInt(redisLastUpdated) === new Date(Date.now()).getDate()) {
             return
         }
 
