@@ -7,6 +7,9 @@ COPY applications/socket-server ./app
 COPY .env ./app
 COPY shared ./shared
 
+COPY cert.pem ./app
+COPY key.pem ./app
+
 RUN npm install -workspaces --if-present
 
 WORKDIR /usr/src/app

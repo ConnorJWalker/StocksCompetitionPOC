@@ -13,7 +13,7 @@ import AdminSettings from './views/admin-settings'
 import Error from './views/Error'
 
 const App = () => {
-    const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!))
+    const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!, { secure: true }))
 
     const router = createBrowserRouter([
         {

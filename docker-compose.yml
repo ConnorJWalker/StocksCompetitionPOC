@@ -6,8 +6,9 @@ services:
       dockerfile: applications/api/Dockerfile
     depends_on:
       - redis
+      - nginx
     ports:
-      - 4000:4000
+      - 4000:443
     extra_hosts:
       - "host.docker.internal:host-gateway"
   socket-server:
@@ -17,8 +18,9 @@ services:
       dockerfile: applications/socket-server/Dockerfile
     depends_on:
       - redis
+      - nginx
     ports:
-      - 4001:4001
+      - 4001:443
     extra_hosts:
       - "host.docker.internal:host-gateway"
   data-fetcher:
@@ -42,6 +44,15 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - api
+  nginx:
+    container_name: nginx
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    ports:
+      - 443:443
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   redis:
     container_name: redis-container
     image: "redis:latest"
