@@ -505,13 +505,17 @@ path {
     .leaderboards-container {
         margin-top: 0;
         grid-column: 2;
-        grid-row: 2;
-        height: 100%;
+        grid-row: 2/4;
+        height: 100vh;
     }
 
     .leaderboards-container > div {
         position: sticky;
         top: 0;
+    }
+
+    .leaderboards {
+        max-height: unset;
     }
 
     .post {
