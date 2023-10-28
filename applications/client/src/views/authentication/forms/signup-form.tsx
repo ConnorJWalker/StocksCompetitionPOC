@@ -6,6 +6,9 @@ import HttpError from '../../../models/http-error'
 import useSignup from '../../../hooks/use-signup'
 import useApi from '../../../hooks/useApi'
 
+//@ts-ignore
+const isSafari = /constructor/i.test(window.HTMLElement) || ((p: any) => p.toString() === "[object SafariRemoteNotification]")(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
+
 const SignupForm = ({ ChangePage }: any) => {
     const validator = new SignUpValidator()
     const [showMainForm, setShowMainForm] = useState(true)
@@ -74,12 +77,12 @@ const SignupForm = ({ ChangePage }: any) => {
                             type='color'
                             value={signupForm.displayColour}
                             onChange={e => setSignupForm({ ...signupForm, displayColour: e.target.value })}
-                            hidden />
+                            hidden={!isSafari} />
                     </label>
                 </div>
 
                 <footer>
-                    <button className='link' type='button' onClick={ChangePage}>Log In</button>
+                    <button className='link' type='button' onClick={ChangePage}>Have an account? Log In</button>
                     <button className='btn-action'>Next</button>
                 </footer>
             </form>
@@ -103,7 +106,7 @@ const SignupForm = ({ ChangePage }: any) => {
                     onChange={e => setSignupForm({ ...signupForm, apiKey: e.target.value })} />
 
                 <footer>
-                    <button className='link'>Log In</button>
+                    <button className='link'>Have an account? Log In</button>
 
                     <div>
                         <button type='button' onClick={() => setShowMainForm(true)}>Back</button>

@@ -39,7 +39,7 @@ const LoginForm = ({ ChangePage }: any) => {
             <ValidationErrors errors={serverErrors} />
 
             <footer>
-                <button className='link' type='button' onClick={ChangePage}>Sign Up</button>
+                <button className='link' type='button' onClick={ChangePage}>Dont have an account? Sign Up</button>
                 <button className='btn-action'>Log In</button>
             </footer>
         </form>
