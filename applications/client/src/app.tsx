@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createHashRouter, RouterProvider } from 'react-router-dom'
 import io from 'socket.io-client'
 import Home from './views/home'
 import Profile from './views/profile/profile'
@@ -15,7 +15,7 @@ import Error from './views/Error'
 const App = () => {
     const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!, { secure: true }))
 
-    const router = createBrowserRouter([
+    const router = createHashRouter([
         {
             path: '/login',
             element: <AuthenticationForms />,
@@ -52,7 +52,7 @@ const App = () => {
             ],
             errorElement: <Error />
         }
-    ])
+    ], { basename: process.env.REACT_APP_URL || '' })
 
     return (
         <SocketContext.Provider value={socket.current}>
