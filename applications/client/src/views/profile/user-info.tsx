@@ -69,7 +69,7 @@ const UserInfo = ({ discordUsername }: props) => {
             <div>
                 <div>
                     <img
-                        src={userInfo?.accountValue.value.user.profilePicture}
+                        src={process.env.REACT_APP_SERVER_URL! + userInfo?.accountValue.value.user.profilePicture}
                         alt={`${userInfo?.accountValue.value.user.displayName}'s profile picture`}
                         className='profile-picture' />
                     <span>

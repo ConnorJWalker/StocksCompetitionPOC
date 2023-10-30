@@ -14,7 +14,7 @@ interface props {
 const PostHeader = ({ user, date }: props) => {
     return (
         <header>
-            <img src={user.profilePicture} alt=""/>
+            <img src={process.env.REACT_APP_SERVER_URL + user.profilePicture} alt=""/>
             <span>
                 <Link to={`/profile/${user.discordUsername}`}>
                     <h3>

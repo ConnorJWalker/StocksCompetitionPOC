@@ -8,6 +8,11 @@ import 'express-async-errors'
 import './middleware/passport'
 import routes from './routes'
 
+const profilePicturesDirectory = './static/profile-pictures'
+if (!fs.existsSync(profilePicturesDirectory)) {
+    fs.mkdirSync(profilePicturesDirectory, { recursive: true })
+}
+
 const app: Application = express()
 
 const corsSettings = {
@@ -17,6 +22,7 @@ const corsSettings = {
 
 app.use(cors(corsSettings))
 
+app.use('/api/static', express.static('static'))
 app.use(express.json())
 app.use(routes)
 

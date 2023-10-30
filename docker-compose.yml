@@ -11,6 +11,8 @@ services:
       - 4000:443
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - profilePictures:/static
   socket-server:
     container_name: socket-server
     build:
@@ -58,3 +60,5 @@ services:
     image: "redis:latest"
     ports:
       - 6379:6379
+volumes:
+  profilePictures:

@@ -5,7 +5,7 @@ import { postsLimiter } from '../middleware/rate-limit'
 
 const router = Router()
 
-router.post('/reaction/:type/:postType/:postId', postsLimiter, PostController.AddReaction)
+router.post('/reaction/:type/:postType/:postId', PostController.AddReaction)
 
 router.get('/comment/:postType/:postId', PostController.GetComments)
 

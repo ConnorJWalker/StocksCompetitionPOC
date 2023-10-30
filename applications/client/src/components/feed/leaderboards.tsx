@@ -51,7 +51,7 @@ const Leaderboards = ({ controller }: props) => {
                     {
                         accountValues.map((account, index) => (
                             <div className='leaderboard-item' onClick={() => navigate(`/profile/${account.user.discordUsername}`)} key={index}>
-                                <img src={account.user.profilePicture} alt={`${account.user.displayName}'s profile picture`}/>
+                                <img src={process.env.REACT_APP_SERVER_URL + account.user.profilePicture} alt={`${account.user.displayName}'s profile picture`}/>
                                 <p>{ account.user.displayName }</p>
                                 <p>£{ account.values.total }</p>
                             </div>

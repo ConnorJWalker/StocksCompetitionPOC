@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.ts",
+    "migrate-pp": "npx ts-node scripts/profile-picture-migration.ts",
     "test": "echo \"No\" && exit 1"
   },
   "dependencies": {

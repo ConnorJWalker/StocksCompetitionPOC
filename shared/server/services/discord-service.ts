@@ -1,3 +1,4 @@
+import * as fs from 'fs'
 import IHttpResult from 'shared-models/ihttp-result'
 import IGuildMember from 'shared-models/discord/guild-member'
 import Redis from '../config/redis'
@@ -81,9 +82,18 @@ const GetProfilePicture = async (discordUsername: string): Promise<string> => {
     }
 
     const baseUrl = 'https://cdn.discordapp.com/'
-    return !user.avatar
+    const avatarUrl = !user.avatar
         ? `${baseUrl}embed/avatars/${user.discriminator === 0 ? (Number(user.id) >> 22) % 6 : user.discriminator % 5}.png`
         : `${baseUrl}avatars/${user.id}/${user.avatar}.png`
+
+    const avatarResponse = await fetch(avatarUrl)
+    const avatarBuffer = await avatarResponse.arrayBuffer()
+    const avatarSplit = avatarUrl.split('/')
+    const avatarDirectory = `static/profile-pictures/${avatarSplit[avatarSplit.length - 2]}-${avatarSplit[avatarSplit.length - 1]}`
+
+    await fs.promises.writeFile('./' + avatarDirectory, Buffer.from(avatarBuffer))
+
+    return avatarDirectory
 }
 
 /**
