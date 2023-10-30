@@ -164,7 +164,7 @@ path {
         margin: 0 4px;
     }
 
-    .selected {
+    .container > nav .selected {
         margin: 0 !important;
     }
 

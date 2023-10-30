@@ -5,6 +5,7 @@ import CommentMenu from './comment-menu'
 import CommentInput from './comment-input'
 import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
 import Reactions from '../reactions'
+import { Link } from 'react-router-dom'
 
 interface props {
     comment: IComment
@@ -26,11 +27,15 @@ const Comment = ({ comment, onDeleteClick }: props) => {
 
     return (
         <div className='comment'>
-            <img src={process.env.REACT_APP_SERVER_URL + comment.user.profilePicture} alt={`${comment.user.displayName}'s profile picture`}/>
+            <Link to={`/profile/${comment.user.discordUsername}`}>
+                <img src={process.env.REACT_APP_SERVER_URL + comment.user.profilePicture} alt={`${comment.user.displayName}'s profile picture`}/>
+            </Link>
             <div className='comment-content-container'>
                 <div className='comment-content'>
                     <span className='comment-header'>
-                        <h4>{ comment.user.displayName }</h4>
+                        <Link to={`/profile/${comment.user.discordUsername}`}>
+                            <h4>{ comment.user.displayName }</h4>
+                        </Link>
                         { (user.id === comment.user.id || user?.isAdmin) &&
                             <CommentMenu onEditClick={() => setInEditMode(!inEditMode)} onDeleteClick={onDeleteClick} /> }
                     </span>

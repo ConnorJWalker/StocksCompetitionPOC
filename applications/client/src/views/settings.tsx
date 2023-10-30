@@ -162,7 +162,7 @@ const Settings = () => {
                 {
                     following.map((value, index) => (
                         <div className='leaderboard-item' key={index}>
-                            <img src={value.profilePicture} alt={value.displayName + 's profile picture'}/>
+                            <img src={process.env.REACT_APP_SERVER_URL + value.profilePicture} alt={value.displayName + 's profile picture'}/>
                             <p>{ value.displayName }</p>
                             <button onClick={() => onUnfollowClick(value.discordUsername)} className='btn-danger'>Unfollow</button>
                         </div>
