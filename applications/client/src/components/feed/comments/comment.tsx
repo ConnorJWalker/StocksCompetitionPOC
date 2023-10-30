@@ -26,7 +26,7 @@ const Comment = ({ comment, onDeleteClick }: props) => {
 
     return (
         <div className='comment'>
-            <img src={comment.user.profilePicture} alt={`${comment.user.displayName}'s profile picture`}/>
+            <img src={process.env.REACT_APP_SERVER_URL + comment.user.profilePicture} alt={`${comment.user.displayName}'s profile picture`}/>
             <div className='comment-content-container'>
                 <div className='comment-content'>
                     <span className='comment-header'>
