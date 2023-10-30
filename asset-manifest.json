@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/StocksCompetition/static/css/main.c1c786cf.css",
-    "main.js": "/StocksCompetition/static/js/main.f5008059.js",
+    "main.css": "/StocksCompetition/static/css/main.94fb6812.css",
+    "main.js": "/StocksCompetition/static/js/main.bce13dcb.js",
     "index.html": "/StocksCompetition/index.html",
-    "main.c1c786cf.css.map": "/StocksCompetition/static/css/main.c1c786cf.css.map",
-    "main.f5008059.js.map": "/StocksCompetition/static/js/main.f5008059.js.map"
+    "main.94fb6812.css.map": "/StocksCompetition/static/css/main.94fb6812.css.map",
+    "main.bce13dcb.js.map": "/StocksCompetition/static/js/main.bce13dcb.js.map"
   },
   "entrypoints": [
-    "static/css/main.c1c786cf.css",
-    "static/js/main.f5008059.js"
+    "static/css/main.94fb6812.css",
+    "static/js/main.bce13dcb.js"
   ]
 }
