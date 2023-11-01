@@ -12,6 +12,7 @@ import { useEffect } from 'react'
 import IUser from '../models/iuser'
 import useApi from './useApi'
 import IComment from '../models/dto/feed/icomment'
+import IInstrument from '../models/iintrument'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
@@ -207,6 +208,11 @@ const useAuthenticatedApi = () => {
         await send(`post/comment/${commentId}`, 'delete')
     }
 
+    const searchInstruments = async (searchTerm: string): Promise<IInstrument[]> => {
+        const response = await send<{ results: IInstrument[] }>(`instrument/search/${searchTerm}`)
+        return response.content.results
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -223,7 +229,8 @@ const useAuthenticatedApi = () => {
         sendComment,
         getComments,
         editComment,
-        deleteComment
+        deleteComment,
+        searchInstruments
     }
 }
 

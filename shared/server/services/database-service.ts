@@ -34,6 +34,8 @@ import { DisqualificationResponseFromDb } from 'shared-models/dto/feed/idisquali
 import IFeedParams from 'shared-models/database/ifeed-params'
 import Redis from '../config/redis'
 import ICommentResponse, { CommentFromDbResult } from 'shared-models/dto/feed/icomment-response'
+import IInstrument from 'client/src/models/iintrument'
+import { InstrumentFromDbResult } from 'shared-models/iinstrument'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(
     `(SELECT id FROM Instruments WHERE t212Ticker = ${Sequalize.escape(ticker)})`
@@ -681,6 +683,24 @@ const DeleteComment = async (commentId: number): Promise<void> => {
     await Comment.destroy({ where: { id: commentId } })
 }
 
+const SearchInstruments = async (searchTerm: string): Promise<IInstrument[]> => {
+    const instruments = await Instrument.findAll({
+        where: {
+            [Op.or]: {
+                ticker: {
+                    [Op.like]: `%${searchTerm}%`
+                },
+                name: {
+                    [Op.like]: `%${searchTerm}%`
+                }
+            }
+        },
+        limit: 20
+    })
+
+    return instruments.map(instrument => InstrumentFromDbResult(instrument))
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -720,5 +740,6 @@ export default {
     GetComment,
     AddComment,
     EditComment,
-    DeleteComment
+    DeleteComment,
+    SearchInstruments
 }

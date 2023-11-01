@@ -611,6 +611,40 @@ path {
     }
 }
 
+/* Instruments and Search Styles */
+.search-container input[type=search] {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--background-colour-alt-light);
+    border: 1px solid var(--background-colour-alt-light);
+    color: var(--font-colour);
+    outline: none;
+}
+
+.search-result {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.search-result:hover, .search-result:active {
+    background-color: var(--background-colour-alt)  ;
+}
+
+.search-result div {
+    padding-left: 10px;
+}
+
+.search-result h3 {
+    margin-bottom: 10px;
+}
+
+.search-result img {
+    width: 100px;
+    height: 100px;
+}
+
 /* Errors Page Style */
 .error-container {
     display: flex;

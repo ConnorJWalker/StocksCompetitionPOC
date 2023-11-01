@@ -8,6 +8,7 @@ import AuthenticatedRoute from './components/authenticated-route'
 import AuthenticationProvider from './components/authentication-provider'
 import SocketContext from './hooks/socket-context'
 import Following from './views/following'
+import Search from './views/search'
 import Settings from './views/settings'
 import AdminSettings from './views/admin-settings'
 import Error from './views/Error'
@@ -35,7 +36,7 @@ const App = () => {
                 },
                 {
                     path: '/search',
-                    element: <h1>Not done yet</h1>
+                    element: <Search />
                 },
                 {
                     path: '/profile/:discordUsername',
