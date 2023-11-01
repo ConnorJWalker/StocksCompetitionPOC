@@ -101,6 +101,14 @@ path {
     stroke-width: 24px;
 }
 
+.instrument-icon-fallback {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-colour-alt);
+    letter-spacing: 2px;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -478,12 +486,7 @@ path {
 .open-position-container object div {
     width: 50px;
     height: 50px;
-    background-color: var(--background-colour-alt);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
     font-size: 0.75em;
-    letter-spacing: 2px;
 }
 
 .about-open-position {
@@ -624,7 +627,7 @@ path {
 .search-result {
     display: flex;
     align-items: center;
-    padding: 10px;
+    margin: 10px 0;
     cursor: pointer;
 }
 
@@ -640,7 +643,7 @@ path {
     margin-bottom: 10px;
 }
 
-.search-result img {
+.search-result object, .search-result .instrument-icon-fallback {
     width: 100px;
     height: 100px;
 }

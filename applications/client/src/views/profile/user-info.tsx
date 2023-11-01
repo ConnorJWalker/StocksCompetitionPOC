@@ -6,6 +6,7 @@ import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 import { useSocket } from '../../hooks/socket-context'
 import IAccountValueResponse from '../../models/dto/feed/iaccount-value-response'
 import { useNavigate } from 'react-router-dom'
+import InstrumentIcon from '../../components/instrument-icon'
 
 interface props {
     discordUsername: string
@@ -91,11 +92,7 @@ const UserInfo = ({ discordUsername }: props) => {
                     userInfo?.openPositions.map((position, index) => (
                         <div key={index} className='open-position-container'>
                             <header>
-                                <object data={position.instrument.icon} type='image/png'>
-                                    <div>
-                                        { position.instrument.ticker }
-                                    </div>
-                                </object>
+                                <InstrumentIcon url={position.instrument.icon} ticker={position.instrument.ticker} />
                                 <p>{ position.instrument.name }</p>
                             </header>
                             <div className='about-open-position'>

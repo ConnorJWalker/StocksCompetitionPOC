@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import IInstrument from '../models/iintrument'
 import useAuthenticatedApi from '../hooks/useAuthenticatedApi'
+import InstrumentIcon from '../components/instrument-icon'
 
 const Search = () => {
     const [searchTerm, setSearchTerm] = useState('')
@@ -30,7 +31,7 @@ const Search = () => {
             <div className='search-results-container'>
                 { results.map(result => (
                     <div className='search-result'>
-                        <img src={result.icon} alt={`${result.ticker}'s logo`}/>
+                        <InstrumentIcon url={result.icon} ticker={result.ticker} />
                         <div>
                             <h3>{ result.name }</h3>
                             <p>{ result.ticker }</p>
