@@ -12,7 +12,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - profilePictures:/static
+      - profilePictures:/usr/src/app/static
   socket-server:
     container_name: socket-server
     build:

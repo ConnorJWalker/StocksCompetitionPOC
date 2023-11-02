@@ -114,7 +114,7 @@ const Settings = () => {
                 <div className='profile-info'>
                     <img
                         className='profile-picture'
-                        src={user?.profilePicture}
+                        src={process.env.REACT_APP_SERVER_URL! + user?.profilePicture}
                         alt={user?.displayName + 's profile picture'} />
                     <div>
                         <label htmlFor='display-name'>Display Name</label>

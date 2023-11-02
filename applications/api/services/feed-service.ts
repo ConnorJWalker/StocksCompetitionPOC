@@ -38,7 +38,7 @@ const GetAccountGraph = async (duration: string, params?: IFeedParams) => {
         startDate.setDate(startDate.getDate() - 7)
     }
     else if (duration === 'max') {
-        startDate.setDate(0)
+        startDate.setFullYear(1970)
     }
 
     let condition = 'true'
