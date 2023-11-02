@@ -683,19 +683,42 @@ const DeleteComment = async (commentId: number): Promise<void> => {
     await Comment.destroy({ where: { id: commentId } })
 }
 
-const SearchInstruments = async (searchTerm: string): Promise<IInstrument[]> => {
+const SearchInstrumentsExact = async (searchTerm: string): Promise<IInstrument[]> => {
     const instruments = await Instrument.findAll({
         where: {
             [Op.or]: {
-                ticker: {
-                    [Op.like]: `%${searchTerm}%`
+                ticker: searchTerm,
+                name: searchTerm
+            }
+        }
+    })
+
+    return instruments.map(instrument => InstrumentFromDbResult(instrument))
+}
+
+const SearchInstrumentsExcludeExact = async (searchTerm: string, reduceLimitBy: number): Promise<IInstrument[]> => {
+    const instruments = await Instrument.findAll({
+        where: {
+            [Op.and]: {
+                [Op.or]: {
+                    ticker: {
+                        [Op.like]: `%${searchTerm}%`
+                    },
+                    name: {
+                        [Op.like]: `%${searchTerm}%`
+                    }
                 },
-                name: {
-                    [Op.like]: `%${searchTerm}%`
+                [Op.or]: {
+                    [Op.not]: {
+                        ticker: searchTerm
+                    },
+                    [Op.not]: {
+                        name: searchTerm
+                    }
                 }
             }
         },
-        limit: 20
+        limit: 20 - reduceLimitBy
     })
 
     return instruments.map(instrument => InstrumentFromDbResult(instrument))
@@ -741,5 +764,6 @@ export default {
     AddComment,
     EditComment,
     DeleteComment,
-    SearchInstruments
+    SearchInstrumentsExact,
+    SearchInstrumentsExcludeExact
 }
