@@ -13,10 +13,9 @@ const Search = () => {
         const value = e.target.value
         setSearchTerm(value)
 
-        if (searchTerm.trim().length === 0) return
+        if (value.trim().length === 0) return
 
-        const searchResults = await searchInstruments(searchTerm)
-        console.log(searchResults)
+        const searchResults = await searchInstruments(value)
         setResults([...searchResults])
     }
 
