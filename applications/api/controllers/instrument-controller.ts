@@ -16,7 +16,7 @@ const SearchInstruments = async (req: Request, res: Response) => {
         results = await DatabaseService.SearchInstrumentsExact(searchTerm)
     }
 
-    results = [...results, ...await DatabaseService.SearchInstrumentsExcludeExact(searchTerm, results.length)]
+    results = [...results, ...await DatabaseService.SearchInstrumentsExcludeExact(searchTerm, results.length, page)]
     return res.status(200).json({ results: results })
 }
 

@@ -696,7 +696,7 @@ const SearchInstrumentsExact = async (searchTerm: string): Promise<IInstrument[]
     return instruments.map(instrument => InstrumentFromDbResult(instrument))
 }
 
-const SearchInstrumentsExcludeExact = async (searchTerm: string, reduceLimitBy: number): Promise<IInstrument[]> => {
+const SearchInstrumentsExcludeExact = async (searchTerm: string, reduceLimitBy: number, page: number): Promise<IInstrument[]> => {
     const instruments = await Instrument.findAll({
         where: {
             [Op.and]: {
@@ -718,7 +718,8 @@ const SearchInstrumentsExcludeExact = async (searchTerm: string, reduceLimitBy: 
                 }
             }
         },
-        limit: 20 - reduceLimitBy
+        limit: 20 - reduceLimitBy,
+        offset: page * 20
     })
 
     return instruments.map(instrument => InstrumentFromDbResult(instrument))

@@ -208,9 +208,26 @@ const useAuthenticatedApi = () => {
         await send(`post/comment/${commentId}`, 'delete')
     }
 
-    const searchInstruments = async (searchTerm: string): Promise<IInstrument[]> => {
-        const response = await send<{ results: IInstrument[] }>(`instrument/search/${searchTerm}`)
-        return response.content.results
+    const searchInstruments = async (searchTerm: string, incrementPage = false): Promise<[boolean, IInstrument[]]> => {
+        if (loadingContent || allContentLoaded) return [false, []]
+
+        loadingContent = true
+        const response = await send<{ results: IInstrument[] }>(`instrument/search/${searchTerm}?page=${currentPage}`)
+
+        if (response.content.results.length === 0) {
+            allContentLoaded = true
+        }
+
+        if (incrementPage) {
+            currentPage++
+        }
+        else {
+            currentPage = 1
+        }
+
+        loadingContent = false
+
+        return [true, response.content.results]
     }
 
     return {
