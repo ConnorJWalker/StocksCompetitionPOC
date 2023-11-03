@@ -8,7 +8,8 @@ import AuthenticatedRoute from './components/authenticated-route'
 import AuthenticationProvider from './components/authentication-provider'
 import SocketContext from './hooks/socket-context'
 import Following from './views/following'
-import Search from './views/search'
+import Search from './views/instruments/search'
+import Instrument from './views/instruments/instrument'
 import Settings from './views/settings'
 import AdminSettings from './views/admin-settings'
 import Error from './views/Error'
@@ -37,6 +38,10 @@ const App = () => {
                 {
                     path: '/search',
                     element: <Search />
+                },
+                {
+                    path: '/instrument/:id',
+                    element: <Instrument />
                 },
                 {
                     path: '/profile/:discordUsername',

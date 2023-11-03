@@ -725,6 +725,28 @@ const SearchInstrumentsExcludeExact = async (searchTerm: string, reduceLimitBy: 
     return instruments.map(instrument => InstrumentFromDbResult(instrument))
 }
 
+const FindInstrumentById = async (id: number): Promise<IInstrument | null> => {
+    const instrument = await Instrument.findByPk(id)
+    return instrument === null ? null : InstrumentFromDbResult(instrument)
+}
+
+const FindUsersHoldingInstrument = async (id: number): Promise<IUser[]> => {
+    const openPositions = await OpenPositions.findAll({
+        where: {
+            InstrumentId: id
+        },
+        include: {
+            model: User,
+            required: true,
+            attributes: {
+                exclude: ['password', 'createdAt', 'updatedAt']
+            }
+        }
+    })
+
+    return openPositions.map(openPosition => UserFromDbResult(openPosition.dataValues.User))
+}
+
 export default {
     CreateUser,
     FindUserById,
@@ -766,5 +788,7 @@ export default {
     EditComment,
     DeleteComment,
     SearchInstrumentsExact,
-    SearchInstrumentsExcludeExact
+    SearchInstrumentsExcludeExact,
+    FindInstrumentById,
+    FindUsersHoldingInstrument
 }

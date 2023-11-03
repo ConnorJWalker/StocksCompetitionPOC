@@ -2,6 +2,15 @@ import { Request, Response } from 'express'
 import DatabaseService from 'shared-server/services/database-service'
 import IInstrument from 'client/src/models/iintrument'
 
+const GetInstrument = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.instrumentId)
+    const instrument = await DatabaseService.FindInstrumentById(id)
+
+    return instrument === null
+        ? res.status(404).json({})
+        : res.status(200).json({ instrument })
+}
+
 const SearchInstruments = async (req: Request, res: Response) => {
     if (!req.params.searchTerm) {
         return res.status(400).json({ error: 'Search term is required' })
@@ -29,10 +38,17 @@ const GetCompanyData = async (req: Request, res: Response) => {
 }
 
 const GetOwningUsers = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.instrumentId)
+    if (await DatabaseService.FindInstrumentById(id) === null) {
+        return res.status(404).json({})
+    }
 
+    const users = await DatabaseService.FindUsersHoldingInstrument(id)
+    return res.status(200).json(users)
 }
 
 export default {
+    GetInstrument,
     SearchInstruments,
     GetInstrumentChart,
     GetCompanyData,

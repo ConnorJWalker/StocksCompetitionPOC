@@ -1,6 +1,7 @@
 import { Model } from 'sequelize'
 
 export default interface IInstrument {
+    id: number
     type: string
     currencyCode: string
     name: string
@@ -10,6 +11,7 @@ export default interface IInstrument {
 
 export const InstrumentFromDbResult = (value: Model): IInstrument => {
     return {
+        id: value.dataValues.id,
         type: value.dataValues.type,
         currencyCode: value.dataValues.currencyCode,
         name: value.dataValues.name,

@@ -648,6 +648,27 @@ path {
     height: 100px;
 }
 
+.instrument-information-container object {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.owning-user {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.owning-user:hover, .owning-user:active {
+    background-color: var(--background-colour-alt-light);
+}
+
+.owning-user img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
 /* Errors Page Style */
 .error-container {
     display: flex;
