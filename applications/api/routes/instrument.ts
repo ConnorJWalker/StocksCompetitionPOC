@@ -3,6 +3,8 @@ import InstrumentController from '../controllers/instrument-controller'
 
 const router = Router()
 
+router.get('/:instrumentId', InstrumentController.GetInstrument)
+
 router.get('/search/:searchTerm', InstrumentController.SearchInstruments)
 
 router.get('/chart/:instrumentId', InstrumentController.GetInstrumentChart)

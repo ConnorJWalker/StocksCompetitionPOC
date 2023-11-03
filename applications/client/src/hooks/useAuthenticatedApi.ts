@@ -230,6 +230,16 @@ const useAuthenticatedApi = () => {
         return [true, response.content.results]
     }
 
+    const getInstrument = async (id: number): Promise<IInstrument> => {
+        const response = await send<{ instrument: IInstrument }>(`instrument/${id}`)
+        return response.content.instrument
+    }
+
+    const getOwningUsers = async (id: number): Promise<IUser[]> => {
+        const response = await send<IUser[]>(`instrument/users/${id}`)
+        return response.content
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -247,7 +257,9 @@ const useAuthenticatedApi = () => {
         getComments,
         editComment,
         deleteComment,
-        searchInstruments
+        searchInstruments,
+        getInstrument,
+        getOwningUsers
     }
 }
 
