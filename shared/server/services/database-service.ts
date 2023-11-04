@@ -34,7 +34,7 @@ import { DisqualificationResponseFromDb } from 'shared-models/dto/feed/idisquali
 import IFeedParams from 'shared-models/database/ifeed-params'
 import Redis from '../config/redis'
 import ICommentResponse, { CommentFromDbResult } from 'shared-models/dto/feed/icomment-response'
-import IInstrument from 'client/src/models/iintrument'
+import IInstrument from 'shared-models/iinstrument'
 import { InstrumentFromDbResult } from 'shared-models/iinstrument'
 
 const instrumentIdFromTicker = (ticker: string) => Sequalize.literal(

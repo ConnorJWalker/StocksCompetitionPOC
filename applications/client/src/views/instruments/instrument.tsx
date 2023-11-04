@@ -16,8 +16,8 @@ const Instrument = () => {
     }, [])
 
     return (
-        <div className='instrument-container'>
-            <div style={{ backgroundColor: 'red', height: '20vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+        <div className='home-container'>
+            <div className='chart' style={{ backgroundColor: 'red', display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
                 Chart
             </div>
             <InstrumentInformation instrument={instrument} />

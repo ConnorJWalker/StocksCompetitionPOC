@@ -94,6 +94,10 @@ const GetExchangeList = async (apiKey: string): Promise<IT212Exchange[]> => {
     throw new Trading212Error(`Could not fetch exchange list: ${result.statusCode}`, getFailureCode(result.statusCode))
 }
 
+const GetChart = async (ticker: string, duration: string): Promise<number[]> => {
+    return []
+}
+
 const send = async <T>(endpoint: string, apiKey: string, method: string = 'get'): Promise<IHttpResult<T | null>> => {
     const response = await fetch(`${process.env.T212_URL}${endpoint}`, {
         method,
@@ -114,5 +118,6 @@ export default {
     GetOpenPositions,
     GetCash,
     GetAllStocks,
-    GetExchangeList
+    GetExchangeList,
+    GetChart
 }

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import DatabaseService from 'shared-server/services/database-service'
-import IInstrument from 'client/src/models/iintrument'
+import InstrumentService from '../services/instrument-service'
 
 const GetInstrument = async (req: Request, res: Response) => {
     const id = parseInt(req.params.instrumentId)
@@ -16,21 +16,20 @@ const SearchInstruments = async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'Search term is required' })
     }
 
-    const searchTerm = req.params.searchTerm
-    const page = req.query.page === undefined ? 0 : parseInt(req.query.page as string)
-    let results: IInstrument[] = []
-
-    // Make sure that exact matches are displayed as the first results
-    if (page === 0) {
-        results = await DatabaseService.SearchInstrumentsExact(searchTerm)
-    }
-
-    results = [...results, ...await DatabaseService.SearchInstrumentsExcludeExact(searchTerm, results.length, page)]
+    const results = await InstrumentService.SearchInstruments(req.params.searchTerm, parseInt((req.query.page || '0') as string))
     return res.status(200).json({ results: results })
 }
 
 const GetInstrumentChart = async (req: Request, res: Response) => {
+    const validDurations = ['day', 'week', 'month', 'year', 'max']
+    if (!req.query.duration || !validDurations.includes(req.query.duration as string)) {
+        return res.status(400).json({ error: 'Invalid duration' })
+    }
 
+    const chart = await InstrumentService.GetInstrumentChart(parseInt(req.params.instrumentId))
+    return chart === null
+        ? res.status(404).json({})
+        : res.status(200).json(chart)
 }
 
 const GetCompanyData = async (req: Request, res: Response) => {

@@ -6,6 +6,7 @@ export default interface IInstrument {
     currencyCode: string
     name: string
     ticker: string
+    t212Ticker: string
     icon: string
 }
 
@@ -16,6 +17,7 @@ export const InstrumentFromDbResult = (value: Model): IInstrument => {
         currencyCode: value.dataValues.currencyCode,
         name: value.dataValues.name,
         ticker: value.dataValues.ticker,
+        t212Ticker: value.dataValues.t212Ticker,
         icon: process.env.T212_ICON_URL + value.dataValues.t212Ticker + '.png'
     }
 }
