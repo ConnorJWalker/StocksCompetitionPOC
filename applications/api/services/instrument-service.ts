@@ -17,18 +17,18 @@ const SearchInstruments = async (searchTerm: string, page: number): Promise<IIns
     ]
 }
 
-const GetInstrumentChart = async (id: number): Promise<number[] | null> => {
+const GetInstrumentChart = async (id: number, duration: string): Promise<number[] | null> => {
     const instrument = await DatabaseService.FindInstrumentById(id)
     if (instrument === null) return null
 
     if (instrument.t212Ticker.includes('_US_EQ')) {
-        const chartData = await PolygonService.GetChart(instrument.ticker, 'day')
+        const chartData = await PolygonService.GetChart(instrument.ticker, duration)
         if (chartData.length > 0) {
             return chartData
         }
     }
 
-    return await Trading212Service.GetChart(instrument.t212Ticker, 'day')
+    return await Trading212Service.GetChart(instrument.t212Ticker, duration)
 }
 
 export default {

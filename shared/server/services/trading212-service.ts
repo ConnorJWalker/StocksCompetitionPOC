@@ -14,6 +14,29 @@ const failureCodes: { [key: number]: FailureReason } = {
     429: FailureReason.RateLimitExceeded
 }
 
+const durations: { [key: string]: { size: number, period: string }} = {
+    day: {
+        size: 288,
+        period: 'FIVE_MINUTES'
+    },
+    week: {
+        size: 336,
+        period: 'THIRTY_MINUTES'
+    },
+    month: {
+        size: 187,
+        period: 'FOUR_HOURS'
+    },
+    year: {
+        size: 365,
+        period: 'ONE_DAY'
+    },
+    max: {
+        size: 500,
+        period: 'ONE_WEEK'
+    }
+}
+
 const getFailureCode = (code: number): FailureReason =>  failureCodes[code] === undefined ? FailureReason.Other : failureCodes[code]
 
 export class Trading212Error extends Error {
@@ -95,6 +118,35 @@ const GetExchangeList = async (apiKey: string): Promise<IT212Exchange[]> => {
 }
 
 const GetChart = async (ticker: string, duration: string): Promise<number[]> => {
+    const { size, period } = durations[duration]
+
+    try {
+        const response = await fetch(process.env.T212_ALT_URL + 'charting/v3/candles/close', {
+            method: 'put',
+            body: JSON.stringify({
+                candles: [{
+                    period,
+                    size,
+                    ticker,
+                    useAskPrice: true
+                }]
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        if (response.ok) {
+            const body = await response.json()
+            return body[0].response['candles'].map((candle: number[]) => candle[1])
+        }
+
+        console.error(await response.text())
+    }
+    catch (e) {
+        console.error(e)
+    }
+
     return []
 }
 
