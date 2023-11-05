@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import UserChart from '../../components/feed/user-chart'
+import UserChart from '../../components/feed/charts/user-chart'
 import { useParams } from 'react-router-dom'
 import UserInfo from './user-info'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'

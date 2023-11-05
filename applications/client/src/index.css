@@ -218,6 +218,7 @@ path {
     text-align: center;
     margin-right: 5px;
     user-select: none;
+    text-transform: capitalize;
 }
 
 .chart-options-container {
@@ -511,7 +512,7 @@ path {
         margin-top: unset;
     }
 
-    .leaderboards-container {
+    .leaderboards-container, .instrument-information-container {
         margin-top: 0;
         grid-column: 2;
         grid-row: 2/4;
@@ -538,11 +539,11 @@ path {
 }
 
 @media screen and (min-width: 1500px) {
-    .leaderboards-container {
+    .leaderboards-container, .instrument-information-container {
         grid-row: 1/4;
     }
 
-    .chart, .chart-duration-container, .feed-container {
+    .chart, .chart-options-container, .feed-container {
         grid-column: 1;
     }
 }

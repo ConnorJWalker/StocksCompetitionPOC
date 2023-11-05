@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Line } from 'react-chartjs-2'
 import { ChartData } from 'chart.js'
 import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
+import DurationSelector from './duration-selector'
 
 interface props {
     id: number
@@ -64,12 +65,19 @@ const InstrumentChart = ({ id }: props) => {
     useEffect(() => {
         getInstrumentChart(id, duration)
             .then(response => setMappedData(mapResponse(response)))
-    }, [])
+    }, [duration])
 
     return (
-        <div className='chart'>
-            <Line data={mappedData} options={options} />
-        </div>
+        <>
+            <div className='chart'>
+                <Line data={mappedData} options={options} />
+            </div>
+            <div className='chart-options-container'>
+                <DurationSelector
+                    durations={durations}
+                    onChange={selectedDuration => setDuration(selectedDuration)} />
+            </div>
+        </>
     )
 }
 

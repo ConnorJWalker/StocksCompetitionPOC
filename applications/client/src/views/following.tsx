@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import IFeedResponse from '../models/dto/feed/ifeed-response'
 import useAuthenticatedApi from '../hooks/useAuthenticatedApi'
-import UserChart from '../components/feed/user-chart'
+import UserChart from '../components/feed/charts/user-chart'
 import Leaderboards from '../components/feed/leaderboards'
 import Feed from '../components/feed/feed'
 

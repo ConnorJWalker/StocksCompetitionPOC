@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Line } from 'react-chartjs-2'
 import { ChartData, Point } from 'chart.js'
-import { IAccountValuesResponse } from '../../models/dto/feed/iaccount-value-response'
-import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
-import { useSocket } from '../../hooks/socket-context'
-import IAccountValueUpdate from '../../models/dto/iaccount-value-update'
+import { IAccountValuesResponse } from '../../../models/dto/feed/iaccount-value-response'
+import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
+import { useSocket } from '../../../hooks/socket-context'
+import IAccountValueUpdate from '../../../models/dto/iaccount-value-update'
 import { ChartJSOrUndefined } from 'react-chartjs-2/dist/types'
-import ExpandIcon from '../icons/expand-icon'
+import ExpandIcon from '../../icons/expand-icon'
+import DurationSelector from './duration-selector'
 
 interface props {
     controller?: string,
@@ -62,8 +63,8 @@ const durations = ['day', 'week', 'max']
 const UserChart = ({ discordUsername, followingOnly }: props) => {
     const currentHour = useRef(new Date(Date.now()).getHours())
 
-    const [duration, setDuration] = useState(0)
-    const durationRef = useRef(0)
+    const [duration, setDuration] = useState(durations[0])
+    const durationRef = useRef(durations[0])
     const [mappedData, setMappedData] = useState<ChartData<'line'>>({ datasets: [], labels: [] })
     const mappedDataRef = useRef<ChartData<'line'>>({ datasets: [], labels: [] })
 
@@ -98,7 +99,7 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
         const newCurrentHour = new Date(Date.now()).getHours()
         const handledUsers = new Set<string>()
         const newValues = mappedDataRef.current
-        const appendNewValues = updatedValues.savedToDatabase && (durationRef.current === 0 || currentHour.current < newCurrentHour)
+        const appendNewValues = updatedValues.savedToDatabase && (durationRef.current === durations[0] || currentHour.current < newCurrentHour)
 
         updatedValues.values.forEach(value => {
             const datasetIndex = mappedDataRef.current.datasets.findIndex(dataset => {
@@ -158,7 +159,7 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
     }, [])
 
     useEffect(() => {
-        getChart(durations[duration], { discordUsername, followingOnly })
+        getChart(duration, { discordUsername, followingOnly })
             .then(response => setMappedData(mapResponse(response)))
     }, [duration, discordUsername])
 
@@ -168,27 +169,9 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
                 <Line data={mappedData} options={options} ref={(reference) => chartReference.current = reference} />
             </div>
             <div className='chart-options-container'>
-                <span className='chart-duration-container'>
-                    <span
-                        className={duration === 0 ? 'selected' : ''}
-                        onClick={() => setDuration(0)}
-                    >
-                        Day
-                    </span>
-                    <span
-                        className={duration === 1 ? 'selected' : ''}
-                        onClick={() => setDuration(1)}
-                    >
-                        Week
-                    </span>
-                    <span
-                        className={duration === 2 ? 'selected' : ''}
-                        onClick={() => setDuration(2)}
-                    >
-                        Max
-                    </span>
-                </span>
-
+                <DurationSelector
+                    durations={durations}
+                    onChange={selectedDuration => setDuration(selectedDuration)} />
                 <span className='expand' onClick={onFullscreenClick}>
                     <ExpandIcon />
                 </span>
