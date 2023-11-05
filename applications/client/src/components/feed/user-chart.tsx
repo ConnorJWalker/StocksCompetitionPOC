@@ -1,15 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Line } from 'react-chartjs-2'
-import {
-    Chart as ChartJs,
-    ChartData,
-    Legend,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Tooltip, Point
-} from 'chart.js'
+import { ChartData, Point } from 'chart.js'
 import { IAccountValuesResponse } from '../../models/dto/feed/iaccount-value-response'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 import { useSocket } from '../../hooks/socket-context'
@@ -22,8 +13,6 @@ interface props {
     discordUsername?: string
     followingOnly?: boolean
 }
-
-ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 const options = {
     responsive: true,

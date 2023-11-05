@@ -13,6 +13,9 @@ import Instrument from './views/instruments/instrument'
 import Settings from './views/settings'
 import AdminSettings from './views/admin-settings'
 import Error from './views/Error'
+import { CategoryScale, Chart as ChartJs, Legend, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js'
+
+ChartJs.register(Legend, CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 const App = () => {
     const socket = useRef(io(process.env.REACT_APP_SOCKET_URL!, { secure: true }))

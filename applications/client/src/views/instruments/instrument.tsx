@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import IInstrument from '../../models/iintrument'
 import useAuthenticatedApi from '../../hooks/useAuthenticatedApi'
 import InstrumentInformation from './components/instrument-information'
+import InstrumentChart from './components/instrument-chart'
 
 const Instrument = () => {
     const [instrument, setInstrument] = useState<IInstrument>()
@@ -17,9 +18,7 @@ const Instrument = () => {
 
     return (
         <div className='home-container'>
-            <div className='chart' style={{ backgroundColor: 'red', display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-                Chart
-            </div>
+            { instrument !== undefined && <InstrumentChart id={instrument.id} /> }
             <InstrumentInformation instrument={instrument} />
         </div>
     )

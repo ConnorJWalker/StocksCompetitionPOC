@@ -240,6 +240,11 @@ const useAuthenticatedApi = () => {
         return response.content
     }
 
+    const getInstrumentChart = async (id: number, duration: string = 'day'): Promise<number[]> => {
+        const response = await send<number[]>(`instrument/chart/${id}?duration=${duration}`)
+        return response.content
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -259,7 +264,8 @@ const useAuthenticatedApi = () => {
         deleteComment,
         searchInstruments,
         getInstrument,
-        getOwningUsers
+        getOwningUsers,
+        getInstrumentChart
     }
 }
 
