@@ -29,19 +29,21 @@ const InstrumentInformation = ({ instrument }: props) => {
 
             <h2>Owned by</h2>
             {
-                owningUsers.map(user => (
-                    <Link to={`/profile/${user.discordUsername}`}>
-                        <div className='owning-user' key={user.id}>
-                            <img
-                                src={process.env.REACT_APP_SERVER_URL + user.profilePicture}
-                                alt={`${user.displayName}'s profile picture`} />
-                            <span>
-                                <h3>{ user.displayName }</h3>
-                                <p>{ user.discordUsername }</p>
-                            </span>
-                        </div>
-                    </Link>
-                ))
+                owningUsers.length === 0
+                    ? <p>Nobody currently owns this instrument</p>
+                    : owningUsers.map(user => (
+                        <Link to={`/profile/${user.discordUsername}`}>
+                            <div className='owning-user' key={user.id}>
+                                <img
+                                    src={process.env.REACT_APP_SERVER_URL + user.profilePicture}
+                                    alt={`${user.displayName}'s profile picture`} />
+                                <span>
+                                    <h3>{ user.displayName }</h3>
+                                    <p>{ user.discordUsername }</p>
+                                </span>
+                            </div>
+                        </Link>
+                    ))
             }
         </section>
     )
