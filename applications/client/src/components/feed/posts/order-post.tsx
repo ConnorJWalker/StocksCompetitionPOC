@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import PostHeader from './post-header'
 import IOrder from '../../../models/dto/feed/iorder'
 import formatPrice from '../../../utils/format-price'
@@ -22,8 +23,8 @@ const OrderPost = ({ user, id, order }: props) => {
         <div className='post'>
             <PostHeader user={user} date={order.date} />
             <div>
-                { order.type === 'buy' ? 'Bought' : 'Sold' } { order.quantity } shares of { order.instrument.name }
-                &nbsp;({ order.instrument.ticker }) for { getPrice(order.price, order.instrument.currencyCode) }
+                { order.type === 'buy' ? 'Bought' : 'Sold' } { order.quantity } shares of <Link to={`/instrument/${order.instrument.id}`}>
+                { order.instrument.name } ({ order.instrument.ticker })</Link> for { getPrice(order.price, order.instrument.currencyCode) }
             </div>
             <PostFooter
                 id={id}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import formatPrice from '../../utils/format-price'
 import { useUserContext } from '../../hooks/user-context'
 import IProfileData from '../../models/pages/iprofile-data'
@@ -91,10 +92,12 @@ const UserInfo = ({ discordUsername }: props) => {
                 {
                     userInfo?.openPositions.map((position, index) => (
                         <div key={index} className='open-position-container'>
-                            <header>
-                                <InstrumentIcon url={position.instrument.icon} ticker={position.instrument.ticker} />
-                                <p>{ position.instrument.name }</p>
-                            </header>
+                            <Link to={`/instrument/${position.instrument.id}`}>
+                                <header>
+                                    <InstrumentIcon url={position.instrument.icon} ticker={position.instrument.ticker} />
+                                    <p>{ position.instrument.name }</p>
+                                </header>
+                            </Link>
                             <div className='about-open-position'>
                                 <p>Quantity - { position.quantity }</p>
                                 <p>Average Price - { formatPrice(position.averagePrice, position.instrument.currencyCode) }</p>

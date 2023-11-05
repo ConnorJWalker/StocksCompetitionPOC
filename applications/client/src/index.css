@@ -316,6 +316,10 @@ path {
     padding: 10px;
 }
 
+.post > div a {
+    text-decoration: underline;
+}
+
 .post-actions {
     display: flex;
 }
