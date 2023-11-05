@@ -67,6 +67,16 @@ const InstrumentChart = ({ id }: props) => {
             .then(response => setMappedData(mapResponse(response)))
     }, [duration])
 
+    useEffect(() => {
+        if (duration === durations[0]) {
+            getInstrumentChart(id, duration)
+                .then(response => setMappedData(mapResponse(response)))
+        }
+        else {
+            setDuration(durations[0])
+        }
+    }, [id])
+
     return (
         <>
             <div className='chart'>
@@ -75,6 +85,7 @@ const InstrumentChart = ({ id }: props) => {
             <div className='chart-options-container'>
                 <DurationSelector
                     durations={durations}
+                    currentDuration={duration}
                     onChange={selectedDuration => setDuration(selectedDuration)} />
             </div>
         </>

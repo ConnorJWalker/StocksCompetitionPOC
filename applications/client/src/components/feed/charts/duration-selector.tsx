@@ -1,16 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 interface props {
     durations: string[]
+    currentDuration: string
     onChange: (duration: string) => void
 }
 
-const DurationSelector = ({ durations, onChange }: props) => {
-    const [currentDuration, setCurrentDuration] = useState(durations[0])
-
+const DurationSelector = ({ durations, currentDuration, onChange }: props) => {
     const onClick = (duration: string) => {
         if (duration !== currentDuration) {
-            setCurrentDuration(duration)
             onChange(duration)
         }
     }

@@ -171,6 +171,7 @@ const UserChart = ({ discordUsername, followingOnly }: props) => {
             <div className='chart-options-container'>
                 <DurationSelector
                     durations={durations}
+                    currentDuration={duration}
                     onChange={selectedDuration => setDuration(selectedDuration)} />
                 <span className='expand' onClick={onFullscreenClick}>
                     <ExpandIcon />

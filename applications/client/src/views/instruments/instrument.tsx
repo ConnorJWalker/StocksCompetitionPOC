@@ -12,9 +12,11 @@ const Instrument = () => {
     const { getInstrument } = useAuthenticatedApi()
 
     useEffect(() => {
-        getInstrument(parseInt(id!))
-            .then(response => setInstrument(response))
-    }, [])
+        if (id) {
+            getInstrument(parseInt(id))
+                .then(response => setInstrument(response))
+        }
+    }, [id])
 
     return (
         <div className='home-container'>
