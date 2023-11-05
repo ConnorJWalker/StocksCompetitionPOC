@@ -1,4 +1,6 @@
-const url = 'https://api.polygon.io/v2/'
+import ICompanyData from '../models/dto/company-data'
+
+const url = 'https://api.polygon.io/'
 const key = process.env.POLYGON_KEY!
 
 const timespanMultipliers: { [key: string]:  { multiplier: number, timespan: string }} = {
@@ -49,7 +51,7 @@ const GetChart = async (ticker: string, duration: string): Promise<number[]> => 
     const [start, end] = getChartStartAndEnd(duration)
     const { multiplier, timespan } = timespanMultipliers[duration]
 
-    const endpoint = url + `aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${start}/${end}?`
+    const endpoint = url + `v2/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${start}/${end}?`
 
     try {
         const response = await fetch(endpoint + new URLSearchParams({
@@ -72,6 +74,27 @@ const GetChart = async (ticker: string, duration: string): Promise<number[]> => 
     return []
 }
 
+const GetCompanyData = async (ticker: string): Promise<ICompanyData | null> => {
+    const endpoint = url + `v3/reference/tickers/${ticker}?apiKey=${key}`
+
+    try {
+        const response = await fetch(endpoint)
+
+        if (response.ok) {
+            const body = await response.json()
+            return { description: body.results.description }
+        }
+
+        console.error((await response.json()).error)
+    }
+    catch (e) {
+        console.error(e)
+    }
+
+    return null
+}
+
 export default {
-    GetChart
+    GetChart,
+    GetCompanyData
 }

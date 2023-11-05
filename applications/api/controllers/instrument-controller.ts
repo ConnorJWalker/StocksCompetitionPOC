@@ -34,7 +34,10 @@ const GetInstrumentChart = async (req: Request, res: Response) => {
 }
 
 const GetCompanyData = async (req: Request, res: Response) => {
-
+    const companyData = await InstrumentService.GetInstrumentData(parseInt(req.params.instrumentId))
+    return companyData === null
+        ? res.status(404).json({})
+        : res.status(200).json(companyData)
 }
 
 const GetOwningUsers = async (req: Request, res: Response) => {

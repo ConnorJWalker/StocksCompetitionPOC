@@ -649,9 +649,10 @@ path {
     height: 100px;
 }
 
-.instrument-information-container object {
+.instrument-information-container object, .instrument-icon-fallback {
     width: 100%;
     aspect-ratio: 1;
+    font-size: 1.5em;
 }
 
 .owning-user {

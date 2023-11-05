@@ -7,6 +7,7 @@ import IT212Instrument from 'shared-models/trading212/instrument'
 import Redis from '../config/redis'
 import { IUserWithSecrets } from 'shared-models/iuser'
 import IT212Exchange from 'shared-models/trading212/exchange'
+import ICompanyData from 'api/models/dto/company-data'
 
 const failureCodes: { [key: number]: FailureReason } = {
     401: FailureReason.Unauthorised,
@@ -150,6 +151,27 @@ const GetChart = async (ticker: string, duration: string): Promise<number[]> => 
     return []
 }
 
+const GetCompanyData = async (ticker: string): Promise<ICompanyData | null> => {
+    const endpoint = process.env.T212_ALT_URL + 'rest/companies/v2/fundamentals?'
+
+    try {
+        const response = await fetch(endpoint + new URLSearchParams({
+            languageCode: 'en',
+            ticker
+        }))
+
+        if (response.ok) {
+            const body = await response.json()
+            return { description: body.generalInformation.businessDescription }
+        }
+    }
+    catch (e) {
+        console.error(e)
+    }
+
+    return null
+}
+
 const send = async <T>(endpoint: string, apiKey: string, method: string = 'get'): Promise<IHttpResult<T | null>> => {
     const response = await fetch(`${process.env.T212_URL}${endpoint}`, {
         method,
@@ -171,5 +193,6 @@ export default {
     GetCash,
     GetAllStocks,
     GetExchangeList,
-    GetChart
+    GetChart,
+    GetCompanyData
 }
