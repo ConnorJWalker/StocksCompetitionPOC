@@ -671,6 +671,21 @@ path {
     margin-right: 10px;
 }
 
+.company-description {
+    margin: 5px 0;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.company-description-toggle {
+    text-align: center;
+    cursor: pointer;
+}
+
+.company-description-toggle span {
+    display: block;
+}
+
 /* Errors Page Style */
 .error-container {
     display: flex;

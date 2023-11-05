@@ -13,6 +13,7 @@ import IUser from '../models/iuser'
 import useApi from './useApi'
 import IComment from '../models/dto/feed/icomment'
 import IInstrument from '../models/iintrument'
+import ICompanyData from '../models/dto/icompany-data'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
@@ -245,6 +246,11 @@ const useAuthenticatedApi = () => {
         return response.content
     }
 
+    const getCompanyData = async (id: number): Promise<ICompanyData> => {
+        const response = await send<ICompanyData>(`instrument/data/${id}`)
+        return response.content
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -265,7 +271,8 @@ const useAuthenticatedApi = () => {
         searchInstruments,
         getInstrument,
         getOwningUsers,
-        getInstrumentChart
+        getInstrumentChart,
+        getCompanyData
     }
 }
 

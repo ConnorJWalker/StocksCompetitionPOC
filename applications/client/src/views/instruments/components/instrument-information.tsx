@@ -4,13 +4,16 @@ import InstrumentIcon from '../../../components/instrument-icon'
 import IInstrument from '../../../models/iintrument'
 import IUser from '../../../models/iuser'
 import useAuthenticatedApi from '../../../hooks/useAuthenticatedApi'
+import ICompanyData from '../../../models/dto/icompany-data'
 
 interface props {
     instrument?: IInstrument
+    companyData?: ICompanyData
 }
 
-const InstrumentInformation = ({ instrument }: props) => {
+const InstrumentInformation = ({ instrument, companyData }: props) => {
     const [owningUsers, setOwningUsers] = useState<IUser[]>([])
+    const [expandDescription, setExpandDescription] = useState(false)
 
     const { getOwningUsers } = useAuthenticatedApi()
 
@@ -25,7 +28,16 @@ const InstrumentInformation = ({ instrument }: props) => {
         <section className='instrument-information-container'>
             <InstrumentIcon url={instrument?.icon || ''} ticker={instrument?.ticker || ''} />
             <h2>{ instrument?.name }</h2>
-            <p>{ instrument?.ticker }</p>
+            <h3>{ instrument?.ticker }</h3>
+
+            <p className='company-description' style={{ maxHeight: expandDescription ? '' : '90px' }}>
+                { companyData?.description }
+            </p>
+            { companyData !== undefined &&
+                <div className='company-description-toggle' onClick={() => setExpandDescription(!expandDescription)}>
+                    <span style={{ transform: expandDescription ? 'none' : 'rotate(180deg)' }}>^</span>
+                </div>
+            }
 
             <h2>Owned by</h2>
             {
