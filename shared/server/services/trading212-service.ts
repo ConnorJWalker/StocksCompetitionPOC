@@ -7,6 +7,7 @@ import IT212Instrument from 'shared-models/trading212/instrument'
 import Redis from '../config/redis'
 import { IUserWithSecrets } from 'shared-models/iuser'
 import IT212Exchange from 'shared-models/trading212/exchange'
+import IT212Fundamentals from 'shared-models/trading212/fundamentals'
 import ICompanyData from 'api/models/dto/company-data'
 
 const failureCodes: { [key: number]: FailureReason } = {
@@ -36,6 +37,10 @@ const durations: { [key: string]: { size: number, period: string }} = {
         size: 500,
         period: 'ONE_WEEK'
     }
+}
+
+const valueOrUndefined = (value: number): number | undefined => {
+    return value < -90000 ? undefined : value
 }
 
 const getFailureCode = (code: number): FailureReason =>  failureCodes[code] === undefined ? FailureReason.Other : failureCodes[code]
@@ -161,8 +166,18 @@ const GetCompanyData = async (ticker: string): Promise<ICompanyData | null> => {
         }))
 
         if (response.ok) {
-            const body = await response.json()
-            return { description: body.generalInformation.businessDescription }
+            const body = await response.json() as IT212Fundamentals
+            return {
+                description: body.generalInformation.businessDescription,
+                keyFinancials: {
+                    marketCap: valueOrUndefined(body.keyRatios.marketCap),
+                    peRatio: valueOrUndefined(body.keyRatios.peRatio),
+                    revenue: valueOrUndefined(body.keyRatios.revenue),
+                    eps: valueOrUndefined(body.keyRatios.eps),
+                    dividend: valueOrUndefined(body.keyRatios.dividendYield),
+                    beta: valueOrUndefined(body.keyRatios.beta)
+                }
+            }
         }
     }
     catch (e) {

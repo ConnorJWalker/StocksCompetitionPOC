@@ -36,12 +36,12 @@ const GetInstrumentData = async (id: number): Promise<ICompanyData | null> => {
     const instrument = await DatabaseService.FindInstrumentById(id)
     if (instrument === null) return null
 
-    if (instrument.t212Ticker.includes('_US_EQ')) {
-        const companyData = await PolygonService.GetCompanyData(instrument.ticker)
-        if (companyData !== null) {
-            return companyData
-        }
-    }
+    // if (instrument.t212Ticker.includes('_US_EQ')) {
+    //     const companyData = await PolygonService.GetCompanyData(instrument.ticker)
+    //     if (companyData !== null) {
+    //         return companyData
+    //     }
+    // }
 
     return await Trading212Service.GetCompanyData(instrument.t212Ticker)
 }

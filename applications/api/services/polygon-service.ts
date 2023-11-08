@@ -82,7 +82,7 @@ const GetCompanyData = async (ticker: string): Promise<ICompanyData | null> => {
 
         if (response.ok) {
             const body = await response.json()
-            return { description: body.results.description }
+            return { description: body.results.description, keyFinancials: {} }
         }
 
         console.error((await response.json()).error)
