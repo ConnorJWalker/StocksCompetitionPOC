@@ -5,6 +5,7 @@ import IOpenPositionsUpdates from 'shared-models/database/iopen-positions-update
 import { IDbOrderHistory } from 'shared-models/database/iorder-history'
 import Trading212Service from 'shared-server/services/trading212-service'
 import DatabaseService from 'shared-server/services/database-service'
+import DiscordService from 'shared-server/services/discord-service'
 
 type TickerDict = { [key: string]: number }
 
@@ -54,26 +55,39 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
         this.newOrderHistories = []
         this.currentOrderPrices = {}
 
-        const trading212OpenPositions = await this.getTrading212Values(user => Trading212Service.GetOpenPositions(user))
-        const databaseOpenPositions = await DatabaseService.GetOpenPositions(this.users.map(user => user.id))
+        // TODO: remove when resolved
+        let trading212OpenPositions: IOpenPositions[], databaseOpenPositions: IOpenPositions[]
+        try {
+            trading212OpenPositions = await this.getTrading212Values(user => Trading212Service.GetOpenPositions(user))
+            databaseOpenPositions = await DatabaseService.GetOpenPositions(this.users.map(user => user.id))
 
-        for (const user of this.users) {
-            const userDatabaseOpenPositions = databaseOpenPositions.find(position => position.user.id === user.id)
-            const userTrading212OpenPositions = trading212OpenPositions.find(position => position.user.id === user.id)
+            for (const user of this.users) {
+                const userDatabaseOpenPositions = databaseOpenPositions.find(position => position.user.id === user.id)
+                const userTrading212OpenPositions = trading212OpenPositions.find(position => position.user.id === user.id)
 
-            this.openPositionsUpdates[user.id] = { new: [], updated: [], removed: [] }
+                this.openPositionsUpdates[user.id] = { new: [], updated: [], removed: [] }
 
-            const handledTickers = await this.handleUpdatedValues(userDatabaseOpenPositions, userTrading212OpenPositions)
+                const handledTickers = await this.handleUpdatedValues(userDatabaseOpenPositions, userTrading212OpenPositions)
 
-            if (userTrading212OpenPositions !== undefined) {
-                await this.handleNewValues(handledTickers, userTrading212OpenPositions)
+                if (userTrading212OpenPositions !== undefined) {
+                    await this.handleNewValues(handledTickers, userTrading212OpenPositions)
+                }
             }
+
+            await DatabaseService.AddOrders(this.newOrderHistories)
+            await DatabaseService.UpdateOpenPositions(this.openPositionsUpdates)
+
+            this.previousOrderPrices = this.currentOrderPrices
         }
+        catch (e) {
+            console.dir('trading212 open positions ', trading212OpenPositions)
+            console.dir('database open positions ', databaseOpenPositions)
+            console.dir('users ', this.users)
 
-        await DatabaseService.AddOrders(this.newOrderHistories)
-        await DatabaseService.UpdateOpenPositions(this.openPositionsUpdates)
+            await DiscordService.SendDisqualificationMessage(['if you are not connor ignore this pls'])
 
-        this.previousOrderPrices = this.currentOrderPrices
+            throw e
+        }
     }
 
     /**
