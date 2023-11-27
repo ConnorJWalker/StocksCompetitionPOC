@@ -494,6 +494,11 @@ const GetDisqualifiedUsers = async (userIds: number[], userId: number) => {
     return disqualifications.map(disqualification => DisqualificationResponseFromDb(disqualification))
 }
 
+const GetDisqualificationStrikes = async (userId: number): Promise<number | null> => {
+    const disqualification = await Disqualification.findOne({ where: { UserId: userId }})
+    return disqualification?.dataValues.strikes ?? null
+}
+
 const GetFeedIdUnion = async (limit: number, offset: number, params?: IFeedParams): Promise<IFeedUnion[]> => {
     let condition: boolean | string = true
     let sql = RawSql.FeedUnion
@@ -709,6 +714,7 @@ export default {
     IncrementDisqualificationStrikes,
     DisqualifyUsers,
     GetDisqualifiedUsers,
+    GetDisqualificationStrikes,
     GetFeedIdUnion,
     ToggleUserFollow,
     IsUserFollowing,

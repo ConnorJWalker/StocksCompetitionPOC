@@ -21,4 +21,6 @@ router.patch('/displayName/:discordUsername', AdminOnly, GetProfileUser, UserCon
 
 router.patch('/profilePicture', UserController.UpdateDiscordProfilePicture)
 
+router.get('/strikes', UserController.GetDisqualificationStrikes)
+
 export default router

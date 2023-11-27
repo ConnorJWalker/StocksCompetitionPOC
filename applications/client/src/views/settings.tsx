@@ -6,6 +6,7 @@ import useLogout from '../hooks/use-logout'
 import ValidationErrors from './authentication/forms/validation-errors'
 import HttpError from '../models/http-error'
 import SignUpValidator from '../utils/sign-up-validator'
+import IDisqualificationStrikes from '../models/dto/profile/idsiqualification-strikes'
 
 const Settings = () => {
     const validator = new SignUpValidator()
@@ -23,12 +24,15 @@ const Settings = () => {
     const [profilePictureErrors, setProfilePictureErrors] = useState<string[]>([])
     const [profilePictureSuccess, setProfilePictureSuccess] = useState(false)
 
+    const [disqualificationStrikes, setDisqualificationStrikes] = useState<IDisqualificationStrikes>()
+
     const logout = useLogout()
-    const { sendFollowRequest, getFollowing, getApiKeyIsValid, setApiKey, setDisplayName, setProfilePicture } = useAuthenticatedApi()
+    const { sendFollowRequest, getFollowing, getApiKeyIsValid, setApiKey, setDisplayName, setProfilePicture, getDisqualificationStrikes } = useAuthenticatedApi()
 
     useEffect(() => {
         getFollowing().then(response => setFollowing(response))
         getApiKeyIsValid().then(response => setApiKeyIsValid(response))
+        getDisqualificationStrikes().then(response => setDisqualificationStrikes(response))
     }, [])
 
     const onUnfollowClick = async (discordUsername: string) => {
@@ -168,6 +172,17 @@ const Settings = () => {
                         </div>
                     ))
                 }
+            </section>
+            <section className='disqualifications'>
+                <h2>Disqualification Strikes</h2>
+                <p>Current Strikes: { disqualificationStrikes?.strikes }</p>
+                <p>Max strikes before disqualification: { disqualificationStrikes?.maxStrikes }</p>
+                <p>Max cash percentage: { disqualificationStrikes?.maxCash }%</p>
+
+                <p style={{ marginTop: '25px' }}>
+                    Every 5 minutes a disqualification strike is added if your account values cash percentage is above the max allowed cash percentage. After max strikes are reached you will be disqualified.
+                    This strikes are only counted during market opening hours, excluding pre and post market
+                </p>
             </section>
             <section>
                 <h2>Authentication</h2>

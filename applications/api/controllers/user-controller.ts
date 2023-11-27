@@ -88,6 +88,19 @@ const UpdateDiscordProfilePicture = async (req: RequestWithTargetUser, res: Resp
     return res.status(200).json({ profilePicture: discordProfilePicture })
 }
 
+const GetDisqualificationStrikes = async (req: RequestWithTargetUser, res: Response) => {
+    const strikes = await DatabaseService.GetDisqualificationStrikes(req.authenticatedUser!.id)
+    if (strikes === null) {
+        return res.status(404).json({ error: 'User not found' })
+    }
+
+    return res.status(200).json({
+        strikes,
+        maxStrikes: process.env.MAX_DISQUALIFICATION_STRIKES,
+        maxCash: process.env.MAX_CASH_PERCENTAGE
+    })
+}
+
 export default {
     Follow,
     IsFollowing,
@@ -96,5 +109,6 @@ export default {
     UpdateApiKey,
     UpdateDisplayName,
     AdminUpdateDisplayName,
-    UpdateDiscordProfilePicture
+    UpdateDiscordProfilePicture,
+    GetDisqualificationStrikes
 }

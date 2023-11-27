@@ -12,6 +12,7 @@ import { useEffect } from 'react'
 import IUser from '../models/iuser'
 import useApi from './useApi'
 import IComment from '../models/dto/feed/icomment'
+import IDisqualificationStrikes from '../models/dto/profile/idsiqualification-strikes'
 
 let refreshPromise: Promise<IAuthenticationResponse | null> | null = null
 
@@ -207,6 +208,11 @@ const useAuthenticatedApi = () => {
         await send(`post/comment/${commentId}`, 'delete')
     }
 
+    const getDisqualificationStrikes = async (): Promise<IDisqualificationStrikes> => {
+        const response = await send<IDisqualificationStrikes>('user/strikes')
+        return response.content
+    }
+
     return {
         getUserInfo,
         getChart,
@@ -223,7 +229,8 @@ const useAuthenticatedApi = () => {
         sendComment,
         getComments,
         editComment,
-        deleteComment
+        deleteComment,
+        getDisqualificationStrikes
     }
 }
 
