@@ -35,5 +35,6 @@ app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
 
 https.createServer({
     key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
+    cert: fs.readFileSync('cert.pem'),
+    passphrase: process.env.PEM_PASSPHRASE!
 }, app).listen(443)
