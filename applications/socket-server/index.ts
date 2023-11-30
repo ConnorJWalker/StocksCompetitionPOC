@@ -1,7 +1,7 @@
 import { Server } from 'socket.io'
 import 'dotenv/config'
 import * as fs from 'fs'
-import * as https from 'https'
+import * as http from 'http'
 import { SubscriberClient } from 'shared-server/config/redis'
 import IAccountValueResponse from 'shared-models/dto/iaccount-value-response'
 import IAccountValue from 'shared-models/iaccount-value'
@@ -9,11 +9,7 @@ import IAccountValueUpdate from 'shared-models/redis/iaccount-value-update'
 
 let previousAccountValues: IAccountValueResponse[] = []
 
-const server = https.createServer({
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem'),
-    passphrase: process.env.PEM_PASSPHRASE!
-})
+const server = http.createServer({})
 
 const io = new Server(server, {
     cors: {
@@ -21,7 +17,7 @@ const io = new Server(server, {
     }
 })
 
-server.listen(443)
+server.listen(80)
 
 ;(async () => {
     await SubscriberClient.subscribe('account-values-update', (message: string) => {

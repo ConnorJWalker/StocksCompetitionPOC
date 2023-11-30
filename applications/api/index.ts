@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import * as https from 'https'
+import * as http from 'http'
 import * as fs from 'fs'
 import * as express from 'express'
 import { Application, Request, Response, NextFunction } from 'express'
@@ -33,8 +33,4 @@ app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
     return res.status(500).json({ error: 'Internal server error, try again later' })
 })
 
-https.createServer({
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem'),
-    passphrase: process.env.PEM_PASSPHRASE!
-}, app).listen(443)
+http.createServer({}, app).listen(80)

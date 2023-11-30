@@ -56,7 +56,7 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
         this.currentOrderPrices = {}
 
         // TODO: remove when resolved
-        let trading212OpenPositions: IOpenPositions[], databaseOpenPositions: IOpenPositions[]
+        let trading212OpenPositions: IOpenPositions[] = [], databaseOpenPositions: IOpenPositions[] = []
         try {
             trading212OpenPositions = await this.getTrading212Values(user => Trading212Service.GetOpenPositions(user))
             databaseOpenPositions = await DatabaseService.GetOpenPositions(this.users.map(user => user.id))
@@ -80,9 +80,9 @@ export default class OpenPositionsUpdater extends UpdaterBase<IOpenPositions> {
             this.previousOrderPrices = this.currentOrderPrices
         }
         catch (e) {
-            console.dir('trading212 open positions ', trading212OpenPositions)
-            console.dir('database open positions ', databaseOpenPositions)
-            console.dir('users ', this.users)
+            console.log('trading212 open positions ', trading212OpenPositions)
+            console.log('database open positions ', databaseOpenPositions)
+            console.log('users ', this.users)
 
             await DiscordService.SendDisqualificationMessage(['if you are not connor ignore this pls'])
 
