@@ -34,6 +34,10 @@ With the exception of the client, each application listed below can be run indep
 any of the applications to be running. While the client application will start without any of the other project running, the API
 application must be running for any of its features to work.
 
+<div style="text-align: center">
+    <img alt="Stocks competition system diagram" src="../StocksCompetitionPOC/.github/diagrams/stocks-competition-design.png"/>
+</div>
+
 ### API
 An Express REST API that is used to:
 
